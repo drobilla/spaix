@@ -83,10 +83,28 @@ def plot(sources, out_filename, x_col, x_label, y_col, y_label, y_max=None):
     sys.stderr.write("Wrote {}\n".format(out_filename))
 
 
-def run(script_opts, bench_opts, out_path):
+def bench_name(prog):
+    name = os.path.basename(prog)
+    if name.startswith("bench_"):
+        name = name[6:]
+    if name.endswith("_rtree"):
+        name = name[:-6]
+    return name
+
+    
+def tsv_path(prog, insert, split):
+    return os.path.join(options.dir,
+                        "{}_insert_{}_split_{}.tsv".format(
+                            bench_name(prog), insert, split))
+
+
+def run(script_opts, bench_opts, insert, split):
     "Run one benchmark and return the path to the output file"
-    with open(out_path, "w") as out:
-        subprocess.check_call([script_opts.program] + bench_opts, stdout=out)
+    for prog in script_opts.program:
+        out_path = tsv_path(prog, insert, split)
+        with open(out_path, "w") as out:
+            alg_opts = ["--insert", insert, "--split", split]
+            subprocess.check_call([prog] + bench_opts + alg_opts, stdout=out)
 
     sys.stderr.write("Wrote {}\n".format(out_path))
 
@@ -103,7 +121,8 @@ if __name__ == "__main__":
                    help="do not plot benchmarks")
     opt.add_option("--page-size", type="int", default=128,
                    help="page size for directory nodes")
-    opt.add_option("--program", type="string", default="build/bench_RTree",
+    opt.add_option("--program", type="string", default=["build/bench_spaix_rtree"],
+                   action="append",
                    help="path to benchmarking program",)
     opt.add_option("--queries", type="int", default=32,
                    help="number of queries per step")
@@ -121,6 +140,10 @@ if __name__ == "__main__":
         opt.print_usage()
         sys.exit(1)
 
+    if len(options.program) > 1:
+        options.program = options.program[1:] # Remove default
+
+    print(options.program)
     bench_opts = [
         "--page-size", str(options.page_size),
         "--queries", str(options.queries),
@@ -130,19 +153,13 @@ if __name__ == "__main__":
         "--steps", str(options.steps),
     ]
 
-    def tsv_path(insert, split):
-        return os.path.join(options.dir,
-                            "insert_{}_split_{}.tsv".format(insert, split))
-
     if not options.no_run:
         for insert in ("linear", "quadratic"):
             for split in ("linear", "quadratic"):
                 if insert == "quadratic" and split == "linear":
                     continue  # Works, but is really awful and makes no sense
 
-                run(options,
-                    bench_opts + ["--insert", insert, "--split", split],
-                    tsv_path(insert, split))
+                run(options, bench_opts, insert, split)
 
     def mathify(name):
         return "$m$" if name == "linear" else "$m^2$"
@@ -151,11 +168,15 @@ if __name__ == "__main__":
         sources = []
         for insert in ("linear", "quadratic"):
             for split in ("linear", "quadratic"):
-                path = tsv_path(insert, split)
-                if os.path.exists(path):
-                    label = "insert {}, split {}".format(mathify(insert),
-                                                         mathify(split))
-                    sources += [DataSource(path, label)]
+                for prog in options.program:
+                    path = tsv_path(prog, insert, split)
+                    print(path)
+                    if os.path.exists(path) and os.path.getsize(path) > 0:
+                        label = "{} insert {}, split {}".format(bench_name(prog),
+                                                                mathify(insert),
+                                                                mathify(split))
+                        print("%s : %s" % (path, label))
+                        sources += [DataSource(path, label)]
 
         def max_value(cols):
             """Return the maximum value in the given column in all sources"""

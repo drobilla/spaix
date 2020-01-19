@@ -55,7 +55,7 @@ public:
 
     SeedWaste                 max_waste{std::numeric_limits<Volume>::lowest()};
     std::pair<size_t, size_t> seeds{deposit.size(), deposit.size()};
-    for (size_t i = 0; i < deposit.size(); ++i) {
+    for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
         const auto& a = deposit[i];
         const auto& b = deposit[j];

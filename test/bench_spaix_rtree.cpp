@@ -13,7 +13,10 @@
   this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "BenchParameters.hpp"
+#include "Distribution.hpp"
 #include "options.hpp"
+#include "write_row.hpp"
 
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
@@ -36,10 +39,14 @@
 
 namespace {
 
-using Args   = spaix::test::Arguments;
-using Scalar = float;
-using Data   = float;
-using Rect2  = spaix::Rect<Scalar, Scalar>;
+using Args       = spaix::test::Arguments;
+using Parameters = spaix::test::BenchParameters;
+using Scalar     = float;
+using Data       = float;
+using Rect2      = spaix::Rect<Scalar, Scalar>;
+
+template <class T>
+using Distribution = spaix::test::Distribution<T>;
 
 struct Counts
 {
@@ -69,56 +76,6 @@ struct BenchmarkWithin
 };
 
 constexpr unsigned min_fill_divisor = 4;
-
-struct Parameters
-{
-  Parameters(const spaix::test::Arguments& args)
-    : n_elements{static_cast<size_t>(std::stoul(args.at("size")))}
-    , n_queries{static_cast<size_t>(std::stoul(args.at("queries")))}
-    , n_steps{static_cast<size_t>(std::stoul(args.at("steps")))}
-    , span{std::stof(args.at("span"))}
-    , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
-    , page_size{static_cast<size_t>(std::stoul(args.at("page-size")))}
-  {
-  }
-
-  size_t   n_elements;
-  size_t   n_queries;
-  size_t   n_steps;
-  Scalar   span;
-  uint32_t seed;
-  size_t   page_size;
-};
-
-/// Distribution of numbers that can be incrementally updated
-template <class T>
-class Distribution
-{
-public:
-  void update(T x)
-  {
-    if (_n == 0) {
-      _min = _max = _mean = x;
-    } else {
-      _min  = std::min(_min, x);
-      _max  = std::max(_max, x);
-      _mean = _mean + (x - _mean) / T(_n + 1);
-    }
-
-    ++_n;
-  }
-
-  inline size_t n() const { return _n; }
-  inline T      min() const { return _min; }
-  inline T      max() const { return _max; }
-  inline T      mean() const { return _mean; }
-
-private:
-  size_t _n{};
-  T      _min{};
-  T      _max{};
-  T      _mean{};
-};
 
 template <class Last>
 void
