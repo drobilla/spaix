@@ -5,6 +5,7 @@ stages:
 .build_template: &build_definition
   stage: build
 
+
 x64_dbg:
   <<: *build_definition
   image: lv2plugin/debian-x64
@@ -23,13 +24,31 @@ x64_rel:
     - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
     - ninja -C build test
 
+
+mac_dbg:
+  <<: *build_definition
+  tags: [macos]
+  script:
+    - meson . build -Dbuildtype=debug -Dwerror=true -Dtest=true
+    - ninja -C build test
+
+mac_rel:
+  <<: *build_definition
+  tags: [macos]
+  script:
+    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - ninja -C build test
+
+
 pages:
   stage: deploy
-  script: mv build/meson-logs/coveragereport/ public/
+  script:
+    - mkdir -p .public
+    - mv build/meson-logs/coveragereport/ .public/coverage
+    - mv .public public
   dependencies:
     - x64_dbg
   artifacts:
-    expire_in: 30 days
     paths:
       - public
   only:
