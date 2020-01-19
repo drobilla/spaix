@@ -24,6 +24,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/everything.hpp"
+#include "spaix/traversal.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
 
@@ -182,32 +183,27 @@ public:
 
   const_iterator begin() const
   {
-    return const_iterator{begin_stack(), Everything{}};
+    return const_iterator{_root.get(), Everything{}};
   }
 
-  const_iterator end() const { return const_iterator{{}, Everything{}}; }
+  const_iterator end() const { return const_iterator{nullptr, Everything{}}; }
 
   iterator begin()
   {
-    return empty() ? end() : iterator{begin_stack(), Everything{}};
+    return empty() ? end() : iterator{_root.get(), Everything{}};
   }
 
-  iterator end() { return iterator{{}, Everything{}}; }
+  iterator end() { return iterator{nullptr, Everything{}}; }
 
   template <class Predicate>
   Range<Predicate> query(Predicate predicate) const
   {
     if (empty()) {
-      return {{{}, predicate}, {{}, predicate}};
+      return {{nullptr, predicate}, {nullptr, predicate}};
     }
 
-    auto first_stack = query_begin_stack(predicate);
-    if (first_stack.empty()) {
-      return {{{}, predicate}, {{}, predicate}};
-    }
-
-    ConstIter<Predicate> first{std::move(first_stack), predicate};
-    ConstIter<Predicate> last{{}, predicate};
+    ConstIter<Predicate> first{_root.get(), predicate};
+    ConstIter<Predicate> last{nullptr, predicate};
     if (first != last && !predicate.leaf(first->key)) {
       ++first;
     }
@@ -278,52 +274,6 @@ public:
   }
 
 private:
-  typename iterator::Stack begin_stack() const
-  {
-    typename iterator::Stack stack;
-
-    if (!empty()) {
-      stack.emplace_back(Frame{_root.get(), 0});
-      while (stack.back().node->child_type == NodeType::DIR) {
-        stack.emplace_back(Frame{stack.back().node->dir_children[0].get(), 0});
-      }
-    }
-
-    return stack;
-  }
-
-  template <class Predicate>
-  typename iterator::Stack query_begin_stack(const Predicate& predicate) const
-  {
-    typename iterator::Stack stack;
-
-    if (!empty() && predicate.directory(_root->key)) {
-      const auto* dir = _root.get();
-
-      while (dir->child_type == NodeType::DIR) {
-        // Find first child that matches predicate
-        ChildIndex index = 0u;
-        for (ChildIndex i = 0u; i < dir->num_children(); ++i) {
-          if (predicate.directory(dir->dir_children[i]->key)) {
-            break;
-          } else {
-            index = i;
-          }
-        }
-
-        // Move down to next level
-        stack.emplace_back(Frame{dir, index});
-        dir = dir->dir_children[index].get();
-      }
-
-      stack.emplace_back(Frame{dir, 0}); // FIXME?
-
-      assert(stack.back().node->child_type == NodeType::DAT);
-    }
-
-    return stack;
-  }
-
   DirNodePair insert_rec(DirNode& parent, const Key& key, const Data& data)
   {
     parent.expand(key);

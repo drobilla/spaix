@@ -31,8 +31,15 @@ class DataSource:
         self.data = pandas.read_csv(path, sep="\t")
 
 
-def plot(sources, out_filename, x_col, x_label, y_col, y_label, y_max=None):
-    "Plot results"
+def plot(sources,
+         out_filename,
+         x_col,
+         x_label,
+         y_col,
+         y_label,
+         show_error=True,
+         y_max=None):
+    """Plot results"""
 
     matplotlib.use("agg")
     import matplotlib.pyplot as plt
@@ -48,25 +55,29 @@ def plot(sources, out_filename, x_col, x_label, y_col, y_label, y_max=None):
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
 
+    min_col = y_col + "_min" if show_error else y_col
+    max_col = y_col + "_max" if show_error else y_col
+    
     if y_max is None:
         y_max = 0.0
         for source in sources:
-            y_max = max(y_max, source.data[y_col + "_max"].max())
+            y_max = max(y_max, source.data[max_col].max())
 
     ax.set_ylim([0.0, y_max * 1.01])
     ax.grid(linewidth=0.25, linestyle=":", color="0", dashes=[0.2, 1.6])
     ax.ticklabel_format(style="sci", scilimits=(4, 0), useMathText=True)
     ax.tick_params(axis="both", width=0.75)
 
-    min_col = y_col + "_min"
-    max_col = y_col + "_max"
+    yerr = None
+    if show_error:
+        yerr = [source.data[y_col] - source.data[min_col],
+                source.data[max_col] - source.data[y_col]]
 
     for source in sources:
         ax.errorbar(
             source.data[x_col],
             source.data[y_col],
-            yerr=[source.data[y_col] - source.data[min_col],
-                  source.data[max_col] - source.data[y_col]],
+            yerr=yerr,
             label=source.label,
             marker=next(markers),
             dashes=next(dashes),
@@ -88,11 +99,17 @@ def bench_name(prog):
     if name.startswith("bench_"):
         name = name[6:]
     if name.endswith("_rtree"):
-        name = name[:-6]
+        name = name[0:-6]
+
+    # print("{} => {}".format(prog, name))
     return name
 
     
 def tsv_path(prog, insert, split):
+    # print("tsv path {} {} {} => {}".format(prog, insert, split, os.path.join(options.dir,
+    #                     "{}_insert_{}_split_{}.tsv".format(
+    #                         bench_name(prog), insert, split))))
+
     return os.path.join(options.dir,
                         "{}_insert_{}_split_{}.tsv".format(
                             bench_name(prog), insert, split))
@@ -115,6 +132,8 @@ if __name__ == "__main__":
 
     opt.add_option("--dir", type="string", default="build",
                    help="path to output directory")
+    opt.add_option("--no-error", action="store_true",
+                   help="do not show error bars")
     opt.add_option("--no-run", action="store_true",
                    help="do not run benchmarks")
     opt.add_option("--no-plot", action="store_true",
@@ -143,7 +162,6 @@ if __name__ == "__main__":
     if len(options.program) > 1:
         options.program = options.program[1:] # Remove default
 
-    print(options.program)
     bench_opts = [
         "--page-size", str(options.page_size),
         "--queries", str(options.queries),
@@ -154,8 +172,8 @@ if __name__ == "__main__":
     ]
 
     if not options.no_run:
-        for insert in ("linear", "quadratic"):
-            for split in ("linear", "quadratic"):
+        for insert in ["linear"]:#, "quadratic"]:
+            for split in ["linear", "quadratic"]:
                 if insert == "quadratic" and split == "linear":
                     continue  # Works, but is really awful and makes no sense
 
@@ -166,16 +184,14 @@ if __name__ == "__main__":
 
     if not options.no_plot:
         sources = []
-        for insert in ("linear", "quadratic"):
-            for split in ("linear", "quadratic"):
+        for insert in ["linear"]:#, "quadratic"):
+            for split in ["linear", "quadratic"]:
                 for prog in options.program:
                     path = tsv_path(prog, insert, split)
-                    print(path)
                     if os.path.exists(path) and os.path.getsize(path) > 0:
                         label = "{} insert {}, split {}".format(bench_name(prog),
                                                                 mathify(insert),
                                                                 mathify(split))
-                        print("%s : %s" % (path, label))
                         sources += [DataSource(path, label)]
 
         def max_value(cols):
@@ -183,22 +199,23 @@ if __name__ == "__main__":
             result = 0.0
             for source in sources:
                 for col in cols:
-                    result = max(result, source.data[col + "_max"].max())
+                    max_col = col if options.no_error else col + "_max"
+                    result = max(result, source.data[max_col].max())
 
             return result
 
         plot(sources, os.path.join(options.dir, "insert.svg"),
-             "n", "Size", "t_ins", "Insert time (s)")
+             "n", "Size", "t_ins", "Insert time (s)", not options.no_error)
 
         plot(sources, os.path.join(options.dir, "iter.svg"),
-             "n", "Size", "t_iter", "Range query time (s)")
+             "n", "Size", "t_iter", "Range query time (s)", not options.no_error)
 
         nodes_y_max = max_value(["q_dirs", "q_dats"])
         plot(sources, os.path.join(options.dir, "q_dirs.svg"),
-             "n", "Size", "q_dirs", "Directory nodes searched")
+             "n", "Size", "q_dirs", "Directory nodes searched", not options.no_error)
 
         plot(sources, os.path.join(options.dir, "q_dats.svg"),
-             "n", "Size", "q_dats", "Leaf nodes searched")
+             "n", "Size", "q_dats", "Leaf nodes searched", not options.no_error)
 
         html_path = os.path.join(options.dir, "benchmarks.html")
         with open(html_path, "w") as html:

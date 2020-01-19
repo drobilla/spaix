@@ -33,10 +33,9 @@ template <class Parent, class Child, size_t dim, size_t n_dims>
 constexpr bool
 contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
 {
-  return (min<dim>(child) < min<dim>(parent) ||
-          max<dim>(parent) < max<dim>(child))
-             ? false
-             : contains_rec(parent, child, ++index);
+  return (!(min<dim>(child) < min<dim>(parent)) &&
+          !(max<dim>(parent) < max<dim>(child)) &&
+          contains_rec(parent, child, ++index));
 }
 
 } // namespace detail
@@ -70,7 +69,7 @@ template <class... Ts>
 constexpr bool
 contains(const Point<Ts...>& parent, const Point<Ts...>& child)
 {
-  return detail::contains_rec(parent, child, ibegin<Ts...>());
+  return parent == child;
 }
 
 } // namespace spaix

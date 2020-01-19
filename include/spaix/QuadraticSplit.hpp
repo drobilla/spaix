@@ -57,10 +57,8 @@ public:
     std::pair<size_t, size_t> seeds{deposit.size(), deposit.size()};
     for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
-        const auto& a = deposit[i];
-        const auto& b = deposit[j];
-        const auto& k = a->key;
-        const auto& l = b->key;
+        const auto& k = deposit[i]->key;
+        const auto& l = deposit[j]->key;
 
         const SeedWaste waste = volume(k | l) - volumes[i] - volumes[j];
 
@@ -138,9 +136,9 @@ private:
     using DirKey     = typename DirNode::NodeKey;
     using Volume     = decltype(volume(std::declval<DirKey>()));
     using Result     = ChildAssignment<DirKey>;
-    using Preference = Volume;
+    using Preference = std::tuple<Volume, Volume, ChildCount>;
 
-    Preference best_preference{0};
+    Preference best_preference{0, 0, 0};
     Result     best{deposit.size(), DirKey{}, Side::left};
 
     const auto lhs_volume = volume(lhs.key);
@@ -151,10 +149,15 @@ private:
       if (child) {
         const auto l_key       = lhs.key | child->key;
         const auto r_key       = rhs.key | child->key;
-        const auto l_expansion = volume(l_key) - lhs_volume;
-        const auto r_expansion = volume(r_key) - rhs_volume;
+        const auto l_volume    = volume(l_key);
+        const auto r_volume    = volume(r_key);
+        const auto l_expansion = l_volume - lhs_volume;
+        const auto r_expansion = r_volume - rhs_volume;
 
-        const Preference preference = abs_diff(l_expansion, r_expansion);
+        const Preference preference = {
+            abs_diff(l_expansion, r_expansion),
+            abs_diff(l_volume, r_volume),
+            abs_diff(lhs.num_children(), rhs.num_children())};
 
         if (preference >= best_preference) {
           best_preference = preference;
@@ -162,9 +165,9 @@ private:
             best = Result{i, l_key, Side::left};
           } else if (r_expansion < l_expansion) {
             best = Result{i, r_key, Side::right};
-          } else if (lhs_volume < rhs_volume) {
+          } else if (l_volume < r_volume) {
             best = Result{i, l_key, Side::left};
-          } else if (rhs_volume < lhs_volume) {
+          } else if (r_volume < l_volume) {
             best = Result{i, r_key, Side::right};
           } else if (lhs.num_children() < rhs.num_children()) {
             best = Result{i, l_key, Side::left};

@@ -64,6 +64,7 @@ public:
   }
 
   void clear() { _size = 0; }
+  Size size() const { return _size; }
 
 private:
   Size                    _size{};

@@ -17,6 +17,7 @@
 #define SPAIX_ITERATOR_HPP
 
 #include "spaix/StaticVector.hpp"
+#include "spaix/traversal.hpp"
 #include "spaix/types.hpp"
 
 #include <cassert>
@@ -54,6 +55,18 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   {
   }
 
+  Iterator(DirNode* root, Predicate predicate)
+    : _stack{}, _predicate{std::move(predicate)}
+  {
+    if (root && predicate.directory(root->key)) {
+      const ChildIndex root_child_index = leftmost_child(*root, predicate);
+      if (root_child_index < root->num_children()) {
+        _stack.emplace_back(Frame{root, root_child_index});
+        move_down_left();
+      }
+    }
+  }
+
   Iterator& operator++()
   {
     scan_next();
@@ -64,6 +77,7 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   {
     assert(!_stack.empty());
     assert(_stack.back().index < _stack.back().node->n_children);
+    assert(_stack.back().node->child_type == NodeType::DAT);
 
     return *_stack.back().node->dat_children[_stack.back().index];
   }
@@ -88,60 +102,85 @@ private:
     return _stack.back();
   }
 
-  /// Move up until we reach a node we are not at the end of yet
-  void move_up()
-  {
-    while (!_stack.empty() && back().index >= back().node->n_children - 1) {
-      _stack.pop_back();
-    }
-  }
+  const DirNode* node() { return back().node; }
+  ChildIndex     index() { return back().index; }
 
   /// Move right until we reach a good leaf or the end of the parent
   bool move_right_leaf()
   {
-    assert(back().node->child_type == NodeType::DAT);
+    assert(node()->child_type == NodeType::DAT);
     do {
       ++back().index;
-    } while (back().index < back().node->n_children &&
-             !_predicate.leaf(back().node->dat_children[back().index]->key));
+    } while (index() < node()->n_children &&
+             !_predicate.leaf(node()->dat_children[index()]->key));
 
-    return back().index < back().node->n_children;
+    return index() < node()->n_children;
   }
 
   /// Move right until we reach a good directory or the end of the parent
-  bool move_right_dir()
+  void move_right_dir()
   {
-    assert(back().node->child_type == NodeType::DIR);
+    assert(node()->child_type == NodeType::DIR);
     do {
       ++back().index;
-    } while (
-        back().index < back().node->n_children &&
-        !_predicate.directory(back().node->dir_children[back().index]->key));
+    } while (index() < node()->n_children &&
+             !_predicate.directory(node()->dir_children[index()]->key));
+  }
 
-    return back().index < back().node->n_children;
+  /// Move up/right until we reach a node we are not at the end of yet
+  bool move_up_right()
+  {
+    while (!_stack.empty() && index() >= node()->n_children) {
+      _stack.pop_back(); // Move up
+      if (_stack.empty()) {
+        return false; // Reached end of tree
+      }
+
+      move_right_dir(); // Move to the next child of this node
+    }
+
+    return true;
+  }
+
+  /// Move down/left until we reach a potentially matching leaf
+  bool move_down_left()
+  {
+    while (node()->child_type == NodeType::DIR) {
+      auto* const dir = node()->dir_children[index()].get();
+      if (dir->child_type == NodeType::DAT) {
+        _stack.emplace_back(Frame{dir, 0});
+      } else {
+        const ChildIndex index = leftmost_child(*dir, _predicate);
+        _stack.emplace_back(Frame{dir, index});
+
+        if (index == dir->num_children()) {
+          // Reached a non-matching directory, skip this subtree
+          if (!move_up_right()) {
+            return false; // Reached end of tree
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   bool increment()
   {
     if (move_right_leaf()) {
       return true; // Moved to next leaf child
+    } else if (!move_up_right()) {
+      return false; // Reached end of tree
     }
 
-    while (!_stack.empty() && back().index >= back().node->n_children) {
-      move_up();
-      if (_stack.empty()) {
-        return false; // Reached end of tree
-      }
+    // Now at a matching directory, and a matching child of that directory
+    assert(_predicate.directory(node()->key) &&
+           ((node()->child_type == NodeType::DIR &&
+             _predicate.directory(node()->dir_children[index()]->key)) ||
+            (_predicate.leaf(node()->dat_children[index()]->key))));
 
-      move_right_dir();
-    }
-
-    _stack.emplace_back(
-        Frame{back().node->dir_children[back().index].get(), 0});
-
-    // Move down and left until we are at the next leaf
-    while (back().node->child_type == NodeType::DIR) {
-      _stack.emplace_back(Frame{back().node->dir_children[0].get(), 0});
+    if (!move_down_left()) {
+      return false; // Reached end of tree
     }
 
     return true;
@@ -153,7 +192,7 @@ private:
       if (!increment()) {
         return;
       }
-    } while (!_predicate.leaf(back().node->dat_children[back().index]->key));
+    } while (!_predicate.leaf(node()->dat_children[index()]->key));
   }
 
   Stack     _stack;
