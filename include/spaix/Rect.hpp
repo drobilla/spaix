@@ -136,35 +136,35 @@ operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 }
 
 template <size_t dim, class... Ts>
-constexpr std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>
+constexpr const std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
 get(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
 template <size_t dim, class... Ts>
-constexpr std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>
+constexpr const std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
 range(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
 template <class... Ts>
-constexpr auto
+constexpr const auto&
 ranges(const Rect<Ts...>& rect)
 {
   return rect.tuple();
 }
 
 template <size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
+constexpr const Nth<dim, Ts...>&
 min(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple()).first;
 }
 
 template <size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
+constexpr const Nth<dim, Ts...>&
 max(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple()).second;

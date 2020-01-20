@@ -34,9 +34,11 @@ template <class... Ts, size_t dim, size_t last_dim>
 constexpr ProductOf<Ts...>
 volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
 {
-  return ((min<dim>(rect) < max<dim>(rect)) ? (max<dim>(rect) - min<dim>(rect))
-                                            : 0) *
-         volume_rec(rect, ++index);
+  const auto r = range<dim>(rect);
+
+  return ((r.first < r.second)
+              ? ((r.second - r.first) * volume_rec(rect, ++index))
+              : 0);
 }
 
 } // namespace detail

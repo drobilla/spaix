@@ -33,8 +33,11 @@ template <class Lhs, class Rhs, size_t dim, size_t num_dims>
 constexpr bool
 intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 {
-  return (!(max<dim>(rhs) < min<dim>(lhs)) &&
-          !(max<dim>(lhs) < min<dim>(rhs)) &&
+  const auto l = range<dim>(lhs);
+  const auto r = range<dim>(rhs);
+
+  return (!(r.second < l.first) && //
+          !(l.second < r.first) && //
           intersects_rec(lhs, rhs, ++index));
 }
 

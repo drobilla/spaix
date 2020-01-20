@@ -64,7 +64,7 @@ operator!=(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 }
 
 template <size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
+constexpr const Nth<dim, Ts...>&
 get(const Point<Ts...>& point)
 {
   return std::get<dim>(point.tuple());

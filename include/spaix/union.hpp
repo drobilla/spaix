@@ -36,9 +36,12 @@ template <class Lhs, class Rhs, size_t dim, size_t n_dims>
 constexpr auto
 union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 {
+  const auto l = range<dim>(lhs);
+  const auto r = range<dim>(rhs);
+
   return std::tuple_cat(
-      std::make_tuple(std::make_pair(std::min(min<dim>(lhs), min<dim>(rhs)),
-                                     std::max(max<dim>(lhs), max<dim>(rhs)))),
+      std::make_tuple(std::make_pair(std::min(l.first, r.first),
+                                     std::max(l.second, r.second))),
       union_rec(lhs, rhs, ++index));
 }
 

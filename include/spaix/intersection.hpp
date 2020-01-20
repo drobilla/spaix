@@ -36,9 +36,12 @@ template <class Lhs, class Rhs, size_t dim, size_t num_dims>
 constexpr auto
 intersection_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 {
+  const auto l = range<dim>(lhs);
+  const auto r = range<dim>(rhs);
+
   return std::tuple_cat(
-      std::make_tuple(std::make_pair(std::max(min<dim>(lhs), min<dim>(rhs)),
-                                     std::min(max<dim>(lhs), max<dim>(rhs)))),
+      std::make_tuple(std::make_pair(std::max(l.first, r.first),
+                                     std::min(l.second, r.second))),
       intersection_rec(lhs, rhs, ++index));
 }
 
