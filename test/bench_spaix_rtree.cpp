@@ -311,7 +311,7 @@ main(int argc, char** argv)
       {"queries", {"Number of queries per step", "COUNT", "100"}},
       {"seed", {"Random number generator seed", "SEED", "5489"}},
       {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},
-      {"span", {"Dimension span", "NUMBER", "1000000"}},
+      {"span", {"Dimension span", "NUMBER", "10000000"}},
       {"split", {"Split (linear, quadratic)", "ALGORITHM", "linear"}},
       {"steps", {"Number of benchmarking steps", "RECORDS", "10"}},
   };

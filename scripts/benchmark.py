@@ -149,7 +149,7 @@ if __name__ == "__main__":
                    help="random number generator seed")
     opt.add_option("--size", type="int", default=1000000,
                    help="maximum number of elements")
-    opt.add_option("--span", type="float", default=1000000.0,
+    opt.add_option("--span", type="float", default=10000000.0,
                    help="dimension span")
     opt.add_option("--steps", type="int", default=10,
                    help="number of benchmarking steps")
