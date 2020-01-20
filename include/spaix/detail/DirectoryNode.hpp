@@ -64,22 +64,20 @@ public:
   DirectoryNode(DirectoryNode&&) = delete;
   DirectoryNode& operator=(DirectoryNode&&) = delete;
 
-  size_t append_child(std::unique_ptr<DatNode> child)
+  void append_child(std::unique_ptr<DatNode> child)
   {
     assert(child_type == NodeType::DAT);
     assert(n_children < Fanout);
     dat_children[n_children++] = std::move(child);
     assert(dat_children[n_children - 1]);
-    return n_children - 1;
   }
 
-  size_t append_child(std::unique_ptr<DirNode> child)
+  void append_child(std::unique_ptr<DirNode> child)
   {
     assert(child_type == NodeType::DIR);
     assert(n_children < Fanout);
     dir_children[n_children++] = std::move(child);
     assert(dir_children[n_children - 1]);
-    return n_children - 1;
   }
 
   size_t num_children() const { return n_children; }
