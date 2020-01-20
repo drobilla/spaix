@@ -42,6 +42,10 @@
 #include <utility>
 #include <vector>
 
+#ifndef NDEBUG
+#  include "spaix/contains.hpp"
+#endif
+
 namespace spaix {
 
 using NodePath = std::vector<ChildIndex>;
@@ -283,6 +287,7 @@ public:
 
       _root->append_child(std::move(sides[0]));
       _root->append_child(std::move(sides[1]));
+      assert(_root->key == ideal_key(*_root));
     }
 
     ++_size;
@@ -305,13 +310,43 @@ public:
   }
 
 private:
+  template <class Children>
+  static DirKey parent_key(const Children& children, const size_t n_children)
+  {
+    if (n_children == 0) {
+      return DirKey{};
+    }
+
+    DirKey key = DirKey{children[0]->key};
+    for (size_t i = 1; i < n_children; ++i) {
+      key = key | children[i]->key;
+    }
+    return key;
+  }
+
+  DirKey ideal_key(const DirNode& node)
+  {
+    if (node.child_type == NodeType::DIR) {
+      return parent_key(node.dir_children, node.n_children);
+    } else {
+      return parent_key(node.dat_children, node.n_children);
+    }
+  }
+
+  void replace_key(DirNode& node, const DirKey& new_key)
+  {
+    if (new_key != node.key) {
+      node.key = new_key;
+    }
+  }
+
   DirNodePair insert_rec(DirNode&      parent,
                          const DirKey& new_parent_key,
                          const Key&    key,
                          const Data&   data)
   {
     assert(contains(new_parent_key, parent.key));
-    parent.key = new_parent_key;
+    assert(contains(new_parent_key, key));
 
     if (parent.child_type == NodeType::DIR) { // Recursing downwards
       const auto  choice   = Insertion::choose(parent.dir_children, key);
@@ -325,20 +360,27 @@ private:
         if (parent.n_children == Fanout) {
           return split(parent.dir_children,
                        std::move(sides[1]),
-                       parent.key,
+                       new_parent_key,
                        parent.child_type);
         }
 
         parent.append_child(std::move(sides[1]));
+        replace_key(parent,
+                    parent_key(parent.dir_children, parent.num_children()));
+      } else {
+        assert(new_parent_key == ideal_key(parent));
+        parent.key = new_parent_key;
       }
 
     } else if (parent.n_children < Fanout) { // Simple leaf insert
       parent.append_child(DatNodePtr{new DatNode{key, data}});
+      assert(new_parent_key == ideal_key(parent));
+      parent.key = new_parent_key;
 
     } else { // Split leaf insert
       return split(parent.dat_children,
                    DatNodePtr{new DatNode{key, data}},
-                   parent.key,
+                   new_parent_key,
                    parent.child_type);
     }
 
@@ -368,6 +410,7 @@ private:
     std::array<NodePtr, Fanout + 1> deposit;
     std::move(nodes.begin(), nodes.end(), deposit.begin());
     deposit[nodes.size()] = std::move(node);
+    assert(bounds == parent_key(deposit, Fanout + 1));
 
     // Pick two nodes to seed the left and right groups
     const auto seeds = Split::pick_seeds(deposit, bounds);
