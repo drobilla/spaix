@@ -41,15 +41,15 @@ struct LinearInsertion
                      std::numeric_limits<Volume>::max(),
                      std::numeric_limits<ChildCount>::max()};
 
-    for (size_t i = 0; i < children.size() && children[i]; ++i) {
+    const size_t n_children = children.size();
+    for (size_t i = 0; i < n_children && children[i]; ++i) {
       const auto& child           = children[i];
       const auto  expanded        = child->key | key;
       const auto  expanded_volume = volume(expanded);
 
-      Volume child_expansion = 0;
-      if (expanded != child->key) {
-        child_expansion = expanded_volume - volume(child->key);
-      }
+      const Volume child_expansion =
+          ((expanded != child->key) ? (expanded_volume - volume(child->key))
+                                    : 0);
 
       Sizes sizes{child_expansion, expanded_volume, child->num_children()};
       if (sizes < best_sizes) {
