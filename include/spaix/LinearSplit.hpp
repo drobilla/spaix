@@ -155,10 +155,8 @@ public:
   static void distribute_children(Deposit&         deposit,
                                   DirNode&         lhs,
                                   DirNode&         rhs,
-                                  const ChildCount min_fanout)
+                                  const ChildCount max_fanout)
   {
-    const auto max_fanout = deposit.size() - min_fanout;
-
     auto lhs_volume = volume(lhs.key);
     auto rhs_volume = volume(rhs.key);
 

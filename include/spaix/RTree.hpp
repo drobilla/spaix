@@ -420,7 +420,7 @@ private:
                       new_parent(std::move(deposit[seeds.second]), type)};
 
     // Distribute remaining nodes between seeds
-    Split::distribute_children(deposit, *sides[0], *sides[1], min_fanout);
+    Split::distribute_children(deposit, *sides[0], *sides[1], Fanout - min_fanout);
     assert(sides[0]->n_children + sides[1]->n_children == deposit.size());
 
     // fprintf(

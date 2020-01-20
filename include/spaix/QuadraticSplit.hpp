@@ -82,10 +82,8 @@ public:
   static void distribute_children(Deposit&         deposit,
                                   DirNode&         lhs,
                                   DirNode&         rhs,
-                                  const ChildCount min_fanout)
+                                  const ChildCount max_fanout)
   {
-    const auto max_fanout = deposit.size() - min_fanout;
-
     for (size_t i = 0; i < deposit.size() - 2; ++i) {
       const auto best = pick_next(deposit, lhs, rhs);
       assert(best.child_index < deposit.size());
