@@ -27,8 +27,6 @@
 #include <memory>
 #include <utility>
 
-#include <iostream>
-
 namespace spaix {
 
 /**

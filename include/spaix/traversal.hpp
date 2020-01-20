@@ -18,6 +18,8 @@
 
 #include "spaix/types.hpp"
 
+#include <cstddef>
+
 namespace spaix {
 
 /**
@@ -29,27 +31,27 @@ template <class DirNode, class Predicate>
 ChildIndex
 leftmost_child(const DirNode& dir, const Predicate& predicate)
 {
-  const ChildCount n_children = dir.num_children();
+  const size_t n_children = dir.num_children();
 
   switch (dir.child_type) {
   case NodeType::DIR:
-    for (ChildIndex i = 0u; i < n_children; ++i) {
+    for (size_t i = 0u; i < n_children; ++i) {
       if (predicate.directory(dir.dir_children[i]->key)) {
-        return i;
+        return static_cast<ChildIndex>(i);
       }
     }
     break;
 
   case NodeType::DAT:
-    for (ChildIndex i = 0u; i < n_children; ++i) {
+    for (size_t i = 0u; i < n_children; ++i) {
       if (predicate.leaf(dir.dat_children[i]->key)) {
-        return i;
+        return static_cast<ChildIndex>(i);
       }
     }
     break;
   }
 
-  return n_children;
+  return static_cast<ChildIndex>(n_children);
 }
 
 } // namespace spaix
