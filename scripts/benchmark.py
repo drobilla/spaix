@@ -123,7 +123,7 @@ def run(script_opts, bench_opts, insert, split):
             alg_opts = ["--insert", insert, "--split", split]
             subprocess.check_call([prog] + bench_opts + alg_opts, stdout=out)
 
-    sys.stderr.write("Wrote {}\n".format(out_path))
+        sys.stderr.write("Wrote {}\n".format(out_path))
 
 
 if __name__ == "__main__":
