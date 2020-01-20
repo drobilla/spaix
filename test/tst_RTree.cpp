@@ -250,11 +250,22 @@ test_tree(const unsigned span, const unsigned n_queries)
       ++count;
     };
 
+#if 1
+    // Fast visitor query
+    count = 0;
+    tree.fast_query(spaix::within(query), verify);
+    CHECK(count == expected_count);
+    // CHECK(predicate.stats.num_checked_dirs < span * span);
+    // CHECK(predicate.stats.num_checked_dats >= count);
+    // CHECK(predicate.stats.num_checked_dats <= (span + 1) * (span + 1));
+#else
+    // Incremental query
     count = 0;
     for (const auto& node : tree.query(spaix::within(query))) {
       verify(node);
     }
     CHECK((count == expected_count));
+#endif
   }
 
   tree.clear();

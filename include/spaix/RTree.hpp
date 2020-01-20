@@ -212,6 +212,36 @@ public:
     return {std::move(first), std::move(last)};
   }
 
+  template <class Predicate, class Visitor>
+  void fast_query(const Predicate& predicate, Visitor visitor) const
+  {
+    fast_query_rec(*_root, predicate, visitor);
+  }
+
+  template <class Predicate, class Visitor>
+  void fast_query_rec(const DirNode&   node,
+                      const Predicate& predicate,
+                      Visitor          visitor) const
+  {
+    if (predicate.directory(node.key)) {
+      switch (node.child_type) {
+      case NodeType::DIR:
+        for (ChildIndex i = 0u; i < node.n_children; ++i) {
+          fast_query_rec(*node.dir_children[i], predicate, visitor);
+        }
+        break;
+
+      case NodeType::DAT:
+        for (ChildIndex i = 0u; i < node.n_children; ++i) {
+          const auto& leaf = *node.dat_children[i];
+          if (predicate.leaf(leaf.key)) {
+            visitor(leaf);
+          }
+        }
+      }
+    }
+  }
+
   /// Remove all items from the tree
   void clear() { _root.reset(); }
 

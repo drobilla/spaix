@@ -94,6 +94,7 @@ write_row(std::ostream& os, First first, Rest... rest)
 struct QueryMetrics
 {
   Distribution<double> iter_times;
+  // Distribution<double> visit_times;
   Distribution<double> checked_dirs;
   Distribution<double> checked_dats;
   Distribution<double> result_counts;
@@ -124,16 +125,29 @@ benchmark_queries(std::mt19937& rng,
     const auto predicate = BenchmarkWithin<Rect2>{Rect2{ranges}, &counts};
 
     const auto t_iter_start = std::chrono::steady_clock::now();
+#if 0
     for (const auto& node : tree.query(predicate)) {
       (void)node;
       ++n_results;
     }
+#else
+    tree.fast_query(predicate, [&n_results](const auto&) { ++n_results; });
+#endif
     const auto t_iter_end = std::chrono::steady_clock::now();
 
     const auto iter_dur =
         std::chrono::duration<double>(t_iter_end - t_iter_start);
     metrics.iter_times.update(
         iter_dur.count()); // / std::max(1.0, double(n_results)));
+
+    // const auto t_visit_start = std::chrono::steady_clock::now();
+    // tree.fast_query(predicate, [&n_results](const auto&) { ++n_results; });
+    // const auto t_visit_end = std::chrono::steady_clock::now();
+
+    // const auto visit_dur =
+    //     std::chrono::duration<double>(t_visit_end - t_visit_start);
+    // metrics.visit_times.update(
+    //     visit_dur.count()); // / std::max(1.0, double(n_results)));
 
     metrics.result_counts.update(n_results);
     metrics.checked_dirs.update(counts.n_checked_dirs);
@@ -165,6 +179,9 @@ run(const Parameters& params, std::ostream& os)
             "t_ins",
             "t_ins_min",
             "t_ins_max",
+            // "t_visit",
+            // "t_visit_min",
+            // "t_visit_max",
             "t_iter",
             "t_iter_min",
             "t_iter_max",
@@ -210,6 +227,9 @@ run(const Parameters& params, std::ostream& os)
                 metrics.iter_times.mean(),
                 metrics.iter_times.min(),
                 metrics.iter_times.max(),
+                // metrics.visit_times.mean(),
+                // metrics.visit_times.min(),
+                // metrics.visit_times.max(),
                 metrics.checked_dirs.mean(),
                 metrics.checked_dirs.min(),
                 metrics.checked_dirs.max(),
