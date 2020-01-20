@@ -20,6 +20,7 @@
 
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
+#include "spaix/QuadraticInsertion.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
@@ -47,6 +48,8 @@ using Rect2      = spaix::Rect<Scalar, Scalar>;
 template <class T>
 using Distribution = spaix::test::Distribution<T>;
 
+constexpr unsigned min_fill_divisor = 3;
+
 struct Counts
 {
   size_t n_checked_dirs = 0u;
@@ -73,23 +76,6 @@ struct BenchmarkWithin
   const QueryKey key;
   Counts*        counts{};
 };
-
-constexpr unsigned min_fill_divisor = 3;
-
-template <class Last>
-void
-write_row(std::ostream& os, Last last)
-{
-  os << last << '\n';
-}
-
-template <class First, class... Rest>
-void
-write_row(std::ostream& os, First first, Rest... rest)
-{
-  os << first << '\t';
-  write_row(os, std::forward<Rest>(rest)...);
-}
 
 struct QueryMetrics
 {
@@ -171,27 +157,27 @@ run(const Parameters& params, std::ostream& os)
   Distribution<double> times;
   Distribution<double> total_times;
 
-  write_row(os,
-            "n",
-            "page_size",
-            "fanout",
-            "elapsed",
-            "t_ins",
-            "t_ins_min",
-            "t_ins_max",
-            // "t_visit",
-            // "t_visit_min",
-            // "t_visit_max",
-            "t_iter",
-            "t_iter_min",
-            "t_iter_max",
-            "q_dirs",
-            "q_dirs_min",
-            "q_dirs_max",
-            "q_dats",
-            "q_dats_min",
-            "q_dats_max",
-            "n_results");
+  spaix::test::write_row(os,
+                         "n",
+                         "page_size",
+                         "fanout",
+                         "elapsed",
+                         "t_ins",
+                         "t_ins_min",
+                         "t_ins_max",
+                         // "t_visit",
+                         // "t_visit_min",
+                         // "t_visit_max",
+                         "t_iter",
+                         "t_iter_min",
+                         "t_iter_max",
+                         "q_dirs",
+                         "q_dirs_min",
+                         "q_dirs_max",
+                         "q_dats",
+                         "q_dats_min",
+                         "q_dats_max",
+                         "n_results");
 
   const auto t_bench_start = std::chrono::steady_clock::now();
   for (size_t i = 0; i < params.n_elements; ++i) {
@@ -216,27 +202,28 @@ run(const Parameters& params, std::ostream& os)
     if (i % n_per_record == n_per_record - 1) {
       const auto metrics = benchmark_queries(rng, t, span, params.n_queries);
 
-      write_row(os,
-                total_times.n(),
-                params.page_size,
-                t.fanout(),
-                std::chrono::duration<double>(t_end - t_bench_start).count(),
-                times.mean(),
-                times.min(),
-                times.max(),
-                metrics.iter_times.mean(),
-                metrics.iter_times.min(),
-                metrics.iter_times.max(),
-                // metrics.visit_times.mean(),
-                // metrics.visit_times.min(),
-                // metrics.visit_times.max(),
-                metrics.checked_dirs.mean(),
-                metrics.checked_dirs.min(),
-                metrics.checked_dirs.max(),
-                metrics.checked_dats.mean(),
-                metrics.checked_dats.min(),
-                metrics.checked_dats.max(),
-                metrics.result_counts.mean());
+      spaix::test::write_row(
+          os,
+          total_times.n(),
+          params.page_size,
+          t.fanout(),
+          std::chrono::duration<double>(t_end - t_bench_start).count(),
+          times.mean(),
+          times.min(),
+          times.max(),
+          metrics.iter_times.mean(),
+          metrics.iter_times.min(),
+          metrics.iter_times.max(),
+          // metrics.visit_times.mean(),
+          // metrics.visit_times.min(),
+          // metrics.visit_times.max(),
+          metrics.checked_dirs.mean(),
+          metrics.checked_dirs.min(),
+          metrics.checked_dirs.max(),
+          metrics.checked_dats.mean(),
+          metrics.checked_dats.min(),
+          metrics.checked_dats.max(),
+          metrics.result_counts.mean());
       times = {};
     }
   }
@@ -295,6 +282,8 @@ run(const Parameters& params, const Args& args)
   const auto insert = args.at("insert");
   if (insert == "linear") {
     return run<spaix::LinearInsertion>(params, args);
+  } else if (insert == "quadratic") {
+    return run<spaix::QuadraticInsertion>(params, args);
   }
 
   throw std::runtime_error("Unknown algorithm '" + insert + "'");
@@ -306,7 +295,7 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
-      {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
+      {"insert", {"Insert (linear, quadratic)", "ALGORITHM", "linear"}},
       {"page-size", {"Page size for directory nodes", "BYTES", "128"}},
       {"queries", {"Number of queries per step", "COUNT", "100"}},
       {"seed", {"Random number generator seed", "SEED", "5489"}},

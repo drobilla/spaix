@@ -172,8 +172,11 @@ if __name__ == "__main__":
     ]
 
     if not options.no_run:
-        for insert in ["linear"]:
+        for insert in ["linear"]:#, "quadratic"]:
             for split in ["linear", "quadratic"]:
+                if insert == "quadratic" and split == "linear":
+                    continue  # Works, but is really awful and makes no sense
+
                 run(options, bench_opts, insert, split)
 
     def mathify(name):
@@ -181,7 +184,7 @@ if __name__ == "__main__":
 
     if not options.no_plot:
         sources = []
-        for insert in ["linear"]:
+        for insert in ["linear"]:#, "quadratic"):
             for split in ["linear", "quadratic"]:
                 for prog in options.program:
                     path = tsv_path(prog, insert, split)

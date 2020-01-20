@@ -18,6 +18,7 @@
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
 #include "spaix/Point.hpp"
+#include "spaix/QuadraticInsertion.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
@@ -135,6 +136,8 @@ run(const Parameters& params, const Args& args)
   const auto insert = args.at("insert");
   if (insert == "linear") {
     return run<spaix::LinearInsertion>(params, args);
+  } else if (insert == "quadratic") {
+    return run<spaix::QuadraticInsertion>(params, args);
   }
 
   throw std::runtime_error("Unknown algorithm '" + insert + "'");
@@ -146,7 +149,7 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
-      {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
+      {"insert", {"Insert (linear, quadratic)", "ALGORITHM", "linear"}},
       {"page-size", {"Page size for directory nodes", "BYTES", "128"}},
       {"scale", {"Scale factor for SVG output", "NUMBER", "1.0"}},
       {"seed", {"Random number generator seed", "SEED", "5489"}},

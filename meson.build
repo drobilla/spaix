@@ -51,6 +51,7 @@ headers = [
   'include/spaix/LinearInsertion.hpp',
   'include/spaix/LinearSplit.hpp',
   'include/spaix/Point.hpp',
+  'include/spaix/QuadraticInsertion.hpp',
   'include/spaix/QuadraticSplit.hpp',
   'include/spaix/RTree.hpp',
   'include/spaix/Range.hpp',
@@ -106,6 +107,7 @@ if get_option('test')
 
   test('draw', draw_exe)
   test('draw', draw_exe, args: ['--insert', 'linear'])
+  test('draw', draw_exe, args: ['--insert', 'quadratic'])
   test('draw', draw_exe, args: ['--split', 'linear'])
   test('draw', draw_exe, args: ['--split', 'quadratic'])
   test('draw', draw_exe, args: ['--page-size', '64'])
@@ -135,6 +137,7 @@ if get_option('benchmark')
 
   if get_option('test')
     test('bench', bench_exe, args: ['--size', '16', '--insert', 'linear'])
+    test('bench', bench_exe, args: ['--size', '16', '--insert', 'quadratic'])
     test('bench', bench_exe, args: ['--size', '16', '--split', 'linear'])
     test('bench', bench_exe, args: ['--size', '16', '--split', 'quadratic'])
     test('bench', bench_exe, args: ['--size', '16', '--page-size', '64'])
