@@ -18,7 +18,6 @@
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
 #include "spaix/Point.hpp"
-#include "spaix/QuadraticInsertion.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
@@ -282,22 +281,6 @@ test_key(const unsigned span, const unsigned n_queries)
                          spaix::fanout<DirKey>(page_size),
                          2,
                          spaix::LinearInsertion,
-                         spaix::QuadraticSplit>>(span, n_queries);
-
-  test_tree<spaix::RTree<Key,
-                         unsigned,
-                         spaix::Rect<unsigned, unsigned>,
-                         spaix::fanout<DirKey>(page_size),
-                         2,
-                         spaix::QuadraticInsertion,
-                         spaix::QuadraticSplit>>(span, n_queries);
-
-  test_tree<spaix::RTree<Key,
-                         unsigned,
-                         spaix::Rect<unsigned, unsigned>,
-                         spaix::fanout<DirKey>(page_size),
-                         2,
-                         spaix::QuadraticInsertion,
                          spaix::QuadraticSplit>>(span, n_queries);
 }
 
