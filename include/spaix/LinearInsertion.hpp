@@ -31,12 +31,15 @@ struct LinearInsertion
 {
   /// Choose the best child node to insert/expand by `key`
   template <class Children, class Key>
-  static size_t choose(const Children& children, const Key& key)
+  static std::pair<size_t, decltype(std::declval<Key>() | std::declval<Key>())>
+  choose(const Children& children, const Key& key)
   {
     using Volume = decltype(volume(std::declval<Key>()));
+    using DirKey = decltype(std::declval<Key>() | std::declval<Key>());
     using Sizes  = std::tuple<Volume, Volume, ChildCount>;
 
     size_t best_index = 0;
+    DirKey best_key   = children[0]->key;
     Sizes  best_sizes{std::numeric_limits<Volume>::max(),
                      std::numeric_limits<Volume>::max(),
                      std::numeric_limits<ChildCount>::max()};
@@ -55,10 +58,11 @@ struct LinearInsertion
       if (sizes < best_sizes) {
         best_sizes = std::move(sizes);
         best_index = i;
+        best_key   = expanded;
       }
     }
 
-    return best_index;
+    return {best_index, best_key};
   }
 };
 

@@ -64,8 +64,6 @@ public:
   DirectoryNode(DirectoryNode&&) = delete;
   DirectoryNode& operator=(DirectoryNode&&) = delete;
 
-  void expand(const Key& k) { this->key = this->key | k; }
-
   size_t append_child(std::unique_ptr<DatNode> child)
   {
     assert(child_type == NodeType::DAT);

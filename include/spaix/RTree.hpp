@@ -22,6 +22,7 @@
 #include "spaix/Point.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/contains.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/everything.hpp"
 #include "spaix/traversal.hpp"
@@ -245,7 +246,7 @@ public:
       _root = DirNodePtr{new DirNode(DirKey{key}, NodeType::DAT)};
     }
 
-    auto sides = insert_rec(*_root, key, data);
+    auto sides = insert_rec(*_root, _root->key | key, key, data);
     if (sides[0]) {
       _root =
           DirNodePtr{new DirNode(sides[0]->key | sides[1]->key, NodeType::DIR)};
@@ -274,14 +275,20 @@ public:
   }
 
 private:
-  DirNodePair insert_rec(DirNode& parent, const Key& key, const Data& data)
+  DirNodePair insert_rec(DirNode&      parent,
+                         const DirKey& new_parent_key,
+                         const Key&    key,
+                         const Data&   data)
   {
-    parent.expand(key);
+    assert(contains(new_parent_key, parent.key));
+    parent.key = new_parent_key;
 
     if (parent.child_type == NodeType::DIR) { // Recursing downwards
-      const size_t index = Insertion::choose(parent.dir_children, key);
-      const auto&  child = parent.dir_children[index];
-      auto         sides = insert_rec(*child, key, data);
+      const auto  choice   = Insertion::choose(parent.dir_children, key);
+      const auto  index    = choice.first;
+      const auto  expanded = choice.second;
+      const auto& child    = parent.dir_children[index];
+      auto        sides    = insert_rec(*child, expanded, key, data);
 
       if (sides[0]) { // Child was split, replace it
         parent.dir_children[index] = std::move(sides[0]);
