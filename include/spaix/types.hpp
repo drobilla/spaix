@@ -28,6 +28,8 @@ enum class NodeType : uint16_t {
   DAT, ///< Leaf data node
 };
 
+enum class Side { left, right };
+
 } // namespace spaix
 
 #endif // SPAIX_TYPES_HPP

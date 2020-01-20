@@ -159,6 +159,9 @@ public:
   {
     const auto max_fanout = deposit.size() - min_fanout;
 
+    auto lhs_volume = volume(lhs.key);
+    auto rhs_volume = volume(rhs.key);
+
     for (size_t i = 0; i < deposit.size(); ++i) {
       if (!deposit[i]) {
         continue;
@@ -169,31 +172,42 @@ public:
         // Left is full, insert into right
         const auto r_key = rhs.key | child->key;
         distribute_child(rhs, r_key, std::move(child));
+        rhs_volume = volume(r_key);
       } else if (rhs.num_children() == max_fanout) {
         // Right is full, insert into left
         const auto l_key = lhs.key | child->key;
         distribute_child(lhs, l_key, std::move(child));
+        lhs_volume = volume(l_key);
       } else {
         // Insert into parent which causes the least expansion
         const auto l_key       = lhs.key | child->key;
         const auto r_key       = rhs.key | child->key;
         const auto l_volume    = volume(l_key);
         const auto r_volume    = volume(r_key);
-        const auto l_expansion = l_volume - volume(lhs.key);
-        const auto r_expansion = r_volume - volume(rhs.key);
+        const auto l_expansion = l_volume - lhs_volume;
+        const auto r_expansion = r_volume - rhs_volume;
 
+        Side side = Side::left;
         if (l_expansion < r_expansion) {
-          distribute_child(lhs, l_key, std::move(child));
+          side = Side::left;
         } else if (r_expansion < l_expansion) {
-          distribute_child(rhs, r_key, std::move(child));
+          side = Side::right;
         } else if (l_volume < r_volume) {
-          distribute_child(lhs, l_key, std::move(child));
+          side = Side::left;
         } else if (r_volume < l_volume) {
-          distribute_child(rhs, r_key, std::move(child));
+          side = Side::right;
         } else if (lhs.num_children() < rhs.num_children()) {
+          side = Side::left;
+        } else {
+          side = Side::right;
+        }
+
+        if (side == Side::left) {
           distribute_child(lhs, l_key, std::move(child));
+          lhs_volume = l_volume;
         } else {
           distribute_child(rhs, r_key, std::move(child));
+          rhs_volume = r_volume;
         }
       }
     }

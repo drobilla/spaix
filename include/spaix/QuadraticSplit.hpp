@@ -110,8 +110,6 @@ public:
   }
 
 private:
-  enum class Side { left, right };
-
   /// Assignment of a child to a parent during a split
   template <class DirKey>
   struct ChildAssignment
