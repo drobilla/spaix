@@ -74,7 +74,7 @@ struct BenchmarkWithin
   Counts*        counts{};
 };
 
-constexpr unsigned min_fill_divisor = 4;
+constexpr unsigned min_fill_divisor = 3;
 
 template <class Last>
 void
