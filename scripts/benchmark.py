@@ -184,7 +184,7 @@ if __name__ == "__main__":
 
     if not options.no_plot:
         sources = []
-        for insert in ["linear"]:#, "quadratic"):
+        for insert in ["linear"]:#, "quadratic"]:
             for split in ["linear", "quadratic"]:
                 for prog in options.program:
                     path = tsv_path(prog, insert, split)
