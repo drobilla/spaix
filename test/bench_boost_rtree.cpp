@@ -54,6 +54,8 @@ using Box   = bg::model::box<Point>;
 template <class T>
 using Distribution = spaix::test::Distribution<T>;
 
+constexpr unsigned min_fill_divisor = 3;
+
 struct QueryMetrics
 {
   Distribution<double> iter_times;
@@ -205,11 +207,14 @@ template <size_t page_size>
 int
 run(const Parameters& params, const Args& args)
 {
+  constexpr auto max_fill = spaix::fanout<Rect2>(page_size);
+  constexpr auto min_fill = spaix::fanout<Rect2>(page_size) / 3;
+
   const auto split = args.at("split");
   if (split == "linear") {
-    return run<bgi::linear<spaix::fanout<Rect2>(page_size)>>(params);
+    return run<bgi::linear<max_fill, min_fill>>(params);
   } else if (split == "quadratic") {
-    return run<bgi::quadratic<spaix::fanout<Rect2>(page_size)>>(params);
+    return run<bgi::quadratic<max_fill, min_fill>>(params);
   }
 
   throw std::runtime_error("Unknown algorithm '" + split + "'");

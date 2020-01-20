@@ -117,7 +117,13 @@ benchmark_queries(std::mt19937& rng,
       ++n_results;
     }
 #else
-    tree.fast_query(predicate, [&n_results](const auto&) { ++n_results; });
+    tree.fast_query(predicate, [&n_results](const auto& node) {
+      volatile auto result = node;
+
+      (void)result;
+
+      ++n_results;
+    });
 #endif
     const auto t_iter_end = std::chrono::steady_clock::now();
 
