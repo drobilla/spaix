@@ -44,18 +44,18 @@ struct Parameters
 {
   Parameters(const spaix::test::Arguments& args)
     : n_elements{static_cast<size_t>(std::stoul(args.at("size")))}
+    , page_size{static_cast<size_t>(std::stoul(args.at("page-size")))}
     , scale{std::stod(args.at("scale"))}
     , span{std::stod(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
-    , page_size{static_cast<size_t>(std::stoul(args.at("page-size")))}
   {
   }
 
   size_t   n_elements;
+  size_t   page_size;
   double   scale;
   Scalar   span;
   uint32_t seed;
-  size_t   page_size;
 };
 
 template <class Tree>
@@ -103,7 +103,7 @@ int
 run(const Parameters& params)
 {
   switch (params.page_size) {
-  case 64: return run<Insertion, Split, 64>(params);
+  // case 64: return run<Insertion, Split, 64>(params);
   case 128: return run<Insertion, Split, 128>(params);
   case 256: return run<Insertion, Split, 256>(params);
   case 512: return run<Insertion, Split, 512>(params);

@@ -208,7 +208,8 @@ int
 run(const Parameters& params, const Args& args)
 {
   constexpr auto max_fill = spaix::fanout<Rect2>(page_size);
-  constexpr auto min_fill = spaix::fanout<Rect2>(page_size) / 3;
+  constexpr auto min_fill =
+      std::max(size_t(1), spaix::fanout<Rect2>(page_size) / 3);
 
   const auto split = args.at("split");
   if (split == "linear") {
@@ -224,7 +225,7 @@ int
 run(const Parameters& params, const Args& args)
 {
   switch (params.page_size) {
-  case 64: return run<64>(params, args);
+  // case 64: return run<64>(params, args);
   case 128: return run<128>(params, args);
   case 256: return run<256>(params, args);
   case 512: return run<512>(params, args);

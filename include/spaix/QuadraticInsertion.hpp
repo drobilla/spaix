@@ -42,24 +42,25 @@ struct QuadraticInsertion
     using Sizes = std::tuple<Volume, Volume, Volume, ChildCount>;
 
     size_t best_index = 0;
-    DirKey best_key   = children[0]->key;
+    DirKey best_key   = children[0].key;
     Sizes  best_sizes{std::numeric_limits<Volume>::max(),
                      std::numeric_limits<Volume>::max(),
                      std::numeric_limits<Volume>::max(),
                      std::numeric_limits<ChildCount>::max()};
 
-    for (size_t i = 0; i < children.size() && children[i]; ++i) {
-      const auto& child    = children[i];
-      const auto  expanded = child->key | key;
+    for (size_t i = 0; i < children.size() && children[i].node; ++i) {
+      const auto& child     = children[i].node;
+      const auto& child_key = children[i].key;
+      const auto  expanded  = child_key | key;
 
       Volume       child_overlap   = 0;
       Volume       child_expansion = 0;
       const Volume key_volume      = volume(expanded);
-      if (expanded != child->key) {
-        child_expansion = key_volume - volume(child->key);
-        for (size_t j = 0; j < children.size() && children[j]; ++j) {
+      if (expanded != child_key) {
+        child_expansion = key_volume - volume(child_key);
+        for (size_t j = 0; j < children.size() && children[j].node; ++j) {
           if (i != j) {
-            child_overlap += volume(expanded & children[j]->key);
+            child_overlap += volume(expanded & children[j].key);
           }
         }
       }

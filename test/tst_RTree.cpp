@@ -14,6 +14,7 @@
 */
 
 #include "check.hpp"
+#include "options.hpp"
 
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
@@ -26,6 +27,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <map>
 #include <numeric>
@@ -41,7 +43,7 @@ using Point    = spaix::Point<unsigned, unsigned>;
 using Data     = unsigned;
 using NodePath = spaix::NodePath;
 
-constexpr size_t page_size = 64u;
+constexpr size_t page_size = 512u;
 
 template <class Key>
 Key
@@ -72,7 +74,8 @@ test_empty_tree(const Tree& tree, const unsigned span)
 
   CHECK(tree.empty());
 
-  STATIC_CHECK(sizeof(DirNode) == page_size);
+  STATIC_CHECK(sizeof(DirNode) <= page_size &&
+               sizeof(DirNode) >= page_size - sizeof(DirKey) - sizeof(Data));
   STATIC_CHECK(Tree::fanout() == spaix::fanout<DirKey>(page_size));
 
   CHECK(tree.begin() == tree.end());
@@ -315,10 +318,25 @@ test_key(const unsigned span, const unsigned n_queries)
 } // namespace
 
 int
-main()
+main(int argc, char** argv)
 {
-  test_key<spaix::Point<unsigned, unsigned>>(16, 1000);
-  test_key<spaix::Rect<unsigned, unsigned>>(16, 1000);
+  const spaix::test::Options opts{
+      {"span", {"Dimension span", "NUMBER", "32"}},
+      {"queries", {"Number of queries", "COUNT", "1000"}}};
+
+  try {
+    const auto args    = parse_options(opts, argc, argv);
+    const auto span    = static_cast<unsigned>(std::stoul(args.at("span")));
+    const auto queries = static_cast<unsigned>(std::stoul(args.at("queries")));
+
+    test_key<spaix::Point<unsigned, unsigned>>(span, queries);
+    test_key<spaix::Rect<unsigned, unsigned>>(span, queries);
+
+  } catch (const std::runtime_error& e) {
+    std::cerr << "error: " << e.what() << "\n\n";
+    print_usage(argv[0], opts);
+    return 1;
+  }
 
   return 0;
 }

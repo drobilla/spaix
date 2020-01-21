@@ -18,24 +18,31 @@
 
 #include <array>
 #include <cassert>
+#include <memory>
+#include <type_traits>
 
 namespace spaix {
 
-template <class T, class Size, Size capacity>
+template <class T, class Size, Size Capacity>
 class StaticVector
 {
 public:
   void pop_back()
   {
-    assert(_size);
-    _array[--_size] = T{};
+    assert(!empty());
+    --_size;
+
+    if (!std::is_trivially_destructible<T>::value) {
+      reinterpret_cast<T*>(&_array[_size])->~T();
+    }
   }
 
   template <class... Args>
   void emplace_back(Args&&... args)
   {
-    assert(_size < capacity);
-    _array[_size++] = T{std::forward<Args>(args)...};
+    assert(_size < Capacity);
+
+    new (&_array[_size++]) T(std::forward<Args>(args)...);
   }
 
   bool empty() const { return _size == 0; }
@@ -43,32 +50,71 @@ public:
   const T& back() const
   {
     assert(_size > 0);
-    return _array[_size - 1];
+    return *reinterpret_cast<const T*>(&_array[_size - 1]);
   }
 
   T& back()
   {
     assert(_size > 0);
-    return _array[_size - 1];
+    return *reinterpret_cast<T*>(&_array[_size - 1]);
+  }
+
+  const T& operator[](const Size index) const
+  {
+    return *reinterpret_cast<const T*>(&_array[index]);
+  }
+
+  T& operator[](const Size index)
+  {
+    return *reinterpret_cast<T*>(&_array[index]);
   }
 
   bool operator==(const StaticVector& rhs) const
   {
-    for (size_t i = 0; i < _size; ++i) {
-      if (!(_array[i] == rhs._array[i])) {
-        return false;
+    return _size == rhs._size && std::equal(begin(), end(), rhs.begin());
+  }
+
+  void clear()
+  {
+    if (!std::is_trivially_destructible<T>::value) {
+      for (Size i = 0; i < _size; ++i) {
+        reinterpret_cast<T*>(&_array[i])->~T();
       }
     }
 
-    return true;
+    _size = 0;
   }
 
-  void clear() { _size = 0; }
-  Size size() const { return _size; }
+  Size                  size() const { return _size; }
+  static constexpr Size capacity() { return Capacity; }
+
+  T*       begin() { return reinterpret_cast<T*>(_array); }
+  const T* begin() const { return reinterpret_cast<const T*>(_array); }
+  T*       end() { return begin() + _size; }
+  const T* end() const { return begin() + _size; }
+
+  using iterator               = T*;
+  using const_iterator         = const T*;
+  using reverse_iterator       = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+  reverse_iterator       rbegin() { return reverse_iterator(end()); }
+  const_reverse_iterator rbegin() const
+  {
+    return const_reverse_iterator(end());
+  }
+
+  reverse_iterator       rend() { return reverse_iterator(begin()); }
+  const_reverse_iterator rend() const
+  {
+    return const_reverse_iterator(begin());
+  }
 
 private:
-  Size                    _size{};
-  std::array<T, capacity> _array{};
+  using Element = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+
+  Size    _size{};
+  Element _array[Capacity];
 };
 
 } // namespace spaix

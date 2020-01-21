@@ -16,14 +16,24 @@
 #ifndef SPAIX_DIRECTORYNODE_HPP
 #define SPAIX_DIRECTORYNODE_HPP
 
+#include "spaix/StaticVector.hpp"
 #include "spaix/types.hpp"
 
-#include <array>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace spaix {
+
+template <class ChildKey, class ChildNode>
+struct NodeEntry
+{
+  using Key  = ChildKey;
+  using Node = ChildNode;
+
+  Key                   key{};
+  std::unique_ptr<Node> node{};
+};
 
 template <class DirKey, class DatNode, ChildCount Fanout>
 struct DirectoryNode
@@ -36,11 +46,13 @@ public:
   using DatNodePtr = std::unique_ptr<DatNode>;
   using DirNodePtr = std::unique_ptr<DirNode>;
 
-  using DatChildren = std::array<DatNodePtr, Fanout>;
-  using DirChildren = std::array<DirNodePtr, Fanout>;
+  using DirEntry = NodeEntry<DirKey, DirNode>;
+  using DatEntry = DatNode;
 
-  DirectoryNode(const DirKey& k, const NodeType t)
-    : key{std::move(k)}, child_type{t}, n_children{0}
+  using DatChildren = StaticVector<DatEntry, ChildCount, Fanout>;
+  using DirChildren = StaticVector<DirEntry, ChildCount, Fanout>;
+
+  DirectoryNode(const NodeType t) : child_type{t}
   {
     if (child_type == NodeType::DAT) {
       new (&dat_children) DatChildren();
@@ -64,33 +76,59 @@ public:
   DirectoryNode(DirectoryNode&&) = delete;
   DirectoryNode& operator=(DirectoryNode&&) = delete;
 
-  void append_child(std::unique_ptr<DatNode> child)
+  void append_child(DatNode&& child)
   {
     assert(child_type == NodeType::DAT);
-    assert(n_children < Fanout);
-    dat_children[n_children++] = std::move(child);
-    assert(dat_children[n_children - 1]);
+    dat_children.emplace_back(std::move(child));
   }
 
-  void append_child(std::unique_ptr<DirNode> child)
+  void append_child(DirEntry entry)
   {
     assert(child_type == NodeType::DIR);
-    assert(n_children < Fanout);
-    dir_children[n_children++] = std::move(child);
-    assert(dir_children[n_children - 1]);
+    dir_children.emplace_back(std::move(entry));
   }
 
-  size_t num_children() const { return n_children; }
+  size_t num_children() const
+  {
+    return child_type == NodeType::DIR ? dir_children.size()
+                                       : dat_children.size();
+  }
 
-  DirKey         key;        ///< Key that contains all children
   const NodeType child_type; ///< Type of children nodes
-  ChildCount     n_children; ///< Number of direct children
   union
   {
     DirChildren dir_children; ///< Directory node children
     DatChildren dat_children; ///< Data node children
   };
 };
+
+template <class Key, class Node>
+const auto&
+entry_key(const NodeEntry<Key, Node>& entry)
+{
+  return entry.key;
+}
+
+template <class Key, class Data>
+const auto&
+entry_key(const DataNode<Key, Data>& entry)
+{
+  return entry.key;
+}
+
+template <class Key, class Node>
+const auto&
+entry_node(const NodeEntry<Key, Node>& entry)
+{
+  return entry.node;
+}
+
+template <class Key, class Data>
+const auto&
+entry_node(const DataNode<Key, Data>& entry)
+{
+  return entry;
+}
 
 } // namespace spaix
 

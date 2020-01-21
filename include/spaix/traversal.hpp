@@ -36,7 +36,7 @@ leftmost_child(const DirNode& dir, const Predicate& predicate)
   switch (dir.child_type) {
   case NodeType::DIR:
     for (size_t i = 0u; i < n_children; ++i) {
-      if (predicate.directory(dir.dir_children[i]->key)) {
+      if (predicate.directory(dir.dir_children[i].key)) {
         return static_cast<ChildIndex>(i);
       }
     }
@@ -44,7 +44,7 @@ leftmost_child(const DirNode& dir, const Predicate& predicate)
 
   case NodeType::DAT:
     for (size_t i = 0u; i < n_children; ++i) {
-      if (predicate.leaf(dir.dat_children[i]->key)) {
+      if (predicate.leaf(dir.dat_children[i].key)) {
         return static_cast<ChildIndex>(i);
       }
     }

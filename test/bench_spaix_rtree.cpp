@@ -108,10 +108,9 @@ benchmark_queries(std::mt19937& rng,
     size_t n_results = 0u;
     Counts counts    = {0u, 0u};
 
-    const auto predicate = BenchmarkWithin<Rect2>{Rect2{ranges}, &counts};
-
+    const auto predicate    = spaix::within(Rect2{ranges});
     const auto t_iter_start = std::chrono::steady_clock::now();
-#if 0
+#if 1
     for (const auto& node : tree.query(predicate)) {
       (void)node;
       ++n_results;
@@ -187,10 +186,10 @@ run(const Parameters& params, std::ostream& os)
 
   const auto t_bench_start = std::chrono::steady_clock::now();
   for (size_t i = 0; i < params.n_elements; ++i) {
-    const auto x1 = dist(rng);
-    const auto x2 = dist(rng);
-    const auto y1 = dist(rng);
-    const auto y2 = dist(rng);
+    const auto x1 = floorf(dist(rng));
+    const auto x2 = floorf(dist(rng));
+    const auto y1 = floorf(dist(rng));
+    const auto y2 = floorf(dist(rng));
 
     const Rect2 key{{std::min(x1, x2), std::max(x1, x2)},
                     {std::min(y1, y2), std::max(y1, y2)}};

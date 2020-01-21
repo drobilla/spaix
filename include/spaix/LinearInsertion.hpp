@@ -39,22 +39,23 @@ struct LinearInsertion
     using Sizes  = std::tuple<Volume, Volume, ChildCount>;
 
     size_t best_index = 0;
-    DirKey best_key   = children[0]->key;
+    DirKey best_key   = children[0].key;
     Sizes  best_sizes{std::numeric_limits<Volume>::max(),
                      std::numeric_limits<Volume>::max(),
                      std::numeric_limits<ChildCount>::max()};
 
     const size_t n_children = children.size();
-    for (size_t i = 0; i < n_children && children[i]; ++i) {
-      const auto& child           = children[i];
-      const auto  expanded        = child->key | key;
+    for (size_t i = 0; i < n_children && children[i].node; ++i) {
+      const auto& child           = children[i].node;
+      const auto& child_key       = children[i].key;
+      const auto  child_volume    = volume(child_key);
+      const auto  expanded        = child_key | key;
       const auto  expanded_volume = volume(expanded);
 
       const Volume child_expansion =
-          ((expanded != child->key) ? (expanded_volume - volume(child->key))
-                                    : 0);
+          ((expanded != child_key) ? (expanded_volume - child_volume) : 0);
 
-      Sizes sizes{child_expansion, expanded_volume, child->num_children()};
+      Sizes sizes{child_expansion, child_volume, child->num_children()};
       if (sizes < best_sizes) {
         best_sizes = std::move(sizes);
         best_index = i;

@@ -47,21 +47,24 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
                                        const DatNode*,
                                        const DatNode&>
 {
-  using Frame = StackFrame<DirNode>;
-  using Stack = StaticVector<Frame, size_t, max_height>;
+  using Frame    = StackFrame<DirNode>;
+  using Stack    = StaticVector<Frame, size_t, max_height>;
+  using DirEntry = typename DirNode::DirEntry;
+  using DirKey   = typename DirNode::NodeKey;
 
   Iterator(Stack&& stack, Predicate predicate)
     : _stack{std::move(stack)}, _predicate{std::move(predicate)}
   {
   }
 
-  Iterator(DirNode* root, Predicate predicate)
+  Iterator(const DirEntry& root_entry, Predicate predicate)
     : _stack{}, _predicate{std::move(predicate)}
   {
-    if (root && predicate.directory(root->key)) {
+    const auto& root = root_entry.node;
+    if (root && predicate.directory(root_entry.key)) {
       const ChildIndex root_child_index = leftmost_child(*root, predicate);
       if (root_child_index < root->num_children()) {
-        _stack.emplace_back(Frame{root, root_child_index});
+        _stack.emplace_back(Frame{root.get(), root_child_index});
         move_down_left();
       }
     }
@@ -76,19 +79,19 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   const DatNode& operator*() const
   {
     assert(!_stack.empty());
-    assert(_stack.back().index < _stack.back().node->n_children);
+    assert(_stack.back().index < _stack.back().node->num_children());
     assert(_stack.back().node->child_type == NodeType::DAT);
 
-    return *_stack.back().node->dat_children[_stack.back().index];
+    return _stack.back().node->dat_children[_stack.back().index];
   }
 
   const DatNode* operator->() const
   {
     assert(!_stack.empty());
-    assert(_stack.back().index < _stack.back().node->n_children);
+    assert(_stack.back().index < _stack.back().node->num_children());
     assert(_stack.back().node->child_type == NodeType::DAT);
 
-    return _stack.back().node->dat_children[_stack.back().index].get();
+    return &_stack.back().node->dat_children[_stack.back().index];
   }
 
   bool operator==(const Iterator& rhs) const { return _stack == rhs._stack; }
@@ -111,10 +114,10 @@ private:
     assert(node()->child_type == NodeType::DAT);
     do {
       ++back().index;
-    } while (index() < node()->n_children &&
-             !_predicate.leaf(node()->dat_children[index()]->key));
+    } while (index() < node()->num_children() &&
+             !_predicate.leaf(node()->dat_children[index()].key));
 
-    return index() < node()->n_children;
+    return index() < node()->num_children();
   }
 
   /// Move right until we reach a good directory or the end of the parent
@@ -123,14 +126,14 @@ private:
     assert(node()->child_type == NodeType::DIR);
     do {
       ++back().index;
-    } while (index() < node()->n_children &&
-             !_predicate.directory(node()->dir_children[index()]->key));
+    } while (index() < node()->num_children() &&
+             !_predicate.directory(node()->dir_children[index()].key));
   }
 
   /// Move up/right until we reach a node we are not at the end of yet
   bool move_up_right()
   {
-    while (!_stack.empty() && index() >= node()->n_children) {
+	  while (!_stack.empty() && index() >= node()->num_children()) {
       _stack.pop_back(); // Move up
       if (_stack.empty()) {
         return false; // Reached end of tree
@@ -146,7 +149,7 @@ private:
   bool move_down_left()
   {
     while (node()->child_type == NodeType::DIR) {
-      auto* const dir = node()->dir_children[index()].get();
+      auto* const dir = node()->dir_children[index()].node.get();
       if (dir->child_type == NodeType::DAT) {
         _stack.emplace_back(Frame{dir, 0});
       } else {
@@ -174,10 +177,10 @@ private:
     }
 
     // Now at a matching directory, and a matching child of that directory
-    assert(_predicate.directory(node()->key) &&
-           ((node()->child_type == NodeType::DIR &&
-             _predicate.directory(node()->dir_children[index()]->key)) ||
-            (_predicate.leaf(node()->dat_children[index()]->key))));
+    // assert(_predicate.directory(node()->key) &&
+    //        ((node()->child_type == NodeType::DIR &&
+    //          _predicate.directory(node()->dir_children[index()]->key)) ||
+    //         (_predicate.leaf(node()->dat_children[index()]->key))));
 
     if (!move_down_left()) {
       return false; // Reached end of tree
@@ -192,7 +195,7 @@ private:
       if (!increment()) {
         return;
       }
-    } while (!_predicate.leaf(node()->dat_children[index()]->key));
+    } while (!_predicate.leaf(node()->dat_children[index()].key));
   }
 
   Stack     _stack;

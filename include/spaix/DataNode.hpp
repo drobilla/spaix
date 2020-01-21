@@ -25,8 +25,8 @@ struct DataNode
 {
   static constexpr size_t num_children() { return 0; }
 
-  const Key key;
-  Data      data;
+  Key  key; // FIXME? const?
+  Data data;
 };
 
 } // namespace spaix

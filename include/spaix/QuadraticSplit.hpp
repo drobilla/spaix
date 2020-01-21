@@ -41,24 +41,25 @@ class QuadraticSplit
 {
 public:
   /// Return the indices of the children that should be used for split seeds
-  template <class NodePtr, size_t fanout, class DirKey>
+  template <class Entries, class DirKey>
   static std::pair<size_t, size_t>
-  pick_seeds(const std::array<NodePtr, fanout>& deposit, const DirKey&)
+  pick_seeds(const Entries& deposit, const DirKey&)
   {
     using Volume    = decltype(volume(std::declval<DirKey>()));
     using SeedWaste = Volume;
 
-    std::array<Volume, fanout> volumes;
+    assert(deposit.size() == deposit.capacity());
+    std::array<Volume, Entries::capacity()> volumes;
     for (size_t i = 0; i < deposit.size(); ++i) {
-      volumes[i] = volume(deposit[i]->key);
+      volumes[i] = volume(entry_key(deposit[i]));
     }
 
     SeedWaste                 max_waste{std::numeric_limits<Volume>::lowest()};
     std::pair<size_t, size_t> seeds{deposit.size(), deposit.size()};
     for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
-        const auto& k = deposit[i]->key;
-        const auto& l = deposit[j]->key;
+        const auto& k = entry_key(deposit[i]);
+        const auto& l = entry_key(deposit[j]);
 
         const SeedWaste waste = volume(k | l) - volumes[i] - volumes[j];
 
@@ -72,36 +73,44 @@ public:
     assert(seeds.first < deposit.size());
     assert(seeds.second < deposit.size());
     assert(seeds.first != seeds.second);
-    assert(deposit[seeds.first]);
-    assert(deposit[seeds.second]);
+    assert(&entry_node(deposit[seeds.first]));  // FIXME
+    assert(&entry_node(deposit[seeds.second])); // FIXME
     return seeds;
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
-  template <class Deposit, class DirNode>
+  template <class Deposit, class DirEntry>
   static void distribute_children(Deposit&         deposit,
-                                  DirNode&         lhs,
-                                  DirNode&         rhs,
+                                  DirEntry&        lhs,
+                                  DirEntry&        rhs,
                                   const ChildCount max_fanout)
   {
-    for (size_t i = 0; i < deposit.size() - 2; ++i) {
+    const size_t n_entries = deposit.size();
+    for (size_t i = 0; i < n_entries; ++i) {
       const auto best = pick_next(deposit, lhs, rhs);
       assert(best.child_index < deposit.size());
+
+      if (best.child_index != deposit.size() - 1) {
+        std::iter_swap((deposit.begin() + best.child_index),
+                       (deposit.begin() + deposit.size() - 1));
+      }
 
       auto& parent = best.side == Side::left ? lhs : rhs;
 
       parent.key = best.new_parent_key;
-      parent.append_child(std::move(deposit[best.child_index]));
+      parent.node->append_child(std::move(deposit.back()));
+      deposit.pop_back();
 
-      if (parent.num_children() == max_fanout) {
-        auto& other_parent = best.side == Side::left ? rhs : lhs;
-        for (size_t j = 0; j < deposit.size(); ++j) {
-          if (deposit[j]) {
-            other_parent.key = other_parent.key | deposit[j]->key;
-            other_parent.append_child(std::move(deposit[j]));
-          }
+      if (parent.node->num_children() == max_fanout) {
+        auto&        other_parent = best.side == Side::left ? rhs : lhs;
+        const size_t n_remaining  = deposit.size();
+        for (size_t j = 0; j < n_remaining; ++j) {
+          other_parent.key = other_parent.key | entry_key(deposit.back());
+          other_parent.node->append_child(std::move(deposit.back()));
+          deposit.pop_back();
         }
 
+        assert(deposit.empty());
         return;
       }
     }
@@ -125,16 +134,17 @@ private:
   }
 
   /// Choose the next child to distribute during a split
-  template <class Deposit, class DirNode>
-  static ChildAssignment<typename DirNode::NodeKey>
-  pick_next(const Deposit& deposit, const DirNode& lhs, const DirNode& rhs)
+  template <class Deposit, class DirEntry>
+  static ChildAssignment<typename DirEntry::Key>
+  pick_next(const Deposit& deposit, const DirEntry& lhs, const DirEntry& rhs)
   {
+    using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::NodeKey;
     using Volume     = decltype(volume(std::declval<DirKey>()));
     using Result     = ChildAssignment<DirKey>;
-    using Preference = std::tuple<Volume, Volume, ChildCount>;
+    using Preference = Volume;
 
-    Preference best_preference{0, 0, 0};
+    Preference best_preference{0};
     Result     best{deposit.size(), DirKey{}, Side::left};
 
     const auto lhs_volume = volume(lhs.key);
@@ -142,30 +152,26 @@ private:
 
     for (size_t i = 0; i < deposit.size(); ++i) {
       const auto& child = deposit[i];
-      if (child) {
-        const auto l_key       = lhs.key | child->key;
-        const auto r_key       = rhs.key | child->key;
+      if (&entry_node(child)) { // FIXME
+        const auto l_key       = lhs.key | entry_key(child);
+        const auto r_key       = rhs.key | entry_key(child);
         const auto l_volume    = volume(l_key);
         const auto r_volume    = volume(r_key);
         const auto l_expansion = l_volume - lhs_volume;
         const auto r_expansion = r_volume - rhs_volume;
 
-        const Preference preference = {
-            abs_diff(l_expansion, r_expansion),
-            abs_diff(l_volume, r_volume),
-            abs_diff(lhs.num_children(), rhs.num_children())};
-
+        const Preference preference = abs_diff(l_expansion, r_expansion);
         if (preference >= best_preference) {
           best_preference = preference;
           if (l_expansion < r_expansion) {
             best = Result{i, l_key, Side::left};
           } else if (r_expansion < l_expansion) {
             best = Result{i, r_key, Side::right};
-          } else if (l_volume < r_volume) {
+          } else if (lhs_volume < rhs_volume) {
             best = Result{i, l_key, Side::left};
-          } else if (r_volume < l_volume) {
+          } else if (rhs_volume < lhs_volume) {
             best = Result{i, r_key, Side::right};
-          } else if (lhs.num_children() < rhs.num_children()) {
+          } else if (lhs.node->num_children() < rhs.node->num_children()) {
             best = Result{i, l_key, Side::left};
           } else {
             best = Result{i, r_key, Side::right};

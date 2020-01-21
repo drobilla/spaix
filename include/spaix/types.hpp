@@ -16,14 +16,15 @@
 #ifndef SPAIX_TYPES_HPP
 #define SPAIX_TYPES_HPP
 
+#include <cstddef>
 #include <cstdint>
 
 namespace spaix {
 
-using ChildIndex = uint16_t;
-using ChildCount = uint16_t;
+using ChildIndex = size_t;
+using ChildCount = size_t;
 
-enum class NodeType : uint16_t {
+enum class NodeType : size_t {
   DIR, ///< Internal directory node
   DAT, ///< Leaf data node
 };
