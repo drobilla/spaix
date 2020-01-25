@@ -152,36 +152,11 @@ public:
   using DirNodePair = std::array<DirEntry, 2>;
   using Frame       = StackFrame<DirNode>;
 
-#if 0
-  static_assert(
-      sizeof(DirectoryNode<DirKey, DatNode, fanout<DirectoryKey>(512)>) <=
-              512 &&
-          sizeof(DirectoryNode<DirKey, DatNode, fanout<DirectoryKey>(512)>) >
-              512 - sizeof(DirKey) - sizeof(Data),
-      "");
-
-  static_assert(
-      sizeof(DirectoryNode<DirKey, DatNode, fanout<DirectoryKey>(4096)>) <=
-              4096 &&
-          sizeof(DirectoryNode<DirKey, DatNode, fanout<DirectoryKey>(4096)>) >
-              4096 - sizeof(DirKey) - sizeof(Data),
-      "");
-#endif
+  static_assert(sizeof(DirNodePtr) == sizeof(void*), "");
   static_assert(sizeof(DirNode) <= PageSize, "");
-  static_assert(sizeof(DirNode) >
-                    PageSize - sizeof(DirKey) - sizeof(DirNodePtr),
+  static_assert(sizeof(DirNode) > PageSize - sizeof(DirKey) - sizeof(void*),
                 "");
   static_assert(sizeof(DirNode) > PageSize - sizeof(Key) - sizeof(Data), "");
-
-  RTree() = default;
-
-  ~RTree() = default;
-
-  RTree(const RTree&)            = delete;
-  RTree& operator=(const RTree&) = delete;
-
-  RTree(RTree&&) noexcept            = default;
-  RTree& operator=(RTree&&) noexcept = default;
 
   template <class Predicate>
   using Iter = Iterator<Predicate,
