@@ -16,6 +16,9 @@
 #ifndef TEST_DISTRIBUTION_HPP
 #define TEST_DISTRIBUTION_HPP
 
+#include <algorithm>
+#include <cstddef>
+
 namespace spaix {
 namespace test {
 

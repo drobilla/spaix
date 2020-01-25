@@ -27,6 +27,29 @@ template <class T, class Size, Size Capacity>
 class StaticVector
 {
 public:
+  StaticVector() = default;
+  ~StaticVector() { clear(); }
+
+  StaticVector(StaticVector&& vec) noexcept
+  {
+    for (Size i = 0; i < vec.size(); ++i) {
+      new (&_array[i]) T(std::move(vec[i]));
+      ++_size;
+    }
+  }
+
+  StaticVector(const StaticVector& vec)
+  {
+    for (Size i = 0; i < vec.size(); ++i) {
+      new (&_array[i]) T(vec[i]);
+      ++_size;
+    }
+  }
+
+	// TODO (maybe, unused...)
+  StaticVector& operator=(StaticVector&) = delete;
+  StaticVector& operator=(StaticVector&&) = delete;
+
   void pop_back()
   {
     assert(!empty());

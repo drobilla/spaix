@@ -31,27 +31,25 @@ template <class DirNode, class Predicate>
 ChildIndex
 leftmost_child(const DirNode& dir, const Predicate& predicate)
 {
-  const size_t n_children = dir.num_children();
-
   switch (dir.child_type) {
   case NodeType::DIR:
-    for (size_t i = 0u; i < n_children; ++i) {
+    for (size_t i = 0u; i < dir.dir_children.size(); ++i) {
       if (predicate.directory(dir.dir_children[i].key)) {
         return static_cast<ChildIndex>(i);
       }
     }
-    break;
+    return dir.dir_children.size();
 
   case NodeType::DAT:
-    for (size_t i = 0u; i < n_children; ++i) {
+    for (size_t i = 0u; i < dir.dat_children.size(); ++i) {
       if (predicate.leaf(dir.dat_children[i].key)) {
         return static_cast<ChildIndex>(i);
       }
     }
-    break;
+    return dir.dat_children.size();
   }
 
-  return static_cast<ChildIndex>(n_children);
+  return 0; // Unreached
 }
 
 } // namespace spaix

@@ -16,6 +16,7 @@
 #ifndef SPAIX_QUADRATICSPLIT_HPP
 #define SPAIX_QUADRATICSPLIT_HPP
 
+#include "spaix/StaticVector.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
@@ -28,8 +29,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <iostream>
-
 namespace spaix {
 
 /**
@@ -41,15 +40,16 @@ class QuadraticSplit
 {
 public:
   /// Return the indices of the children that should be used for split seeds
-  template <class Entries, class DirKey>
+  template <class Entry, size_t count, class DirKey>
   static std::pair<size_t, size_t>
-  pick_seeds(const Entries& deposit, const DirKey&)
+  pick_seeds(const StaticVector<Entry, ChildCount, count>& deposit,
+             const DirKey&)
   {
     using Volume    = decltype(volume(std::declval<DirKey>()));
     using SeedWaste = Volume;
 
     assert(deposit.size() == deposit.capacity());
-    std::array<Volume, Entries::capacity()> volumes;
+    std::array<Volume, count> volumes;
     for (size_t i = 0; i < deposit.size(); ++i) {
       volumes[i] = volume(entry_key(deposit[i]));
     }
@@ -73,8 +73,6 @@ public:
     assert(seeds.first < deposit.size());
     assert(seeds.second < deposit.size());
     assert(seeds.first != seeds.second);
-    assert(&entry_node(deposit[seeds.first]));  // FIXME
-    assert(&entry_node(deposit[seeds.second])); // FIXME
     return seeds;
   }
 
@@ -91,8 +89,8 @@ public:
       assert(best.child_index < deposit.size());
 
       if (best.child_index != deposit.size() - 1) {
-        std::iter_swap((deposit.begin() + best.child_index),
-                       (deposit.begin() + deposit.size() - 1));
+        std::iter_swap(deposit.begin() + best.child_index,
+                       deposit.begin() + deposit.size() - 1);
       }
 
       auto& parent = best.side == Side::left ? lhs : rhs;
@@ -105,12 +103,11 @@ public:
         auto&        other_parent = best.side == Side::left ? rhs : lhs;
         const size_t n_remaining  = deposit.size();
         for (size_t j = 0; j < n_remaining; ++j) {
-          other_parent.key = other_parent.key | entry_key(deposit.back());
-          other_parent.node->append_child(std::move(deposit.back()));
-          deposit.pop_back();
+          other_parent.key |= entry_key(deposit[j]);
+          other_parent.node->append_child(std::move(deposit[j]));
         }
 
-        assert(deposit.empty());
+        deposit.clear();
         return;
       }
     }
@@ -151,31 +148,25 @@ private:
     const auto rhs_volume = volume(rhs.key);
 
     for (size_t i = 0; i < deposit.size(); ++i) {
-      const auto& child = deposit[i];
-      if (&entry_node(child)) { // FIXME
-        const auto l_key       = lhs.key | entry_key(child);
-        const auto r_key       = rhs.key | entry_key(child);
-        const auto l_volume    = volume(l_key);
-        const auto r_volume    = volume(r_key);
-        const auto l_expansion = l_volume - lhs_volume;
-        const auto r_expansion = r_volume - rhs_volume;
+      const auto& child       = deposit[i];
+      const auto  l_key       = lhs.key | entry_key(child);
+      const auto  r_key       = rhs.key | entry_key(child);
+      const auto  l_volume    = volume(l_key);
+      const auto  r_volume    = volume(r_key);
+      const auto  l_expansion = l_volume - lhs_volume;
+      const auto  r_expansion = r_volume - rhs_volume;
 
-        const Preference preference = abs_diff(l_expansion, r_expansion);
-        if (preference >= best_preference) {
-          best_preference = preference;
-          if (l_expansion < r_expansion) {
-            best = Result{i, l_key, Side::left};
-          } else if (r_expansion < l_expansion) {
-            best = Result{i, r_key, Side::right};
-          } else if (lhs_volume < rhs_volume) {
-            best = Result{i, l_key, Side::left};
-          } else if (rhs_volume < lhs_volume) {
-            best = Result{i, r_key, Side::right};
-          } else if (lhs.node->num_children() < rhs.node->num_children()) {
-            best = Result{i, l_key, Side::left};
-          } else {
-            best = Result{i, r_key, Side::right};
-          }
+      const Preference preference = abs_diff(l_expansion, r_expansion);
+      if (preference >= best_preference) {
+        best_preference = preference;
+        if (l_expansion < r_expansion) {
+          best = Result{i, l_key, Side::left};
+        } else if (r_expansion < l_expansion) {
+          best = Result{i, r_key, Side::right};
+        } else if (lhs_volume < rhs_volume) {
+          best = Result{i, l_key, Side::left};
+        } else {
+          best = Result{i, r_key, Side::right};
         }
       }
     }

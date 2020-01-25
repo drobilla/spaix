@@ -25,7 +25,6 @@
 #include "spaix/contains.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/everything.hpp"
-#include "spaix/traversal.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
 
@@ -33,18 +32,11 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <limits>
 #include <memory>
-#include <new>
-#include <type_traits>
 #include <utility>
 #include <vector>
-
-#ifndef NDEBUG
-#  include "spaix/contains.hpp"
-#endif
 
 namespace spaix {
 
@@ -120,7 +112,7 @@ template <class LeafKey,
           class LeafData,
           class DirectoryKey        = typename RectFor<LeafKey>::type,
           ChildCount Fanout         = fanout<DirectoryKey>(),
-          unsigned   MinFillDivisor = 4,
+          unsigned   MinFillDivisor = 3,
           class Insertion           = LinearInsertion,
           class Split               = QuadraticSplit>
 class RTree
@@ -158,7 +150,7 @@ public:
 
   static constexpr auto min_fanout = Fanout / MinFillDivisor;
 
-  RTree() {}
+  RTree() = default;
 
   ~RTree() = default;
 
@@ -238,17 +230,17 @@ public:
   {
     switch (node.child_type) {
     case NodeType::DIR:
-      for (ChildIndex i = 0u; i < node.num_children(); ++i) {
-        if (predicate.directory(node.dir_children[i].key)) {
-          fast_query_rec(*node.dir_children[i].node, predicate, visitor);
+      for (const auto& entry : node.dir_children) {
+        if (predicate.directory(entry.key)) {
+          fast_query_rec(*entry.node, predicate, visitor);
         }
       }
       break;
 
     case NodeType::DAT:
-      for (ChildIndex i = 0u; i < node.num_children(); ++i) {
-        if (predicate.leaf(node.dat_children[i].key)) {
-          visitor(node.dat_children[i]);
+      for (const auto& entry : node.dat_children) {
+        if (predicate.leaf(entry.key)) {
+          visitor(entry);
         }
       }
     }
@@ -285,19 +277,17 @@ public:
   void insert(const Key& key, const Data& data)
   {
     if (empty()) {
-      _root = {DirKey{key}, DirNodePtr{new DirNode{NodeType::DAT}}};
+      _root = {DirKey{key}, std::make_unique<DirNode>(NodeType::DAT)};
     }
 
-    auto sides = insert_rec(_root, key, data);
+    auto sides = insert_rec(_root, _root.key | key, key, data);
     if (sides[0].node) {
       _root = {sides[0].key | sides[1].key,
-               DirNodePtr{new DirNode{NodeType::DIR}}};
+               std::make_unique<DirNode>(NodeType::DIR)};
 
       _root.node->append_child(std::move(sides[0]));
       _root.node->append_child(std::move(sides[1]));
       assert(_root.key == ideal_key(*_root.node));
-    } else {
-      _root.key = _root.key | key;
     }
 
     ++_size;
@@ -326,7 +316,7 @@ private:
     DirKey key;
 
     for (const auto& entry : children) {
-      key = key | entry_key(entry);
+      key |= entry_key(entry);
     }
 
     return key;
@@ -341,15 +331,10 @@ private:
     }
   }
 
-  void replace_key(DirEntry& entry, const DirKey& new_key)
-  {
-    if (new_key != entry.key) {
-      entry.key = new_key;
-    }
-  }
-
-  DirNodePair
-  insert_rec(DirEntry& parent_entry, const Key& key, const Data& data)
+  static DirNodePair insert_rec(DirEntry&     parent_entry,
+                                const DirKey& new_parent_key,
+                                const Key&    key,
+                                const Data&   data)
   {
     auto& parent = *parent_entry.node;
     if (parent.child_type == NodeType::DIR) { // Recursing downwards
@@ -358,13 +343,11 @@ private:
       const auto expanded = choice.second;
       auto&      entry    = parent.dir_children[index];
 
-      entry.key = expanded;
-
-      auto sides = insert_rec(entry, key, data);
+      auto sides = insert_rec(entry, expanded, key, data);
 
       if (sides[0].node) { // Child was split, replace it
         parent.dir_children[index] = std::move(sides[0]);
-        if (parent.num_children() == Fanout) {
+        if (parent.dir_children.size() == Fanout) {
           return split(parent.dir_children,
                        std::move(sides[1]),
                        parent_entry.key | key,
@@ -372,15 +355,15 @@ private:
         }
 
         parent.append_child(std::move(sides[1]));
-        replace_key(parent_entry, parent_key(parent.dir_children));
+        parent_entry.key = parent_key(parent.dir_children);
       } else {
-        parent_entry.key = parent_entry.key | key;
+        parent_entry.key = new_parent_key;
         assert(parent_entry.key == ideal_key(parent));
       }
 
-    } else if (parent.num_children() < Fanout) { // Simple leaf insert
+    } else if (parent.dat_children.size() < Fanout) { // Simple leaf insert
       parent.append_child(DatNode{key, data});
-      parent_entry.key = parent_entry.key | key;
+      parent_entry.key = new_parent_key;
       assert(parent_entry.key == ideal_key(parent));
 
     } else { // Split leaf insert
@@ -406,7 +389,7 @@ private:
     }
 
     DirKey     key{entry_key(deposit.back())};
-    DirNodePtr node{new DirNode(child_type)};
+    DirNodePtr node{std::make_unique<DirNode>(child_type)};
     node->append_child(std::move(deposit.back()));
     deposit.pop_back();
     return {key, std::move(node)};
@@ -419,23 +402,12 @@ private:
                            const DirKey&                            bounds,
                            const NodeType                           type)
   {
-    // assert(node);
-    // assert(std::find(nodes.begin(), nodes.end(), nullptr) == nodes.end());
-
     // Make an array of all nodes to deposit
     StaticVector<Entry, ChildCount, Fanout + 1> deposit;
     for (auto&& e : nodes) {
       deposit.emplace_back(std::move(e));
     }
     deposit.emplace_back(std::move(entry));
-    // std::array<Entry, Fanout + 1> deposit;
-    // std::move(nodes.begin(), nodes.end(), deposit.begin());
-    // deposit[nodes.size()] = std::move(entry);
-    if (bounds != parent_key(deposit)) {
-      std::cerr << "bounds: " << bounds << std::endl;
-      std::cerr << "ideal:  " << parent_key(deposit) << std::endl;
-    }
-    // FIXME
     assert(bounds == parent_key(deposit));
 
     // Pick two nodes to seed the left and right groups
@@ -451,22 +423,16 @@ private:
         deposit, sides[0], sides[1], Fanout - min_fanout);
     assert(sides[0].node->num_children() + sides[1].node->num_children() ==
            Fanout + 1);
-    sides[0].key = ideal_key(*sides[0].node);
-    sides[1].key = ideal_key(*sides[1].node);
+    assert(sides[0].key == ideal_key(*sides[0].node));
+    assert(sides[1].key == ideal_key(*sides[1].node));
 
-    // fprintf(
-    //     stderr, "Balance: %u %u\n", sides[0]->num_children(),
-    //     sides[1]->num_children());
-    // fprintf(
-    //     stderr, "Overlap: %f\n", double(volume(sides[0]->key &
-    //     sides[1]->key)));
     return sides;
   }
 
-  void visit_structure_rec(const DirEntry& entry,
-                           DirVisitor      visit_dir,
-                           DatVisitor      visit_dat,
-                           NodePath&       path) const
+  static void visit_structure_rec(const DirEntry& entry,
+                                  DirVisitor      visit_dir,
+                                  DatVisitor      visit_dat,
+                                  NodePath&       path)
   {
     const auto& node = *entry.node;
     if (visit_dir(entry.key, path, node.num_children())) {

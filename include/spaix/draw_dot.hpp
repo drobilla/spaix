@@ -16,6 +16,8 @@
 #ifndef SPAIX_DRAW_DOT_HPP
 #define SPAIX_DRAW_DOT_HPP
 
+#include "spaix/types.hpp"
+
 #include <cstddef>
 #include <cstdint>
 #include <sstream>
@@ -23,6 +25,8 @@
 #include <vector>
 
 namespace spaix {
+
+using NodePath = std::vector<ChildIndex>;
 
 namespace detail {
 

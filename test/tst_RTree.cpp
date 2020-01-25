@@ -112,7 +112,7 @@ make_tree(std::mt19937& rng, const unsigned span)
 
 template <class Key>
 unsigned
-num_items_in_area(const unsigned x_span, const unsigned y_span);
+num_items_in_area(unsigned x_span, unsigned y_span);
 
 template <>
 unsigned

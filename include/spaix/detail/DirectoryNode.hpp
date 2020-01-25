@@ -16,6 +16,7 @@
 #ifndef SPAIX_DIRECTORYNODE_HPP
 #define SPAIX_DIRECTORYNODE_HPP
 
+#include "spaix/DataNode.hpp"
 #include "spaix/StaticVector.hpp"
 #include "spaix/types.hpp"
 
@@ -52,7 +53,7 @@ public:
   using DatChildren = StaticVector<DatEntry, ChildCount, Fanout>;
   using DirChildren = StaticVector<DirEntry, ChildCount, Fanout>;
 
-  DirectoryNode(const NodeType t) : child_type{t}
+  explicit DirectoryNode(const NodeType t) : child_type{t}
   {
     if (child_type == NodeType::DAT) {
       new (&dat_children) DatChildren();

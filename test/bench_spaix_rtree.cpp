@@ -110,7 +110,7 @@ benchmark_queries(std::mt19937& rng,
 
     const auto predicate    = spaix::within(Rect2{ranges});
     const auto t_iter_start = std::chrono::steady_clock::now();
-#if 1
+#if 0
     for (const auto& node : tree.query(predicate)) {
       (void)node;
       ++n_results;
@@ -197,7 +197,7 @@ run(const Parameters& params, std::ostream& os)
     const auto value = static_cast<Data>(i);
 
     const auto t_start = std::chrono::steady_clock::now();
-    t.insert(std::move(key), std::move(value));
+    t.insert(key, value);
     const auto t_end = std::chrono::steady_clock::now();
 
     const auto d = std::chrono::duration<double>(t_end - t_start).count();

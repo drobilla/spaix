@@ -78,6 +78,13 @@ public:
   using Tuple   = std::tuple<Range<T0>, Range<Ts>...>;
   using Scalars = std::tuple<T0, Ts...>;
 
+  Rect(const Rect& rect)     = default;
+  Rect(Rect&& rect) noexcept = default;
+  Rect& operator=(const Rect& rect) = default;
+  Rect& operator=(Rect&& rect) noexcept = default;
+
+  ~Rect() = default;
+
   /// Construct an empty rectangle
   explicit constexpr Rect()
     : _ranges{detail::empty_ranges_rec<T0, Ts...>(ibegin())}
@@ -98,17 +105,22 @@ public:
   }
 
   /// Construct a rectangle for the given ranges in each dimension
+#if 1
   explicit constexpr Rect(Tuple ranges)
     : _ranges{detail::ranges_are_empty(ranges, ibegin())
                   ? detail::empty_ranges_rec<T0, Ts...>(ibegin())
                   : std::move(ranges)}
   {
   }
+#else
+  explicit constexpr Rect(Tuple ranges) : _ranges{std::move(ranges)} {}
+#endif
 
   static constexpr auto   ibegin() { return spaix::ibegin<T0, Ts...>(); }
   static constexpr size_t size() { return 1 + sizeof...(Ts); }
 
   constexpr const Tuple& tuple() const { return _ranges; }
+  constexpr Tuple&       tuple() { return _ranges; }
 
 private:
   Tuple _ranges;
@@ -145,6 +157,13 @@ get(const Rect<Ts...>& rect)
 template <size_t dim, class... Ts>
 constexpr const std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
 range(const Rect<Ts...>& rect)
+{
+  return std::get<dim>(rect.tuple());
+}
+
+template <size_t dim, class... Ts>
+std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
+range(Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }

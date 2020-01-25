@@ -26,7 +26,7 @@ namespace test {
 
 struct BenchParameters
 {
-  BenchParameters(const spaix::test::Arguments& args)
+  explicit BenchParameters(const spaix::test::Arguments& args)
     : n_elements{static_cast<size_t>(std::stoul(args.at("size")))}
     , n_queries{static_cast<size_t>(std::stoul(args.at("queries")))}
     , n_steps{static_cast<size_t>(std::stoul(args.at("steps")))}

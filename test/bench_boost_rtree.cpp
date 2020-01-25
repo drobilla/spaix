@@ -18,23 +18,19 @@
 #include "options.hpp"
 #include "write_row.hpp"
 
-#include "spaix/RTree.hpp" // FIXME?
+#include "spaix/RTree.hpp" // FIXME
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
 
-// FIXME
 #include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <iostream>
 #include <random>
 #include <stdexcept>
-#include <string>
 #include <utility>
 
 namespace {
@@ -121,7 +117,7 @@ template <class Algorithm>
 int
 run(const Parameters& params)
 {
-  using Value = std::pair<Box, float>;
+  using Value = std::pair<Box, Data>;
   using Tree  = bgi::rtree<Value, Algorithm>;
 
   auto&      os           = std::cout;
@@ -167,7 +163,7 @@ run(const Parameters& params)
     const auto value = static_cast<Data>(i);
 
     const auto t_start = std::chrono::steady_clock::now();
-    t.insert(std::make_pair(std::move(key), std::move(value)));
+    t.insert(std::make_pair(key, value));
     const auto t_end = std::chrono::steady_clock::now();
 
     const auto d = std::chrono::duration<double>(t_end - t_start).count();
@@ -255,6 +251,7 @@ main(int argc, char** argv)
   };
 
   try {
+
     const auto args = parse_options(opts, argc, argv);
 
     if (args.at("insert") != "linear") {
@@ -263,6 +260,7 @@ main(int argc, char** argv)
     }
 
     run(Parameters{args}, args);
+
   } catch (const std::runtime_error& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);

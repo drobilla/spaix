@@ -36,7 +36,7 @@ struct Option
 using Options   = std::map<std::string, Option>;
 using Arguments = std::map<std::string, std::string>;
 
-static void
+inline void
 print_usage(const std::string& prog, const Options& options)
 {
   std::cerr << "Usage: " << prog << " [OPTION]...\n\n";
@@ -59,7 +59,7 @@ print_usage(const std::string& prog, const Options& options)
   }
 }
 
-static Arguments
+inline Arguments
 parse_options(const Options& opts, int argc, char** argv)
 {
   std::map<std::string, std::string> args;

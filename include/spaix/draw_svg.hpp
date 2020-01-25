@@ -17,6 +17,7 @@
 #define SPAIX_DRAW_SVG_HPP
 
 #include "spaix/Rect.hpp"
+#include "spaix/types.hpp"
 
 #include <cstdint>
 #include <cstdio>
@@ -26,6 +27,9 @@
 #include <vector>
 
 namespace spaix {
+
+using NodePath = std::vector<ChildIndex>;
+
 namespace svg {
 
 constexpr double pad = 8;

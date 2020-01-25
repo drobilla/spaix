@@ -43,6 +43,10 @@ test_union()
   STATIC_CHECK(((TestPoint{1, 6} | rect) == TestRect{{1, 3}, {2, 6}}));
 
   STATIC_CHECK(((TestPoint{1, 2} | TestPoint{3, 5}) == rect));
+
+  auto mut = TestRect{{1, 3}, {2, 5}};
+  mut |= TestRect{{2, 4}, {1, 5}};
+  CHECK((mut == TestRect{{1, 4}, {1, 5}}));
 }
 
 } // namespace test

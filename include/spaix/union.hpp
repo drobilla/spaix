@@ -45,6 +45,25 @@ union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
       union_rec(lhs, rhs, ++index));
 }
 
+template <class Lhs, class Rhs, size_t n_dims>
+constexpr auto
+expand_rec(Lhs&, const Rhs&, EndIndex<n_dims>)
+{
+}
+
+template <class Lhs, class Rhs, size_t dim, size_t n_dims>
+constexpr auto
+expand_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
+{
+  auto&      l = range<dim>(lhs);
+  const auto r = range<dim>(rhs);
+
+  l.first  = std::min(l.first, r.first);
+  l.second = std::max(l.second, r.second);
+
+  expand_rec(lhs, rhs, ++index);
+}
+
 } // namespace detail
 
 /// Return the geometric union of `lhs` and `rhs`
@@ -61,6 +80,24 @@ constexpr Rect<Ts...>
 operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
+}
+
+/// Return the geometric union of `lhs` and `rhs`
+template <class... Ts>
+constexpr Rect<Ts...>&
+operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+{
+  detail::expand_rec(lhs, rhs, ibegin<Ts...>());
+  return lhs;
+}
+
+/// Return the geometric union of `lhs` and `rhs`
+template <class... Ts>
+constexpr Rect<Ts...>
+operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+{
+  detail::expand_rec(lhs, rhs, ibegin<Ts...>());
+  return lhs;
 }
 
 /// Return the geometric union of `lhs` and `rhs`

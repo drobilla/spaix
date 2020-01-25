@@ -29,8 +29,6 @@
 
 namespace spaix {
 
-// FIXME: node/entry names in here are rotten
-
 /**
    Linear node split.
 
@@ -47,16 +45,16 @@ public:
     size_t max_max = 0;
   };
 
-  template <class Children, size_t n_dims>
-  static void update_indices(const Children&,
+  template <class Entries, size_t n_dims>
+  static void update_indices(const Entries&,
                              const size_t,
                              std::array<ExtremeIndices, n_dims>&,
                              Index<n_dims, n_dims>)
   {
   }
 
-  template <class Children, size_t dim, size_t n_dims>
-  static void update_indices(const Children&                     deposit,
+  template <class Entries, size_t dim, size_t n_dims>
+  static void update_indices(const Entries&                      deposit,
                              const size_t                        child_index,
                              std::array<ExtremeIndices, n_dims>& indices,
                              Index<dim, n_dims>                  index)
@@ -89,20 +87,20 @@ public:
   struct MaxSeparation
   {
     size_t dimension  = 0;
-    T      separation = {};
+    T      separation = std::numeric_limits<T>::min();
   };
 
-  template <class Children, class T, size_t n_dims>
-  static void update_max_separation(const Children&,
+  template <class Entries, class T, size_t n_dims>
+  static void update_max_separation(const Entries&,
                                     const std::array<ExtremeIndices, n_dims>&,
                                     MaxSeparation<T>&,
                                     Index<n_dims, n_dims>)
   {
   }
 
-  template <class Children, class T, size_t dim, size_t n_dims>
+  template <class Entries, class T, size_t dim, size_t n_dims>
   static void
-  update_max_separation(const Children&                           deposit,
+  update_max_separation(const Entries&                            deposit,
                         const std::array<ExtremeIndices, n_dims>& indices,
                         MaxSeparation<T>&  max_separation,
                         Index<dim, n_dims> index)
@@ -111,9 +109,9 @@ public:
         static_cast<T>(max<dim>(entry_key(deposit[indices[dim].max_max])) -
                        min<dim>(entry_key(deposit[indices[dim].min_min])));
 
-    const auto separation = static_cast<T>(
-        abs_diff(max<dim>(entry_key(deposit[indices[dim].min_max])),
-                 min<dim>(entry_key(deposit[indices[dim].max_min]))));
+    const auto separation =
+        static_cast<T>(max<dim>(entry_key(deposit[indices[dim].min_max])) -
+                       min<dim>(entry_key(deposit[indices[dim].max_min])));
 
     const auto normalized_separation =
         separation / (width > std::numeric_limits<T>::epsilon() ? width : T{1});
@@ -127,28 +125,27 @@ public:
   }
 
   /// Return the indices of the children that should be used for split seeds
-  template <class Children, class DirKey>
+  template <class Entries, class DirKey>
   static std::pair<size_t, size_t>
-  pick_seeds(const Children& deposit, const DirKey& bounds)
+  pick_seeds(const Entries& deposit, const DirKey& bounds)
   {
-    std::array<ExtremeIndices, DirKey::size()> indices;
-    indices.fill(ExtremeIndices{});
+    using Scalar = typename CommonScalarType<typename DirKey::Scalars>::type;
+
+    std::array<ExtremeIndices, DirKey::size()> indices{};
 
     for (size_t i = 1; i < deposit.size(); ++i) {
       update_indices(deposit, i, indices, bounds.ibegin());
     }
 
-    MaxSeparation<typename CommonScalarType<typename DirKey::Scalars>::type>
-        max_separation;
+    MaxSeparation<Scalar> max_separation;
     update_max_separation(deposit, indices, max_separation, bounds.ibegin());
 
-    const std::pair<size_t, size_t> seeds = {
-        indices[max_separation.dimension].max_min,
-        indices[max_separation.dimension].min_max};
+    const auto max_min_index = indices[max_separation.dimension].max_min;
+    const auto min_max_index = indices[max_separation.dimension].min_max;
+    assert(max_min_index != min_max_index);
 
-    return seeds.first < seeds.second
-               ? seeds
-               : std::pair<size_t, size_t>{seeds.second, seeds.first};
+    return {std::min(max_min_index, min_max_index),
+            std::max(max_min_index, min_max_index)};
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
@@ -161,71 +158,67 @@ public:
     auto lhs_volume = volume(lhs.key);
     auto rhs_volume = volume(rhs.key);
 
-    for (size_t i = 0; i < deposit.size(); ++i) {
-      if (!&entry_node(deposit[i])) { // FIXME
-        continue;
+    const size_t n_entries = deposit.size();
+    for (size_t i = 0; i < n_entries; ++i) {
+      auto child = std::move(deposit.back());
+      deposit.pop_back();
+
+      // Insert into parent which causes the least expansion
+      const auto l_key       = lhs.key | entry_key(child);
+      const auto r_key       = rhs.key | entry_key(child);
+      const auto l_volume    = volume(l_key);
+      const auto r_volume    = volume(r_key);
+      const auto l_expansion = l_volume - lhs_volume;
+      const auto r_expansion = r_volume - rhs_volume;
+
+      Side side = Side::left;
+      if (l_expansion < r_expansion) {
+        side = Side::left;
+      } else if (r_expansion < l_expansion) {
+        side = Side::right;
+      } else if (l_volume < r_volume) {
+        side = Side::left;
+      } else {
+        side = Side::right;
       }
 
-      auto child = std::move(deposit[i]);
-      if (lhs.node->num_children() == max_fanout) {
-        // Left is full, insert into right
-        const auto r_key = rhs.key | entry_key(child);
-        distribute_child(rhs, r_key, std::move(child));
-        rhs_volume = volume(r_key);
-      } else if (rhs.node->num_children() == max_fanout) {
-        // Right is full, insert into left
-        const auto l_key = lhs.key | entry_key(child);
+      if (side == Side::left) {
         distribute_child(lhs, l_key, std::move(child));
-        lhs_volume = volume(l_key);
+        if (lhs.node->num_children() == max_fanout) {
+          // Left is now full, insert remaining entries into right
+          for (size_t j = 0; j < deposit.size(); ++j) {
+            rhs.key |= deposit[j].key;
+            rhs.node->append_child(std::move(deposit[j]));
+          }
+          deposit.clear();
+          return;
+        }
+
+        lhs_volume = l_volume;
       } else {
-        // Insert into parent which causes the least expansion
-        const auto l_key       = lhs.key | entry_key(child);
-        const auto r_key       = rhs.key | entry_key(child);
-        const auto l_volume    = volume(l_key);
-        const auto r_volume    = volume(r_key);
-        const auto l_expansion = l_volume - lhs_volume;
-        const auto r_expansion = r_volume - rhs_volume;
-
-        Side side = Side::left;
-        if (l_expansion < r_expansion) {
-          side = Side::left;
-        } else if (r_expansion < l_expansion) {
-          side = Side::right;
-        } else if (l_volume < r_volume) {
-          side = Side::left;
-        } else if (r_volume < l_volume) {
-          side = Side::right;
-        } else if (lhs.node->num_children() < rhs.node->num_children()) {
-          side = Side::left;
-        } else {
-          side = Side::right;
+        distribute_child(rhs, r_key, std::move(child));
+        if (rhs.node->num_children() == max_fanout) {
+          // Right is now full, insert remaining entries into left
+          for (size_t j = 0; j < deposit.size(); ++j) {
+            lhs.key |= deposit[j].key;
+            lhs.node->append_child(std::move(deposit[j]));
+          }
+          deposit.clear();
+          return;
         }
 
-        if (side == Side::left) {
-          distribute_child(lhs, l_key, std::move(child));
-          lhs_volume = l_volume;
-        } else {
-          distribute_child(rhs, r_key, std::move(child));
-          rhs_volume = r_volume;
-        }
+        rhs_volume = r_volume;
       }
     }
   }
 
 private:
-  /// Return |a - b| safely for unsigned types
-  template <class T>
-  static constexpr T abs_diff(T a, T b)
-  {
-    return a > b ? a - b : b - a;
-  }
-
   template <class DirNode, class DirKey, class Entry>
   static void
   distribute_child(DirNode& parent, const DirKey& parent_key, Entry&& child)
   {
     parent.key = parent_key;
-    parent.node->append_child(std::move(child));
+    parent.node->append_child(std::forward<Entry>(child));
   }
 };
 

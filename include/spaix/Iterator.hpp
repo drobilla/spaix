@@ -52,10 +52,10 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   using DirEntry = typename DirNode::DirEntry;
   using DirKey   = typename DirNode::NodeKey;
 
-  Iterator(Stack&& stack, Predicate predicate)
-    : _stack{std::move(stack)}, _predicate{std::move(predicate)}
-  {
-  }
+  // Iterator(Stack stack, Predicate predicate)
+  //   : _stack{std::move(stack)}, _predicate{std::move(predicate)}
+  // {
+  // }
 
   Iterator(const DirEntry& root_entry, Predicate predicate)
     : _stack{}, _predicate{std::move(predicate)}
@@ -65,7 +65,9 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
       const ChildIndex root_child_index = leftmost_child(*root, predicate);
       if (root_child_index < root->num_children()) {
         _stack.emplace_back(Frame{root.get(), root_child_index});
-        move_down_left();
+        if (!move_down_left()) {
+          _stack.clear();
+        }
       }
     }
   }
@@ -114,10 +116,10 @@ private:
     assert(node()->child_type == NodeType::DAT);
     do {
       ++back().index;
-    } while (index() < node()->num_children() &&
+    } while (index() < node()->dat_children.size() &&
              !_predicate.leaf(node()->dat_children[index()].key));
 
-    return index() < node()->num_children();
+    return index() < node()->dat_children.size();
   }
 
   /// Move right until we reach a good directory or the end of the parent
@@ -126,14 +128,14 @@ private:
     assert(node()->child_type == NodeType::DIR);
     do {
       ++back().index;
-    } while (index() < node()->num_children() &&
+    } while (index() < node()->dir_children.size() &&
              !_predicate.directory(node()->dir_children[index()].key));
   }
 
   /// Move up/right until we reach a node we are not at the end of yet
   bool move_up_right()
   {
-	  while (!_stack.empty() && index() >= node()->num_children()) {
+    while (!_stack.empty() && index() >= node()->num_children()) {
       _stack.pop_back(); // Move up
       if (_stack.empty()) {
         return false; // Reached end of tree
@@ -156,7 +158,7 @@ private:
         const ChildIndex index = leftmost_child(*dir, _predicate);
         _stack.emplace_back(Frame{dir, index});
 
-        if (index == dir->num_children()) {
+        if (index >= dir->dir_children.size()) {
           // Reached a non-matching directory, skip this subtree
           if (!move_up_right()) {
             return false; // Reached end of tree
@@ -182,11 +184,7 @@ private:
     //          _predicate.directory(node()->dir_children[index()]->key)) ||
     //         (_predicate.leaf(node()->dat_children[index()]->key))));
 
-    if (!move_down_left()) {
-      return false; // Reached end of tree
-    }
-
-    return true;
+    return move_down_left();
   }
 
   void scan_next()

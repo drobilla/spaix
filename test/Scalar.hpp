@@ -28,7 +28,7 @@ template <class Tag, class Rep>
 struct Scalar
 {
   constexpr Scalar() : _value{} {}
-  constexpr Scalar(const Rep v) : _value{v} {}
+	constexpr Scalar(const Rep v) : _value{v} {} // NOLINT
 
   constexpr bool operator==(const Scalar& rhs) const
   {
