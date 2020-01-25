@@ -47,11 +47,21 @@ struct Everything;
 /// Return a fanout so that directory nodes fit within `page_size` bytes
 template <class DirKey>
 constexpr ChildCount
-fanout(const size_t page_size = 128u)
+internal_fanout(const size_t page_size = 128u)
 {
   return static_cast<ChildCount>(
       (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
       (sizeof(DirKey) + sizeof(std::unique_ptr<void*>)));
+}
+
+/// Return a fanout so that directory nodes fit within `page_size` bytes
+template <class DatKey, class Data>
+constexpr ChildCount
+leaf_fanout(const size_t page_size = 128u)
+{
+  return static_cast<ChildCount>(
+      (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
+      (sizeof(DatKey) + sizeof(Data)));
 }
 
 /// Return log_2(n)
@@ -110,22 +120,30 @@ struct RectFor<Rect<Values...>>
 */
 template <class LeafKey,
           class LeafData,
-          class DirectoryKey        = typename RectFor<LeafKey>::type,
-          ChildCount Fanout         = fanout<DirectoryKey>(),
-          unsigned   MinFillDivisor = 3,
-          class Insertion           = LinearInsertion,
-          class Split               = QuadraticSplit>
+          class DirectoryKey      = typename RectFor<LeafKey>::type,
+          size_t   PageSize       = 4096,
+          unsigned MinFillDivisor = 3,
+          class Insertion         = LinearInsertion,
+          class Split             = QuadraticSplit>
 class RTree
 {
 public:
-  static_assert(Fanout > 1, "");
-
   using Data   = LeafData;
   using DirKey = DirectoryKey;
   using Key    = LeafKey;
 
+  static constexpr auto dir_fanout     = internal_fanout<DirKey>(PageSize);
+  static constexpr auto dat_fanout     = leaf_fanout<Key, Data>(PageSize);
+  static constexpr auto min_dir_fanout = dir_fanout / MinFillDivisor;
+  static constexpr auto min_dat_fanout = dat_fanout / MinFillDivisor;
+
+  static_assert(dir_fanout > 1, "");
+  static_assert(dat_fanout > 1, "");
+  static_assert(min_dir_fanout >= 1, "");
+  static_assert(min_dat_fanout >= 1, "");
+
   using DatNode = DataNode<Key, Data>;
-  using DirNode = DirectoryNode<DirKey, DatNode, Fanout>;
+  using DirNode = DirectoryNode<DirKey, DatNode, dir_fanout, dat_fanout>;
 
   using DatNodePtr = std::unique_ptr<DatNode>;
   using DirNodePtr = std::unique_ptr<DirNode>;
@@ -134,6 +152,7 @@ public:
   using DirNodePair = std::array<DirEntry, 2>;
   using Frame       = StackFrame<DirNode>;
 
+#if 0
   static_assert(
       sizeof(DirectoryNode<DirKey, DatNode, fanout<DirectoryKey>(512)>) <=
               512 &&
@@ -147,8 +166,12 @@ public:
           sizeof(DirectoryNode<DirKey, DatNode, fanout<DirectoryKey>(4096)>) >
               4096 - sizeof(DirKey) - sizeof(Data),
       "");
-
-  static constexpr auto min_fanout = Fanout / MinFillDivisor;
+#endif
+  static_assert(sizeof(DirNode) <= PageSize, "");
+  static_assert(sizeof(DirNode) >
+                    PageSize - sizeof(DirKey) - sizeof(DirNodePtr),
+                "");
+  static_assert(sizeof(DirNode) > PageSize - sizeof(Key) - sizeof(Data), "");
 
   RTree() = default;
 
@@ -164,13 +187,13 @@ public:
   using Iter = Iterator<Predicate,
                         DirNode,
                         DatNode,
-                        max_height(sizeof(DatNode), min_fanout)>;
+                        max_height(sizeof(DatNode), min_dir_fanout)>;
 
   template <class Predicate>
   using ConstIter = Iterator<Predicate,
                              DirNode,
                              const DatNode,
-                             max_height(sizeof(DatNode), min_fanout)>;
+                             max_height(sizeof(DatNode), min_dir_fanout)>;
 
   template <class Predicate>
   struct Range
@@ -255,8 +278,11 @@ public:
   /// Return true iff there are no items in the tree
   bool empty() const { return !_root.node; }
 
-  /// Return the maximum number of children of a node
-  static constexpr ChildCount fanout() { return Fanout; }
+  /// Return the maximum number of children of an internal node
+  static constexpr ChildCount internal_fanout() { return dir_fanout; }
+
+  /// Return the maximum number of children of a leaf node
+  static constexpr ChildCount leaf_fanout() { return dat_fanout; }
 
   /// Return an upper bound on the maximum number of elements in a tree
   static constexpr size_t max_size()
@@ -267,7 +293,7 @@ public:
   /// Return the maximum height of a tree
   static constexpr size_t max_height()
   {
-    return spaix::max_height(sizeof(DatNode), min_fanout);
+    return spaix::max_height(sizeof(DatNode), min_dir_fanout);
   }
 
   /// Return a key that encompasses all items in the tree
@@ -347,7 +373,7 @@ private:
 
       if (sides[0].node) { // Child was split, replace it
         parent.dir_children[index] = std::move(sides[0]);
-        if (parent.dir_children.size() == Fanout) {
+        if (parent.dir_children.size() == dir_fanout) {
           return split(parent.dir_children,
                        std::move(sides[1]),
                        parent_entry.key | key,
@@ -361,7 +387,7 @@ private:
         assert(parent_entry.key == ideal_key(parent));
       }
 
-    } else if (parent.dat_children.size() < Fanout) { // Simple leaf insert
+    } else if (parent.dat_children.size() < dat_fanout) { // Simple leaf insert
       parent.append_child(DatNode{key, data});
       parent_entry.key = new_parent_key;
       assert(parent_entry.key == ideal_key(parent));
@@ -377,11 +403,10 @@ private:
   }
 
   /// Create a new parent seeded with a child
-  template <class Entry>
-  static DirEntry
-  new_parent(StaticVector<Entry, ChildCount, Fanout + 1>& deposit,
-             ChildIndex                                   index,
-             NodeType                                     child_type)
+  template <class Entry, size_t count>
+  static DirEntry new_parent(StaticVector<Entry, ChildCount, count>& deposit,
+                             ChildIndex                              index,
+                             NodeType                                child_type)
   {
     if (index != deposit.size() - 1) {
       std::iter_swap(deposit.begin() + index,
@@ -396,14 +421,14 @@ private:
   }
 
   /// Split `nodes` plus `node` in two and return the resulting sides
-  template <class Entry>
-  static DirNodePair split(StaticVector<Entry, ChildCount, Fanout>& nodes,
+  template <class Entry, size_t fanout>
+  static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                            Entry                                    entry,
                            const DirKey&                            bounds,
                            const NodeType                           type)
   {
     // Make an array of all nodes to deposit
-    StaticVector<Entry, ChildCount, Fanout + 1> deposit;
+    StaticVector<Entry, ChildCount, fanout + 1> deposit;
     for (auto&& e : nodes) {
       deposit.emplace_back(std::move(e));
     }
@@ -420,9 +445,9 @@ private:
 
     // Distribute remaining nodes between seeds
     Split::distribute_children(
-        deposit, sides[0], sides[1], Fanout - min_fanout);
+        deposit, sides[0], sides[1], fanout / MinFillDivisor);
     assert(sides[0].node->num_children() + sides[1].node->num_children() ==
-           Fanout + 1);
+           fanout + 1);
     assert(sides[0].key == ideal_key(*sides[0].node));
     assert(sides[1].key == ideal_key(*sides[1].node));
 

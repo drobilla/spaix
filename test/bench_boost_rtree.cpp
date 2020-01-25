@@ -41,7 +41,7 @@ namespace bgi = boost::geometry::index;
 using Args       = spaix::test::Arguments;
 using Parameters = spaix::test::BenchParameters;
 using Scalar     = float;
-using Data       = float;
+using Data       = size_t;
 using Rect2      = spaix::Rect<Scalar, Scalar>;
 
 using Point = bg::model::point<float, 2, bg::cs::cartesian>;
@@ -203,9 +203,8 @@ template <size_t page_size>
 int
 run(const Parameters& params, const Args& args)
 {
-  constexpr auto max_fill = spaix::fanout<Rect2>(page_size);
-  constexpr auto min_fill =
-      std::max(size_t(1), spaix::fanout<Rect2>(page_size) / 3);
+  constexpr auto max_fill = spaix::internal_fanout<Rect2>(page_size);
+  constexpr auto min_fill = std::max(size_t(1), max_fill / min_fill_divisor);
 
   const auto split = args.at("split");
   if (split == "linear") {
@@ -228,6 +227,7 @@ run(const Parameters& params, const Args& args)
   case 1024: return run<1024>(params, args);
   case 2048: return run<2048>(params, args);
   case 4096: return run<4096>(params, args);
+  case 8192: return run<8192>(params, args);
   }
 
   throw std::runtime_error("Invalid page size '" +

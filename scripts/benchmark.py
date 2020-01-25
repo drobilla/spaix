@@ -180,7 +180,7 @@ if __name__ == "__main__":
                 run(options, bench_opts, insert, split)
 
     def mathify(name):
-        return "$m$" if name == "linear" else "$m^2$"
+        return name # "$m$" if name == "linear" else "$m^2$"
 
     if not options.no_plot:
         sources = []
@@ -189,9 +189,7 @@ if __name__ == "__main__":
                 for prog in options.program:
                     path = tsv_path(prog, insert, split)
                     if os.path.exists(path) and os.path.getsize(path) > 0:
-                        label = "{} insert {}, split {}".format(bench_name(prog),
-                                                                mathify(insert),
-                                                                mathify(split))
+                        label = "{} {}".format(bench_name(prog), split)
                         sources += [DataSource(path, label)]
 
         def max_value(cols):

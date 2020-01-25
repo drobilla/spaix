@@ -76,7 +76,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
 
   STATIC_CHECK(sizeof(DirNode) <= page_size &&
                sizeof(DirNode) >= page_size - sizeof(DirKey) - sizeof(Data));
-  STATIC_CHECK(Tree::fanout() == spaix::fanout<DirKey>(page_size));
+  // STATIC_CHECK(Tree::fanout() == spaix::fanout<DirKey>(page_size));
 
   CHECK(tree.begin() == tree.end());
   CHECK(tree.query(spaix::within(everything)).empty());
@@ -186,7 +186,8 @@ test_structure(const Tree& tree)
   size_t n_leaves = 0;
   tree.visit_structure(
       [&](const DirKey& key, const NodePath& path, const size_t n_children) {
-        CHECK(n_children <= tree.fanout());
+        (void)n_children;
+        CHECK(n_children <= std::max(Tree::internal_fanout(), Tree::leaf_fanout()));
         check_node(dir_keys, key, path);
         dir_keys.emplace(path, key);
         return true;
@@ -284,33 +285,33 @@ test_key(const unsigned span, const unsigned n_queries)
 
   test_tree<spaix::RTree<Key,
                          unsigned,
-                         spaix::Rect<unsigned, unsigned>,
-                         spaix::fanout<DirKey>(page_size),
-                         2,
+                         DirKey,
+                         page_size,
+                         3,
                          spaix::LinearInsertion,
                          spaix::LinearSplit>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
                          unsigned,
-                         spaix::Rect<unsigned, unsigned>,
-                         spaix::fanout<DirKey>(page_size),
-                         2,
+                         DirKey,
+                         page_size,
+                         3,
                          spaix::LinearInsertion,
                          spaix::QuadraticSplit>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
                          unsigned,
-                         spaix::Rect<unsigned, unsigned>,
-                         spaix::fanout<DirKey>(page_size),
-                         2,
+                         DirKey,
+                         page_size,
+                         3,
                          spaix::QuadraticInsertion,
                          spaix::QuadraticSplit>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
                          unsigned,
-                         spaix::Rect<unsigned, unsigned>,
-                         spaix::fanout<DirKey>(page_size),
-                         2,
+                         DirKey,
+                         page_size,
+                         3,
                          spaix::QuadraticInsertion,
                          spaix::QuadraticSplit>>(span, n_queries);
 }

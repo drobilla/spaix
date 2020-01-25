@@ -147,11 +147,12 @@ if get_option('benchmark')
     test('bench', bench_exe, args: ['--size', '16', '--page-size', '1024'])
     test('bench', bench_exe, args: ['--size', '16', '--page-size', '2048'])
     test('bench', bench_exe, args: ['--size', '16', '--page-size', '4096'])
+    test('bench', bench_exe, args: ['--size', '16', '--page-size', '8192'])
 
     test('bench', bench_exe, args: ['--insert', 'unknown'], should_fail: true)
     test('bench', bench_exe, args: ['--split', 'unknown'], should_fail: true)
-    test('bench', bench_exe, args: ['--page-size', '16'], should_fail: true)
-    test('bench', bench_exe, args: ['--page-size', '8192'], should_fail: true)
+    test('bench', bench_exe, args: ['--page-size', '64'], should_fail: true)
+    test('bench', bench_exe, args: ['--page-size', '16384'], should_fail: true)
     test('bench', bench_exe, args: ['--bad-arg'], should_fail: true)
 
   endif

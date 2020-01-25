@@ -36,22 +36,25 @@ struct NodeEntry
   std::unique_ptr<Node> node{};
 };
 
-template <class DirKey, class DatNode, ChildCount Fanout>
+template <class DirKey,
+          class DatNode,
+          ChildCount DirFanout,
+          ChildCount DatFanout>
 struct DirectoryNode
 {
 public:
-  using DirNode = DirectoryNode<DirKey, DatNode, Fanout>;
+	using DirNode = DirectoryNode<DirKey, DatNode, DirFanout, DatFanout>;
   using Key     = decltype(std::declval<DatNode>().key);
   using NodeKey = DirKey;
 
-  using DatNodePtr = std::unique_ptr<DatNode>;
   using DirNodePtr = std::unique_ptr<DirNode>;
+  using DatNodePtr = std::unique_ptr<DatNode>;
 
   using DirEntry = NodeEntry<DirKey, DirNode>;
   using DatEntry = DatNode;
 
-  using DatChildren = StaticVector<DatEntry, ChildCount, Fanout>;
-  using DirChildren = StaticVector<DirEntry, ChildCount, Fanout>;
+  using DirChildren = StaticVector<DirEntry, ChildCount, DirFanout>;
+  using DatChildren = StaticVector<DatEntry, ChildCount, DatFanout>;
 
   explicit DirectoryNode(const NodeType t) : child_type{t}
   {

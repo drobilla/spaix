@@ -42,7 +42,7 @@ namespace {
 using Args       = spaix::test::Arguments;
 using Parameters = spaix::test::BenchParameters;
 using Scalar     = float;
-using Data       = float;
+using Data       = size_t;
 using Rect2      = spaix::Rect<Scalar, Scalar>;
 
 template <class T>
@@ -211,7 +211,7 @@ run(const Parameters& params, std::ostream& os)
           os,
           total_times.n(),
           params.page_size,
-          t.fanout(),
+          t.internal_fanout(),
           std::chrono::duration<double>(t_end - t_bench_start).count(),
           times.mean(),
           times.min(),
@@ -243,7 +243,7 @@ run(const Parameters& params)
   return run<spaix::RTree<Rect2,
                           Scalar,
                           Rect2,
-                          spaix::fanout<Rect2>(page_size),
+                          page_size,
                           min_fill_divisor,
                           Insertion,
                           Split>>(params, std::cout);
@@ -254,13 +254,14 @@ int
 run(const Parameters& params)
 {
   switch (params.page_size) {
-  case 64: return run<Insertion, Split, 64>(params);
+  // case 64: return run<Insertion, Split, 64>(params);
   case 128: return run<Insertion, Split, 128>(params);
   case 256: return run<Insertion, Split, 256>(params);
   case 512: return run<Insertion, Split, 512>(params);
   case 1024: return run<Insertion, Split, 1024>(params);
   case 2048: return run<Insertion, Split, 2048>(params);
   case 4096: return run<Insertion, Split, 4096>(params);
+  case 8192: return run<Insertion, Split, 8192>(params);
   }
 
   throw std::runtime_error("Invalid page size '" +
