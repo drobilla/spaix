@@ -38,93 +38,6 @@ namespace spaix {
 class LinearSplit
 {
 public:
-  struct ExtremeIndices
-  {
-    size_t min_min = 1;
-    size_t max_min = 1;
-    size_t min_max = 0;
-    size_t max_max = 0;
-  };
-
-  template <class Entries, size_t n_dims>
-  static void update_indices(const Entries&,
-                             const size_t,
-                             std::array<ExtremeIndices, n_dims>&,
-                             Index<n_dims, n_dims>)
-  {
-  }
-
-  template <class Entries, size_t dim, size_t n_dims>
-  static void update_indices(const Entries&                      deposit,
-                             const size_t                        child_index,
-                             std::array<ExtremeIndices, n_dims>& indices,
-                             Index<dim, n_dims>                  index)
-  {
-    const auto& child = deposit[child_index];
-    const auto  low   = min<dim>(entry_key(child));
-    const auto  high  = max<dim>(entry_key(child));
-
-    if (low <= min<dim>(entry_key(deposit[indices[dim].min_min]))) {
-      indices[dim].min_min = child_index;
-    }
-
-    if (low >= min<dim>(entry_key(deposit[indices[dim].max_min]))) {
-      indices[dim].max_min = child_index;
-    }
-
-    if (high <= max<dim>(entry_key(deposit[indices[dim].min_max])) &&
-        child_index != indices[dim].max_min) {
-      indices[dim].min_max = child_index;
-    }
-
-    if (high >= max<dim>(entry_key(deposit[indices[dim].max_max]))) {
-      indices[dim].max_max = child_index;
-    }
-
-    update_indices(deposit, child_index, indices, ++index);
-  }
-
-  template <class T>
-  struct MaxSeparation
-  {
-    size_t dimension  = 0;
-    T      separation = std::numeric_limits<T>::min();
-  };
-
-  template <class Entries, class T, size_t n_dims>
-  static void update_max_separation(const Entries&,
-                                    const std::array<ExtremeIndices, n_dims>&,
-                                    MaxSeparation<T>&,
-                                    Index<n_dims, n_dims>)
-  {
-  }
-
-  template <class Entries, class T, size_t dim, size_t n_dims>
-  static void
-  update_max_separation(const Entries&                            deposit,
-                        const std::array<ExtremeIndices, n_dims>& indices,
-                        MaxSeparation<T>&  max_separation,
-                        Index<dim, n_dims> index)
-  {
-    const auto width =
-        static_cast<T>(max<dim>(entry_key(deposit[indices[dim].max_max])) -
-                       min<dim>(entry_key(deposit[indices[dim].min_min])));
-
-    const auto separation =
-        static_cast<T>(max<dim>(entry_key(deposit[indices[dim].min_max])) -
-                       min<dim>(entry_key(deposit[indices[dim].max_min])));
-
-    const auto normalized_separation =
-        separation / (width > std::numeric_limits<T>::epsilon() ? width : T{1});
-
-    if (normalized_separation > max_separation.separation) {
-      max_separation.separation = normalized_separation;
-      max_separation.dimension  = dim;
-    }
-
-    update_max_separation(deposit, indices, max_separation, ++index);
-  }
-
   /// Return the indices of the children that should be used for split seeds
   template <class Entries, class DirKey>
   static std::pair<size_t, size_t>
@@ -201,6 +114,94 @@ public:
         rhs_volume = r_volume;
       }
     }
+  }
+
+private:
+  struct ExtremeIndices
+  {
+    size_t min_min = 1;
+    size_t max_min = 1;
+    size_t min_max = 0;
+    size_t max_max = 0;
+  };
+
+  template <class T>
+  struct MaxSeparation
+  {
+    size_t dimension  = 0;
+    T      separation = std::numeric_limits<T>::min();
+  };
+
+  template <class Entries, size_t n_dims>
+  static void update_indices(const Entries&,
+                             const size_t,
+                             std::array<ExtremeIndices, n_dims>&,
+                             Index<n_dims, n_dims>)
+  {
+  }
+
+  template <class Entries, size_t dim, size_t n_dims>
+  static void update_indices(const Entries&                      deposit,
+                             const size_t                        child_index,
+                             std::array<ExtremeIndices, n_dims>& indices,
+                             Index<dim, n_dims>                  index)
+  {
+    const auto& child = deposit[child_index];
+    const auto  low   = min<dim>(entry_key(child));
+    const auto  high  = max<dim>(entry_key(child));
+
+    if (low <= min<dim>(entry_key(deposit[indices[dim].min_min]))) {
+      indices[dim].min_min = child_index;
+    }
+
+    if (low >= min<dim>(entry_key(deposit[indices[dim].max_min]))) {
+      indices[dim].max_min = child_index;
+    }
+
+    if (high <= max<dim>(entry_key(deposit[indices[dim].min_max])) &&
+        child_index != indices[dim].max_min) {
+      indices[dim].min_max = child_index;
+    }
+
+    if (high >= max<dim>(entry_key(deposit[indices[dim].max_max]))) {
+      indices[dim].max_max = child_index;
+    }
+
+    update_indices(deposit, child_index, indices, ++index);
+  }
+
+  template <class Entries, class T, size_t n_dims>
+  static void update_max_separation(const Entries&,
+                                    const std::array<ExtremeIndices, n_dims>&,
+                                    MaxSeparation<T>&,
+                                    Index<n_dims, n_dims>)
+  {
+  }
+
+  template <class Entries, class T, size_t dim, size_t n_dims>
+  static void
+  update_max_separation(const Entries&                            deposit,
+                        const std::array<ExtremeIndices, n_dims>& indices,
+                        MaxSeparation<T>&  max_separation,
+                        Index<dim, n_dims> index)
+  {
+    const auto width =
+        static_cast<T>(max<dim>(entry_key(deposit[indices[dim].max_max])) -
+                       min<dim>(entry_key(deposit[indices[dim].min_min])));
+
+    const auto separation =
+        static_cast<T>(max<dim>(entry_key(deposit[indices[dim].min_max])) -
+                       min<dim>(entry_key(deposit[indices[dim].max_min])));
+
+    const auto normalized_separation =
+        separation / (width > std::numeric_limits<T>::epsilon() ? width : T{1});
+
+    if (normalized_separation > max_separation.separation) {
+      max_separation.separation = normalized_separation;
+      max_separation.dimension  = dim;
+    }
+
+    update_max_separation(deposit, indices, max_separation, ++index);
   }
 };
 

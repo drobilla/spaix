@@ -27,6 +27,11 @@
 
 namespace spaix {
 
+/**
+   An iterator for an RTree.
+
+   This iterates over data items in the tree which match the given predicate.
+*/
 template <class Predicate, class DirNode, class DatNode, size_t max_height>
 struct Iterator
 {
@@ -36,18 +41,6 @@ struct Iterator
   using pointer           = const DatNode*;
   using reference         = const DatNode&;
 
-  struct Frame
-  {
-    const DirNode* node;  ///< Pointer to directory node
-    ChildIndex     index; ///< Index of child
-
-    bool operator==(const Frame& rhs) const
-    {
-      return node == rhs.node && index == rhs.index;
-    }
-  };
-
-  using Stack    = StaticVector<Frame, size_t, max_height>;
   using DirEntry = typename DirNode::DirEntry;
   using DirKey   = typename DirNode::NodeKey;
 
@@ -90,6 +83,19 @@ struct Iterator
   bool operator!=(const Iterator& rhs) const { return !operator==(rhs); }
 
 private:
+  struct Frame
+  {
+    const DirNode* node;  ///< Pointer to directory node
+    ChildIndex     index; ///< Index of child
+
+    bool operator==(const Frame& rhs) const
+    {
+      return node == rhs.node && index == rhs.index;
+    }
+  };
+
+  using Stack = StaticVector<Frame, size_t, max_height>;
+
   /**
      Return the index of the leftmost child of `dir` that matches `predicate`.
 

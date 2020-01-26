@@ -42,50 +42,62 @@ namespace spaix {
 
 using NodePath = std::vector<ChildIndex>;
 
-struct Everything;
+template <class K>
+using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
-template <class Key>
-struct RectFor
-{
-};
+/**
+   Configuration for an RTree.
 
-template <class... Values>
-struct RectFor<Point<Values...>>
-{
-  using type = Rect<Values...>;
-};
+   @tparam PageSize Size of internal nodes in bytes.  The fanout will be set as
+   large as possible without exceeding this.
 
-template <class... Values>
-struct RectFor<Rect<Values...>>
+   @tparam MinFillDivisor Minimum fill divisor when splitting nodes.  The
+   maximum fanout divided by this is the minimum number of children that a
+   split node will receive.  For example, the default value of 3 means that
+   split nodes must have at least a third of the maximum fanout.
+
+   @tparam SplitAlgorithm Node splitting algorithm, spaix::LinearSplit or
+   spaix::QuadraticSplit.
+
+   @tparam InsertionAlgorithm Insert position selection algorithm.
+*/
+template <size_t   PageSize        = 4096u,
+          unsigned MinFillDivisor  = 3u,
+          class SplitAlgorithm     = QuadraticSplit,
+          class InsertionAlgorithm = LinearInsertion>
+struct Configuration
 {
-  using type = Rect<Values...>;
+  static constexpr const auto page_size        = PageSize;
+  static constexpr const auto min_fill_divisor = MinFillDivisor;
+
+  using Insertion = InsertionAlgorithm;
+  using Split     = SplitAlgorithm;
 };
 
 /**
    An R-tree which spatially indexes points or rectangles.
 
-   @tparam LeafKey The key type used for data items stored in tree leaves.
-   @tparam LeafData The type of values stored in the tree.
-
+   @tparam K Geometric key type for elements.
+   @tparam D Data type for elements.
+   @tparam C Tree configuration (an instantiation of spaix::Configuration).
 */
-template <class LeafKey,
-          class LeafData,
-          class DirectoryKey      = typename RectFor<LeafKey>::type,
-          size_t   PageSize       = 4096,
-          unsigned MinFillDivisor = 3,
-          class Insertion         = LinearInsertion,
-          class Split             = QuadraticSplit>
+template <class K, class D, class C>
 class RTree
 {
 public:
-  using Data   = LeafData;
-  using DirKey = DirectoryKey;
-  using Key    = LeafKey;
+  using Key       = K;
+  using Data      = D;
+  using Box       = UnionOf<Key>;
+  using Config    = C;
+  using Insertion = typename Config::Insertion;
+  using Split     = typename Config::Split;
 
-  static constexpr auto dir_fanout     = internal_fanout<DirKey>(PageSize);
-  static constexpr auto dat_fanout     = leaf_fanout<Key, Data>(PageSize);
-  static constexpr auto min_dir_fanout = dir_fanout / MinFillDivisor;
-  static constexpr auto min_dat_fanout = dat_fanout / MinFillDivisor;
+  static constexpr auto page_size        = Config::page_size;
+  static constexpr auto min_fill_divisor = Config::min_fill_divisor;
+  static constexpr auto dir_fanout       = internal_fanout<Box>(page_size);
+  static constexpr auto dat_fanout       = leaf_fanout<Key, Data>(page_size);
+  static constexpr auto min_dir_fanout   = dir_fanout / min_fill_divisor;
+  static constexpr auto min_dat_fanout   = dat_fanout / min_fill_divisor;
 
   static_assert(dir_fanout > 1, "");
   static_assert(dat_fanout > 1, "");
@@ -93,7 +105,7 @@ public:
   static_assert(min_dat_fanout > 1, "");
 
   using DatNode = DataNode<Key, Data>;
-  using DirNode = DirectoryNode<DirKey, DatNode, dir_fanout, dat_fanout>;
+  using DirNode = DirectoryNode<Box, DatNode, dir_fanout, dat_fanout>;
 
   using DatNodePtr  = std::unique_ptr<DatNode>;
   using DirNodePtr  = std::unique_ptr<DirNode>;
@@ -101,10 +113,9 @@ public:
   using DirNodePair = std::array<DirEntry, 2>;
 
   static_assert(sizeof(DirNodePtr) == sizeof(void*), "");
-  static_assert(sizeof(DirNode) <= PageSize, "");
-  static_assert(sizeof(DirNode) > PageSize - sizeof(DirKey) - sizeof(void*),
-                "");
-  static_assert(sizeof(DirNode) > PageSize - sizeof(Key) - sizeof(Data), "");
+  static_assert(sizeof(DirNode) <= page_size, "");
+  static_assert(sizeof(DirNode) > page_size - sizeof(Box) - sizeof(void*), "");
+  static_assert(sizeof(DirNode) > page_size - sizeof(Key) - sizeof(Data), "");
 
   template <class Predicate>
   using Iter = Iterator<Predicate,
@@ -118,6 +129,14 @@ public:
                              const DatNode,
                              max_height(sizeof(DatNode), min_dir_fanout)>;
 
+  /**
+     A range in an RTree that matches a predicate.
+
+     This acts like a collection of nodes that match a query predicate,
+     particularly for use with range-based for loops.  Note, however, that the
+     nodes are not actually contiguous internally as the underlying iterators
+     automatically skip nodes that do not match.
+  */
   template <class Predicate>
   struct Range
   {
@@ -137,23 +156,22 @@ public:
 
   const_iterator end() const
   {
-    return const_iterator{{DirKey{}, nullptr}, Everything{}};
+    return const_iterator{{Box{}, nullptr}, Everything{}};
   }
 
   iterator begin() { return empty() ? end() : iterator{_root, Everything{}}; }
 
-  iterator end() { return iterator{{DirKey{}, nullptr}, Everything{}}; }
+  iterator end() { return iterator{{Box{}, nullptr}, Everything{}}; }
 
   template <class Predicate>
   Range<Predicate> query(Predicate predicate) const
   {
     if (empty()) {
-      return {{{DirKey{}, nullptr}, predicate},
-              {{DirKey{}, nullptr}, predicate}};
+      return {{{Box{}, nullptr}, predicate}, {{Box{}, nullptr}, predicate}};
     }
 
     ConstIter<Predicate> first{_root, predicate};
-    ConstIter<Predicate> last{{DirKey{}, nullptr}, predicate};
+    ConstIter<Predicate> last{{Box{}, nullptr}, predicate};
     if (first != last && !predicate.leaf(first->key)) {
       ++first;
     }
@@ -193,7 +211,7 @@ public:
   }
 
   /// Remove all items from the tree
-  void clear() { _root = {DirKey{}, nullptr}; }
+  void clear() { _root = {Box{}, nullptr}; }
 
   /// Return the number of items in the tree
   size_t size() const { return _size; }
@@ -220,13 +238,13 @@ public:
   }
 
   /// Return a key that encompasses all items in the tree
-  DirKey bounds() const { return _root.node ? _root.key : DirKey{}; }
+  Box bounds() const { return _root.node ? _root.key : Box{}; }
 
   /// Insert a new item at `key` with `data`
   void insert(const Key& key, const Data& data)
   {
     if (empty()) {
-      _root = {DirKey{key}, std::make_unique<DirNode>(NodeType::data)};
+      _root = {Box{key}, std::make_unique<DirNode>(NodeType::data)};
     }
 
     auto sides = insert_rec(_root, _root.key | key, key, data);
@@ -243,7 +261,7 @@ public:
   }
 
   using DirVisitor = std::function<
-      bool(const DirKey& key, const NodePath& path, ChildCount n_children)>;
+      bool(const Box& key, const NodePath& path, ChildCount n_children)>;
 
   using DatVisitor = std::function<
       void(const Key& key, const Data& data, const NodePath& path)>;
@@ -260,9 +278,9 @@ public:
 
 private:
   template <class Children>
-  static DirKey parent_key(const Children& children)
+  static Box parent_key(const Children& children)
   {
-    DirKey key;
+    Box key;
 
     for (const auto& entry : children) {
       key |= entry_key(entry);
@@ -271,7 +289,7 @@ private:
     return key;
   }
 
-  static DirKey ideal_key(const DirNode& node)
+  static Box ideal_key(const DirNode& node)
   {
     if (node.child_type == NodeType::directory) {
       return parent_key(node.dir_children);
@@ -280,10 +298,10 @@ private:
     }
   }
 
-  static DirNodePair insert_rec(DirEntry&     parent_entry,
-                                const DirKey& new_parent_key,
-                                const Key&    key,
-                                const Data&   data)
+  static DirNodePair insert_rec(DirEntry&   parent_entry,
+                                const Box&  new_parent_key,
+                                const Key&  key,
+                                const Data& data)
   {
     auto& parent = *parent_entry.node;
     if (parent.child_type == NodeType::directory) { // Recursing downwards
@@ -322,7 +340,7 @@ private:
                    parent.child_type);
     }
 
-    return {DirEntry{DirKey{}, nullptr}, DirEntry{DirKey{}, nullptr}};
+    return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
   }
 
   /// Create a new parent seeded with a child
@@ -332,7 +350,7 @@ private:
                              NodeType                                child_type)
   {
     const auto iter{deposit.begin() + index};
-    DirKey     key{entry_key(*iter)};
+    Box        key{entry_key(*iter)};
     DirNodePtr node{std::make_unique<DirNode>(child_type)};
 
     node->append_child(std::move(*iter));
@@ -345,10 +363,10 @@ private:
   template <class Entry, ChildCount fanout>
   static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                            Entry                                    entry,
-                           const DirKey&                            bounds,
+                           const Box&                               bounds,
                            const NodeType                           type)
   {
-    constexpr auto max_fanout = fanout - (fanout / MinFillDivisor);
+    constexpr auto max_fanout = fanout - (fanout / min_fill_divisor);
 
     // Make an array of all nodes to deposit
     StaticVector<Entry, ChildCount, fanout + 1> deposit;
@@ -400,8 +418,8 @@ private:
     }
   }
 
-  size_t   _size{};                  ///< Number of elements
-  DirEntry _root{DirKey{}, nullptr}; ///< Key and pointer to root node
+  size_t   _size{};               ///< Number of elements
+  DirEntry _root{Box{}, nullptr}; ///< Key and pointer to root node
 };
 
 } // namespace spaix

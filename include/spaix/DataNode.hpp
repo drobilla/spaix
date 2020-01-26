@@ -18,11 +18,12 @@
 
 namespace spaix {
 
+/// A data record in a tree
 template <class Key, class Data>
 struct DataNode
 {
-  const Key key;
-  Data      data;
+  const Key key;  ///< Point or rectangle key
+  Data      data; ///< Arbitrary user data
 };
 
 } // namespace spaix

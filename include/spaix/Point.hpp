@@ -26,6 +26,7 @@
 
 namespace spaix {
 
+/// A multi-dimension point which supports heterogeneous types
 template <class... Ts>
 class Point
 {

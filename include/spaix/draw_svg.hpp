@@ -142,7 +142,7 @@ draw_svg(std::ostream&  os,
 {
   using Key    = typename Tree::Key;
   using Data   = typename Tree::Data;
-  using DirKey = typename Tree::DirKey;
+  using DirKey = typename Tree::Box;
 
   const auto bounds = tree.bounds();
 

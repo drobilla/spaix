@@ -140,7 +140,7 @@ template <class Tree>
 void
 test_visit_structure(const Tree& tree)
 {
-  using DirKey = typename Tree::DirKey;
+  using DirKey = typename Tree::Box;
 
   std::vector<NodePath> top_paths;
 
@@ -169,7 +169,7 @@ template <class Tree>
 void
 test_structure(const Tree& tree)
 {
-  using DirKey = typename Tree::DirKey;
+  using DirKey = typename Tree::Box;
   using Key    = typename Tree::Key;
 
   std::map<NodePath, DirKey> dir_keys;
@@ -278,32 +278,24 @@ template <class Key, size_t page_size>
 void
 test_page_size(const unsigned span, const unsigned n_queries)
 {
-  using DirKey = Rect;
-
   // Test a small tree where the root has leaf children
-  test_tree<spaix::RTree<Key,
-                         Data,
-                         DirKey,
-                         page_size,
-                         3,
-                         spaix::LinearInsertion,
-                         spaix::LinearSplit>>(2, n_queries);
+  test_tree<
+      spaix::RTree<Key,
+                   Data,
+                   spaix::Configuration<page_size, 3, spaix::LinearSplit>>>(
+      2, n_queries);
 
-  test_tree<spaix::RTree<Key,
-                         Data,
-                         DirKey,
-                         page_size,
-                         3,
-                         spaix::LinearInsertion,
-                         spaix::LinearSplit>>(span, n_queries);
+  test_tree<
+      spaix::RTree<Key,
+                   Data,
+                   spaix::Configuration<page_size, 3, spaix::LinearSplit>>>(
+      span, n_queries);
 
-  test_tree<spaix::RTree<Key,
-                         Data,
-                         DirKey,
-                         page_size,
-                         3,
-                         spaix::LinearInsertion,
-                         spaix::QuadraticSplit>>(span, n_queries);
+  test_tree<
+      spaix::RTree<Key,
+                   Data,
+                   spaix::Configuration<page_size, 3, spaix::QuadraticSplit>>>(
+      span, n_queries);
 }
 
 template <class Key>

@@ -239,13 +239,10 @@ template <class Insertion, class Split, size_t page_size>
 int
 run(const Parameters& params)
 {
-  return run<spaix::RTree<Rect2,
-                          Scalar,
-                          Rect2,
-                          page_size,
-                          min_fill_divisor,
-                          Insertion,
-                          Split>>(params, std::cout);
+  using Config =
+      spaix::Configuration<page_size, min_fill_divisor, Split, Insertion>;
+
+  return run<spaix::RTree<Rect2, Scalar, Config>>(params, std::cout);
 }
 
 template <class Insertion, class Split>

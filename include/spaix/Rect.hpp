@@ -70,7 +70,7 @@ ranges_are_empty(const Tuple& tuple, Index<dim, n_dims> index)
 
 } // namespace detail
 
-/// A multi-dimensional rectangle
+/// A multi-dimensional rectangle which suports heterogeneous types
 template <class T0, class... Ts>
 class Rect
 {
