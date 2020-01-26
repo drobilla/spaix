@@ -201,9 +201,10 @@ test_tree(const unsigned span, const unsigned n_queries)
 {
   using Key = typename Tree::Key;
 
-  std::random_device                      rd;
-  const uint64_t                          time_seed = time(nullptr);
-  std::mt19937                            rng{rd() ^ time_seed};
+  const auto start_time = static_cast<uint64_t>(time(nullptr));
+  const auto seed       = std::random_device{}() ^ start_time;
+
+  std::mt19937                            rng{seed};
   std::uniform_int_distribution<unsigned> dist{0, span - 1};
 
   auto tree = make_tree<Tree>(rng, span);
@@ -243,10 +244,10 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto y_low  = std::min(y0, y1);
     const auto y_high = std::max(y0, y1) + 1;
 
-    const auto     query          = Rect{{x_low, x_high}, {y_low, y_high}};
-    const auto     x_span         = spaix::span<0>(query);
-    const auto     y_span         = spaix::span<1>(query);
-    const unsigned expected_count = num_items_in_area<Key>(x_span, y_span);
+    const auto x_span         = x_high - x_low;
+    const auto y_span         = y_high - y_low;
+    const auto query          = Rect{{x_low, x_high}, {y_low, y_high}};
+    const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
     const auto verify = [&](const auto& node) {
       CHECK((spaix::min<0>(node.key) >= x_low));
