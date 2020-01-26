@@ -70,7 +70,9 @@ headers = [
   'include/spaix/within.hpp',
 ]
 
-boost_dep = dependency('boost', required: false)
+if not get_option('no_boost')
+  boost_dep = dependency('boost', required: false)
+endif
 
 spaix_dep = declare_dependency(
   include_directories: include_directories('include'))
@@ -127,7 +129,7 @@ if get_option('benchmark')
   bench_exe = executable('bench_spaix_rtree', 'test/bench_spaix_rtree.cpp',
                          dependencies: spaix_dep)
 
-  if boost_dep.found()
+  if not get_option('no_boost') and boost_dep.found()
     boost_bench_exe = executable('bench_boost_rtree',
                                  'test/bench_boost_rtree.cpp',
                                  dependencies: [boost_dep, spaix_dep])

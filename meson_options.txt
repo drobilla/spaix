@@ -6,3 +6,6 @@ option('strict', type: 'boolean', value: true,
 
 option('test', type: 'boolean', value: false,
        description: 'Build tests')
+
+option('no_boost', type: 'boolean', value: false,
+       description: 'Do not build boost benchmarking program')
