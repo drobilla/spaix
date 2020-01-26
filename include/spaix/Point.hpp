@@ -17,6 +17,7 @@
 #define SPAIX_POINT_HPP
 
 #include "spaix/detail/meta.hpp"
+#include "spaix/types.hpp"
 
 #include <cstddef>
 #include <iosfwd>
@@ -71,7 +72,7 @@ get(const Point<Ts...>& point)
 }
 
 template <size_t dim, class... Ts>
-constexpr std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>
+constexpr Range<Nth<dim, Ts...>>
 range(const Point<Ts...>& point)
 {
   return std::make_pair(get<dim>(point), get<dim>(point));
@@ -125,26 +126,30 @@ span(const Point<Ts...>&)
   return 0;
 }
 
-template <class... Ts, size_t dim, size_t n_dims>
-void
-print(std::ostream& os, const Point<Ts...>& point, Index<dim, n_dims> index)
-{
-  os << ((dim > 0) ? ", " : "") << get<dim>(point);
-  print(os, point, ++index);
-}
+namespace detail {
 
 template <class... Ts, size_t n_dims>
 void
-print(std::ostream&, const Point<Ts...>&, EndIndex<n_dims>)
+print_rec(std::ostream&, const Point<Ts...>&, EndIndex<n_dims>)
 {
 }
+
+template <class... Ts, size_t dim, size_t n_dims>
+void
+print_rec(std::ostream& os, const Point<Ts...>& point, Index<dim, n_dims> index)
+{
+  os << ((dim > 0) ? ", " : "") << get<dim>(point);
+  print_rec(os, point, ++index);
+}
+
+} // namespace detail
 
 template <class... Ts>
 inline std::ostream&
 operator<<(std::ostream& os, const Point<Ts...>& point)
 {
   os << '[';
-  print(os, point, point.ibegin());
+  detail::print_rec(os, point, point.ibegin());
   return os << ']';
 }
 

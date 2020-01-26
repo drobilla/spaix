@@ -90,6 +90,11 @@ struct Iterator
   bool operator!=(const Iterator& rhs) const { return !operator==(rhs); }
 
 private:
+  /**
+     Return the index of the leftmost child of `dir` that matches `predicate`.
+
+     Returns the end index (on past the last child) if no child matches.
+  */
   static ChildIndex
   leftmost_child(const DirNode& dir, const Predicate& predicate)
   {

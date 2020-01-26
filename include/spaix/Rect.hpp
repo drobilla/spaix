@@ -148,21 +148,21 @@ operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 }
 
 template <size_t dim, class... Ts>
-constexpr const std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
+constexpr const Range<Nth<dim, Ts...>>&
 get(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
 template <size_t dim, class... Ts>
-constexpr const std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
+constexpr const Range<Nth<dim, Ts...>>&
 range(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
 template <size_t dim, class... Ts>
-std::pair<Nth<dim, Ts...>, Nth<dim, Ts...>>&
+Range<Nth<dim, Ts...>>&
 range(Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());

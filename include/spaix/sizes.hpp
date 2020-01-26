@@ -23,7 +23,7 @@
 
 namespace spaix {
 
-/// Return a fanout so that directory nodes fit within `page_size` bytes
+/// Return a directory fanout where nodes fit within `page_size` bytes
 template <class DirKey>
 constexpr ChildCount
 internal_fanout(const size_t page_size = 128u)
@@ -33,7 +33,7 @@ internal_fanout(const size_t page_size = 128u)
       (sizeof(DirKey) + sizeof(void*)));
 }
 
-/// Return a fanout so that directory nodes fit within `page_size` bytes
+/// Return a leaf fanout where nodes nodes fit within `page_size` bytes
 template <class DatKey, class Data>
 constexpr ChildCount
 leaf_fanout(const size_t page_size = 128u)

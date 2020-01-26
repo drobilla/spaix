@@ -72,25 +72,6 @@ ibegin_inclusive()
   return {};
 }
 
-template <class... Ts, size_t last>
-constexpr auto
-tuple_product(const std::tuple<Ts...>& tuple, InclusiveIndex<last, last>)
-{
-  return std::get<last>(tuple);
-}
-
-template <class... Ts, size_t i, size_t last>
-constexpr auto
-tuple_product(const std::tuple<Ts...>& tuple, InclusiveIndex<i, last> index)
-{
-  return std::get<i>(tuple) * tuple_product(tuple, ++index);
-}
-
-template <class... Ts>
-using ProductOf =
-    decltype(tuple_product<Ts...>(std::declval<std::tuple<Ts...>>(),
-                                  ibegin_inclusive<Ts...>()));
-
 } // namespace spaix
 
 #endif // SPAIX_POINT_HPP

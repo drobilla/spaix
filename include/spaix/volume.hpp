@@ -31,7 +31,7 @@ volume_rec(const Rect<Ts...>& rect, LastIndex<last_dim>)
 }
 
 template <class... Ts, size_t dim, size_t last_dim>
-constexpr ProductOf<Ts...>
+constexpr auto
 volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
 {
   const auto r = range<dim>(rect);
@@ -44,14 +44,14 @@ volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
 } // namespace detail
 
 template <class... Ts>
-constexpr ProductOf<Ts...>
+constexpr auto
 volume(const Rect<Ts...>& rect)
 {
   return detail::volume_rec(rect, ibegin_inclusive<Ts...>());
 }
 
 template <class... Ts>
-constexpr ProductOf<Ts...>
+constexpr auto
 volume(const Point<Ts...>&)
 {
   return 0;

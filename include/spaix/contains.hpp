@@ -33,11 +33,10 @@ template <class Parent, class Child, size_t dim, size_t n_dims>
 constexpr bool
 contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
 {
-  const auto p = range<dim>(parent);
-  const auto c = range<dim>(child);
+  const auto& p = range<dim>(parent);
+  const auto& c = range<dim>(child);
 
-  return (!(c.first < p.first) &&   //
-          !(p.second < c.second) && //
+  return (!(c.first < p.first) && !(p.second < c.second) &&
           contains_rec(parent, child, ++index));
 }
 

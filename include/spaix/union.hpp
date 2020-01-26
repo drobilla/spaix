@@ -82,7 +82,7 @@ operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
 }
 
-/// Return the geometric union of `lhs` and `rhs`
+/// Expand `lhs` to include `rhs`
 template <class... Ts>
 constexpr Rect<Ts...>&
 operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
@@ -91,7 +91,7 @@ operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
   return lhs;
 }
 
-/// Return the geometric union of `lhs` and `rhs`
+/// Expand `lhs` to include `rhs`
 template <class... Ts>
 constexpr Rect<Ts...>
 operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs)

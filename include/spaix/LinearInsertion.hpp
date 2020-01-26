@@ -27,6 +27,11 @@
 
 namespace spaix {
 
+/**
+   Linear insert position selection.
+
+   From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
+*/
 struct LinearInsertion
 {
   /// Choose the best child node to insert/expand by `key`

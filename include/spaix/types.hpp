@@ -24,15 +24,15 @@ namespace spaix {
 using ChildIndex = size_t;
 using ChildCount = size_t;
 
+template <class T>
+using Range = std::pair<T, T>;
+
 enum class NodeType : size_t {
   directory, ///< Internal directory node
   data,      ///< Leaf data node
 };
 
 enum class Side { left, right };
-
-template <class T>
-using Range = std::pair<T, T>;
 
 } // namespace spaix
 
