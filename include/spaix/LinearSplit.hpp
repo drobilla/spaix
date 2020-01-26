@@ -150,7 +150,7 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template <class Deposit, class DirNode>
-  static void distribute_children(Deposit&         deposit,
+  static void distribute_children(Deposit&&        deposit,
                                   DirNode&         lhs,
                                   DirNode&         rhs,
                                   const ChildCount max_fanout)

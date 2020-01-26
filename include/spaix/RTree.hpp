@@ -367,7 +367,8 @@ private:
                       new_parent(deposit, seeds.first, type)};
 
     // Distribute remaining nodes between seeds
-    Split::distribute_children(deposit, sides[0], sides[1], max_fanout);
+    Split::distribute_children(
+        std::move(deposit), sides[0], sides[1], max_fanout);
     assert(sides[0].node->num_children() + sides[1].node->num_children() ==
            fanout + 1);
     assert(sides[0].key == ideal_key(*sides[0].node));
