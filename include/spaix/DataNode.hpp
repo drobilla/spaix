@@ -23,8 +23,6 @@ namespace spaix {
 template <class Key, class Data>
 struct DataNode
 {
-  static constexpr size_t num_children() { return 0; }
-
   Key  key; // FIXME? const?
   Data data;
 };
