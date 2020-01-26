@@ -40,6 +40,21 @@ mac_rel:
     - ninja -C build test
 
 
+win_dbg:
+  <<: *build_definition
+  tags: [windows]
+  script:
+    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - ninja -C build test
+
+win_rel:
+  <<: *build_definition
+  tags: [windows]
+  script:
+    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - ninja -C build test
+
+
 pages:
   stage: deploy
   script:
