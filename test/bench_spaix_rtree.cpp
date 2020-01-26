@@ -278,7 +278,7 @@ run(const Parameters& params, const Args& args)
     return run<Insertion, spaix::QuadraticSplit>(params);
   }
 
-  throw std::runtime_error("Unknown algorithm '" + split + "'");
+  throw std::runtime_error("Unknown split algorithm '" + split + "'");
 }
 
 int
@@ -291,7 +291,7 @@ run(const Parameters& params, const Args& args)
     return run<spaix::QuadraticInsertion>(params, args);
   }
 
-  throw std::runtime_error("Unknown algorithm '" + insert + "'");
+  throw std::runtime_error("Unknown insert algorithm '" + insert + "'");
 }
 
 } // namespace
