@@ -17,8 +17,8 @@
 #define SPAIX_RECT_HPP
 
 #include "spaix/Point.hpp"
-#include "spaix/Range.hpp"
 #include "spaix/detail/meta.hpp"
+#include "spaix/types.hpp"
 
 #include <algorithm>
 #include <cstddef>

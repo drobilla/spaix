@@ -17,6 +17,7 @@
 #define SPAIX_TYPES_HPP
 
 #include <cstddef>
+#include <utility>
 
 namespace spaix {
 
@@ -29,6 +30,9 @@ enum class NodeType : size_t {
 };
 
 enum class Side { left, right };
+
+template <class T>
+using Range = std::pair<T, T>;
 
 } // namespace spaix
 
