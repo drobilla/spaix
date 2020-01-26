@@ -20,10 +20,19 @@
 
 #include "spaix/sizes.hpp"
 
+#ifdef __APPLE__
+_Pragma("clang diagnostic push")
+_Pragma("clang diagnostic ignored \"-Weverything\"")
+#endif
+
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
+
+#ifdef __APPLE__
+_Pragma("clang diagnostic pop")
+#endif
 
 #include <algorithm>
 #include <chrono>
