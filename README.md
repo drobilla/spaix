@@ -29,12 +29,11 @@ This library has a few distinguishing features:
  * Test suite with 100% coverage by line.
 
  * Completely separate and pluggable split and insert selection algorithms.
-   Included are:
+   Included are the classic (Guttman) algorithms:
 
-   * Classic linear insert selection.
-   * Classic linear split.
-   * Classic area-minimising quadratic split.
-   * Overlap-minimising quadratic insert selection.
+   * Linear insert selection.
+   * Linear split.
+   * Area-minimising quadratic split.
 
 Building
 --------

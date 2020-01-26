@@ -19,7 +19,6 @@
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
 #include "spaix/Point.hpp"
-#include "spaix/QuadraticInsertion.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
@@ -304,22 +303,6 @@ test_page_size(const unsigned span, const unsigned n_queries)
                          page_size,
                          3,
                          spaix::LinearInsertion,
-                         spaix::QuadraticSplit>>(span, n_queries);
-
-  test_tree<spaix::RTree<Key,
-                         Data,
-                         DirKey,
-                         page_size,
-                         3,
-                         spaix::QuadraticInsertion,
-                         spaix::QuadraticSplit>>(span, n_queries);
-
-  test_tree<spaix::RTree<Key,
-                         Data,
-                         DirKey,
-                         page_size,
-                         3,
-                         spaix::QuadraticInsertion,
                          spaix::QuadraticSplit>>(span, n_queries);
 }
 
