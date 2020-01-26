@@ -27,6 +27,9 @@ template <class T, class Size, Size Capacity>
 class StaticVector
 {
 public:
+  using iterator       = T*;
+  using const_iterator = const T*;
+
   StaticVector() = default;
   ~StaticVector() { clear(); }
 
@@ -46,7 +49,7 @@ public:
     }
   }
 
-	// TODO (maybe, unused...)
+  // TODO (maybe, unused...)
   StaticVector& operator=(StaticVector&) = delete;
   StaticVector& operator=(StaticVector&&) = delete;
 
@@ -111,13 +114,12 @@ public:
   Size                  size() const { return _size; }
   static constexpr Size capacity() { return Capacity; }
 
-  T*       begin() { return reinterpret_cast<T*>(_array); }
-  const T* begin() const { return reinterpret_cast<const T*>(_array); }
-  T*       end() { return begin() + _size; }
-  const T* end() const { return begin() + _size; }
+  iterator       begin() { return reinterpret_cast<T*>(_array); }
+  const_iterator begin() const { return reinterpret_cast<const T*>(_array); }
+  iterator       end() { return begin() + _size; }
+  const_iterator end() const { return begin() + _size; }
 
-  using iterator               = T*;
-  using const_iterator         = const T*;
+#if 0
   using reverse_iterator       = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -132,12 +134,13 @@ public:
   {
     return const_reverse_iterator(begin());
   }
+#endif
 
 private:
   using Element = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
   Size    _size{};
-  Element _array[Capacity];
+  Element _array[Capacity]{};
 };
 
 } // namespace spaix

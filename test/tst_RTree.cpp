@@ -26,7 +26,7 @@
 #include "spaix/within.hpp"
 
 #include <algorithm>
-#include <fstream>
+#include <ctime>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -38,12 +38,13 @@
 
 namespace {
 
-using Rect     = spaix::Rect<unsigned, unsigned>;
-using Point    = spaix::Point<unsigned, unsigned>;
-using Data     = unsigned;
+using Scalar   = float;
+using Rect     = spaix::Rect<float, float>;
+using Point    = spaix::Point<float, float>;
+using Data     = size_t;
 using NodePath = spaix::NodePath;
 
-constexpr size_t page_size = 512u;
+/* constexpr size_t page_size = 512u; */
 
 template <class Key>
 Key
@@ -53,7 +54,7 @@ template <>
 Point
 make_key<Point>(const unsigned x, const unsigned y)
 {
-  return Point{x, y};
+  return Point{float(x), float(y)};
 }
 
 template <>
@@ -67,17 +68,9 @@ template <class Tree>
 void
 test_empty_tree(const Tree& tree, const unsigned span)
 {
-  using DirKey  = typename Tree::DirKey;
-  using DirNode = typename Tree::DirNode;
-
   const Rect everything{{0, span}, {0, span}};
 
   CHECK(tree.empty());
-
-  STATIC_CHECK(sizeof(DirNode) <= page_size &&
-               sizeof(DirNode) >= page_size - sizeof(DirKey) - sizeof(Data));
-  // STATIC_CHECK(Tree::fanout() == spaix::fanout<DirKey>(page_size));
-
   CHECK(tree.begin() == tree.end());
   CHECK(tree.query(spaix::within(everything)).empty());
 }
@@ -170,7 +163,7 @@ test_visit_structure(const Tree& tree)
     return true;
   });
 
-  CHECK(n_dirs > top_paths.size());
+  CHECK(n_dirs >= top_paths.size());
 }
 
 template <class Tree>
@@ -206,11 +199,12 @@ template <class Tree>
 void
 test_tree(const unsigned span, const unsigned n_queries)
 {
-  using Scalar = unsigned;
-  using Key    = typename Tree::Key;
+  using Key = typename Tree::Key;
 
-  std::mt19937                          rng;
-  std::uniform_int_distribution<Scalar> dist{0, span - 1};
+  std::random_device                      rd;
+  const uint64_t                          time_seed = time(nullptr);
+  std::mt19937                            rng{rd() ^ time_seed};
+  std::uniform_int_distribution<unsigned> dist{0, span - 1};
 
   auto tree = make_tree<Tree>(rng, span);
 
@@ -229,6 +223,16 @@ test_tree(const unsigned span, const unsigned n_queries)
   }
   CHECK(n_nodes == tree.size());
 
+  unsigned count = 0;
+
+  // Test a query that is in the tree bounds, but has no matches
+  const auto no_matches_query = Rect{{span / 2.0 + 0.1, span / 2.0 + 0.1},
+                                     {span / 2.0 + 0.9, span / 2.0 + 0.9}};
+  for (const auto& node : tree.query(spaix::within(no_matches_query))) {
+    (void)node;
+  }
+  CHECK((count == 0));
+
   for (auto i = 0u; i < n_queries; ++i) {
     const auto x0     = dist(rng);
     const auto x1     = dist(rng);
@@ -244,8 +248,6 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto     y_span         = spaix::span<1>(query);
     const unsigned expected_count = num_items_in_area<Key>(x_span, y_span);
 
-    unsigned count = 0;
-
     const auto verify = [&](const auto& node) {
       CHECK((spaix::min<0>(node.key) >= x_low));
       CHECK((spaix::max<0>(node.key) <= x_high));
@@ -255,36 +257,40 @@ test_tree(const unsigned span, const unsigned n_queries)
       ++count;
     };
 
-#if 1
     // Fast visitor query
     count = 0;
     tree.fast_query(spaix::within(query), verify);
-    CHECK(count == expected_count);
-    // CHECK(predicate.stats.num_checked_dirs < span * span);
-    // CHECK(predicate.stats.num_checked_dats >= count);
-    // CHECK(predicate.stats.num_checked_dats <= (span + 1) * (span + 1));
-#else
+    CHECK((count == expected_count));
+
     // Incremental query
     count = 0;
     for (const auto& node : tree.query(spaix::within(query))) {
       verify(node);
     }
     CHECK((count == expected_count));
-#endif
   }
 
   tree.clear();
   test_empty_tree(tree, span);
 }
 
-template <class Key>
+template <class Key, size_t page_size>
 void
-test_key(const unsigned span, const unsigned n_queries)
+test_page_size(const unsigned span, const unsigned n_queries)
 {
-  using DirKey = spaix::Rect<unsigned, unsigned>;
+  using DirKey = Rect;
+
+  // Test a small tree where the root has leaf children
+  test_tree<spaix::RTree<Key,
+                         Data,
+                         DirKey,
+                         page_size,
+                         3,
+                         spaix::LinearInsertion,
+                         spaix::LinearSplit>>(2, n_queries);
 
   test_tree<spaix::RTree<Key,
-                         unsigned,
+                         Data,
                          DirKey,
                          page_size,
                          3,
@@ -292,7 +298,7 @@ test_key(const unsigned span, const unsigned n_queries)
                          spaix::LinearSplit>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
-                         unsigned,
+                         Data,
                          DirKey,
                          page_size,
                          3,
@@ -300,7 +306,7 @@ test_key(const unsigned span, const unsigned n_queries)
                          spaix::QuadraticSplit>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
-                         unsigned,
+                         Data,
                          DirKey,
                          page_size,
                          3,
@@ -308,12 +314,25 @@ test_key(const unsigned span, const unsigned n_queries)
                          spaix::QuadraticSplit>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
-                         unsigned,
+                         Data,
                          DirKey,
                          page_size,
                          3,
                          spaix::QuadraticInsertion,
                          spaix::QuadraticSplit>>(span, n_queries);
+}
+
+template <class Key>
+void
+test_key(const unsigned span, const unsigned n_queries)
+{
+  /* test_page_size<Key, 128>(span, n_queries); */
+  test_page_size<Key, 256>(span, n_queries);
+  test_page_size<Key, 512>(span, n_queries);
+  test_page_size<Key, 1024>(span, n_queries);
+  test_page_size<Key, 2048>(span, n_queries);
+  test_page_size<Key, 4096>(span, n_queries);
+  test_page_size<Key, 8192>(span, n_queries);
 }
 
 } // namespace
@@ -330,10 +349,10 @@ main(int argc, char** argv)
     const auto span    = static_cast<unsigned>(std::stoul(args.at("span")));
     const auto queries = static_cast<unsigned>(std::stoul(args.at("queries")));
 
-    test_key<spaix::Point<unsigned, unsigned>>(span, queries);
-    test_key<spaix::Rect<unsigned, unsigned>>(span, queries);
+    test_key<spaix::Point<float, float>>(span, queries);
+    test_key<spaix::Rect<float, float>>(span, queries);
 
-  } catch (const std::runtime_error& e) {
+  } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);
     return 1;

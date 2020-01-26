@@ -25,6 +25,7 @@
 #include "spaix/contains.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/everything.hpp"
+#include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
 
@@ -43,56 +44,6 @@ namespace spaix {
 using NodePath = std::vector<ChildIndex>;
 
 struct Everything;
-
-/// Return a fanout so that directory nodes fit within `page_size` bytes
-template <class DirKey>
-constexpr ChildCount
-internal_fanout(const size_t page_size = 128u)
-{
-  return static_cast<ChildCount>(
-      (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
-      (sizeof(DirKey) + sizeof(std::unique_ptr<void*>)));
-}
-
-/// Return a fanout so that directory nodes fit within `page_size` bytes
-template <class DatKey, class Data>
-constexpr ChildCount
-leaf_fanout(const size_t page_size = 128u)
-{
-  return static_cast<ChildCount>(
-      (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
-      (sizeof(DatKey) + sizeof(Data)));
-}
-
-/// Return log_2(n)
-template <class T>
-constexpr T
-log_2(const T n)
-{
-  return (n < 2) ? 1 : 1 + log_2(n / 2);
-}
-
-/// Return log_b(n)
-template <class T>
-constexpr T
-log_b(const T n, const T b)
-{
-  return log_2(n) / log_2(b);
-}
-
-/// Return an upper bound on the maximum number of elements in a tree
-static constexpr size_t
-max_size(const size_t dat_size)
-{
-  return std::numeric_limits<size_t>::max() / dat_size;
-}
-
-/// Return the maximum height of a tree
-static constexpr size_t
-max_height(const size_t dat_size, const ChildCount min_fanout)
-{
-  return log_b(max_size(dat_size), size_t{min_fanout});
-}
 
 template <class Key>
 struct RectFor
@@ -139,8 +90,8 @@ public:
 
   static_assert(dir_fanout > 1, "");
   static_assert(dat_fanout > 1, "");
-  static_assert(min_dir_fanout >= 1, "");
-  static_assert(min_dat_fanout >= 1, "");
+  static_assert(min_dir_fanout > 1, "");
+  static_assert(min_dat_fanout > 1, "");
 
   using DatNode = DataNode<Key, Data>;
   using DirNode = DirectoryNode<DirKey, DatNode, dir_fanout, dat_fanout>;
@@ -166,7 +117,7 @@ public:
 
   template <class Predicate>
   using ConstIter = Iterator<Predicate,
-                             DirNode,
+                             const DirNode,
                              const DatNode,
                              max_height(sizeof(DatNode), min_dir_fanout)>;
 
@@ -402,6 +353,8 @@ private:
                            const DirKey&                            bounds,
                            const NodeType                           type)
   {
+    constexpr auto max_fanout = fanout - (fanout / MinFillDivisor);
+
     // Make an array of all nodes to deposit
     StaticVector<Entry, ChildCount, fanout + 1> deposit;
     for (auto&& e : nodes) {
@@ -419,8 +372,7 @@ private:
                       new_parent(deposit, seeds.first, type)};
 
     // Distribute remaining nodes between seeds
-    Split::distribute_children(
-        deposit, sides[0], sides[1], fanout / MinFillDivisor);
+    Split::distribute_children(deposit, sides[0], sides[1], max_fanout);
     assert(sides[0].node->num_children() + sides[1].node->num_children() ==
            fanout + 1);
     assert(sides[0].key == ideal_key(*sides[0].node));

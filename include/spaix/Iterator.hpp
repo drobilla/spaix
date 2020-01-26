@@ -52,11 +52,6 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   using DirEntry = typename DirNode::DirEntry;
   using DirKey   = typename DirNode::NodeKey;
 
-  // Iterator(Stack stack, Predicate predicate)
-  //   : _stack{std::move(stack)}, _predicate{std::move(predicate)}
-  // {
-  // }
-
   Iterator(const DirEntry& root_entry, Predicate predicate)
     : _stack{}, _predicate{std::move(predicate)}
   {
@@ -65,9 +60,7 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
       const ChildIndex root_child_index = leftmost_child(*root, predicate);
       if (root_child_index < root->num_children()) {
         _stack.emplace_back(Frame{root.get(), root_child_index});
-        if (!move_down_left()) {
-          _stack.clear();
-        }
+        move_down_left();
       }
     }
   }
@@ -96,7 +89,11 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
     return &_stack.back().node->dat_children[_stack.back().index];
   }
 
-  bool operator==(const Iterator& rhs) const { return _stack == rhs._stack; }
+  bool operator==(const Iterator& rhs) const
+  {
+    return _stack.size() == rhs._stack.size() &&
+           (_stack.empty() || _stack.back() == rhs._stack.back());
+  }
 
   bool operator!=(const Iterator& rhs) const { return !operator==(rhs); }
 
@@ -179,10 +176,9 @@ private:
     }
 
     // Now at a matching directory, and a matching child of that directory
-    // assert(_predicate.directory(node()->key) &&
-    //        ((node()->child_type == NodeType::directory &&
-    //          _predicate.directory(node()->dir_children[index()]->key)) ||
-    //         (_predicate.leaf(node()->dat_children[index()]->key))));
+    assert((node()->child_type == NodeType::directory &&
+            _predicate.directory(node()->dir_children[index()].key)) ||
+           (_predicate.leaf(node()->dat_children[index()].key)));
 
     return move_down_left();
   }

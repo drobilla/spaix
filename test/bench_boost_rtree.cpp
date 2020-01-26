@@ -18,7 +18,7 @@
 #include "options.hpp"
 #include "write_row.hpp"
 
-#include "spaix/RTree.hpp" // FIXME
+#include "spaix/sizes.hpp"
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -42,9 +42,8 @@ using Args       = spaix::test::Arguments;
 using Parameters = spaix::test::BenchParameters;
 using Scalar     = float;
 using Data       = size_t;
-using Rect2      = spaix::Rect<Scalar, Scalar>;
 
-using Point = bg::model::point<float, 2, bg::cs::cartesian>;
+using Point = bg::model::point<Scalar, 2, bg::cs::cartesian>;
 using Box   = bg::model::box<Point>;
 
 template <class T>
@@ -203,7 +202,7 @@ template <size_t page_size>
 int
 run(const Parameters& params, const Args& args)
 {
-  constexpr auto max_fill = spaix::internal_fanout<Rect2>(page_size);
+  constexpr auto max_fill = spaix::internal_fanout<Box>(page_size);
   constexpr auto min_fill = std::max(size_t(1), max_fill / min_fill_divisor);
 
   const auto split = args.at("split");
@@ -220,8 +219,7 @@ int
 run(const Parameters& params, const Args& args)
 {
   switch (params.page_size) {
-  // case 64: return run<64>(params, args);
-  case 128: return run<128>(params, args);
+  // case 128: return run<128>(params, args);
   case 256: return run<256>(params, args);
   case 512: return run<512>(params, args);
   case 1024: return run<1024>(params, args);
@@ -241,7 +239,7 @@ main(int argc, char** argv)
 {
   const spaix::test::Options opts{
       {"insert", {"Insert (linear, quadratic)", "ALGORITHM", "linear"}},
-      {"page-size", {"Page size for directory nodes", "BYTES", "128"}},
+      {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
       {"queries", {"Number of queries per step", "COUNT", "100"}},
       {"seed", {"Random number generator seed", "SEED", "5489"}},
       {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},
@@ -261,7 +259,7 @@ main(int argc, char** argv)
 
     run(Parameters{args}, args);
 
-  } catch (const std::runtime_error& e) {
+  } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);
     return 1;

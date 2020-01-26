@@ -120,20 +120,6 @@ entry_key(const DataNode<Key, Data>& entry)
   return entry.key;
 }
 
-template <class Key, class Node>
-const auto&
-entry_node(const NodeEntry<Key, Node>& entry)
-{
-  return entry.node;
-}
-
-template <class Key, class Data>
-const auto&
-entry_node(const DataNode<Key, Data>& entry)
-{
-  return entry;
-}
-
 } // namespace spaix
 
 #endif // SPAIX_DIRECTORYNODE_HPP

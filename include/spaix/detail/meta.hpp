@@ -26,16 +26,8 @@ namespace spaix {
 template <size_t n, typename... Ts>
 using Nth = typename std::tuple_element<n, std::tuple<Ts...>>::type;
 
-// template <class... Ts>
-// using ProductOf = typename std::common_type<Ts...>::type;
-// template <class... Ts>
-// using ProductOf = decltype(product<Ts...>(std::declval<Ts>()...));
-
 template <class... Ts>
 using CommonType = typename std::common_type<Ts...>::type;
-
-template <class... Ts>
-using CommonTupleType = typename std::common_type<Ts...>::type;
 
 template <class Tuple>
 struct CommonScalarType

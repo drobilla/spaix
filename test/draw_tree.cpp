@@ -100,7 +100,7 @@ run(const Parameters& params)
 {
   switch (params.page_size) {
   // case 64: return run<Insertion, Split, 64>(params);
-  case 128: return run<Insertion, Split, 128>(params);
+  // case 128: return run<Insertion, Split, 128>(params);
   case 256: return run<Insertion, Split, 256>(params);
   case 512: return run<Insertion, Split, 512>(params);
   case 1024: return run<Insertion, Split, 1024>(params);
@@ -146,7 +146,7 @@ main(int argc, char** argv)
 {
   const spaix::test::Options opts{
       {"insert", {"Insert (linear, quadratic)", "ALGORITHM", "linear"}},
-      {"page-size", {"Page size for directory nodes", "BYTES", "128"}},
+      {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
       {"scale", {"Scale factor for SVG output", "NUMBER", "1.0"}},
       {"seed", {"Random number generator seed", "SEED", "5489"}},
       {"size", {"Number of elements", "ELEMENTS", "1024"}},

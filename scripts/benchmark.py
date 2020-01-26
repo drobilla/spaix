@@ -138,7 +138,7 @@ if __name__ == "__main__":
                    help="do not run benchmarks")
     opt.add_option("--no-plot", action="store_true",
                    help="do not plot benchmarks")
-    opt.add_option("--page-size", type="int", default=128,
+    opt.add_option("--page-size", type="int", default=512,
                    help="page size for directory nodes")
     opt.add_option("--program", type="string", default=["build/bench_spaix_rtree"],
                    action="append",

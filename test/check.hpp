@@ -20,10 +20,10 @@
 
 #include <cassert>
 
-#define STATIC_CHECK(condition)   \
-  do {                            \
-    static_assert(condition, ""); \
-    assert(condition);            \
+#define STATIC_CHECK(condition)     \
+  do {                              \
+    static_assert(condition, "");   \
+    assert(condition); /* NOLINT */ \
   } while (0)
 
 #define CHECK(condition) assert(condition)
