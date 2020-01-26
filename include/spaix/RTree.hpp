@@ -326,7 +326,7 @@ private:
   }
 
   /// Create a new parent seeded with a child
-  template <class Entry, size_t count>
+  template <class Entry, ChildCount count>
   static DirEntry new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                              ChildIndex                              index,
                              NodeType                                child_type)
@@ -342,7 +342,7 @@ private:
   }
 
   /// Split `nodes` plus `node` in two and return the resulting sides
-  template <class Entry, size_t fanout>
+  template <class Entry, ChildCount fanout>
   static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                            Entry                                    entry,
                            const DirKey&                            bounds,
