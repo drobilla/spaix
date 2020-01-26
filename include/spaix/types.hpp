@@ -17,7 +17,6 @@
 #define SPAIX_TYPES_HPP
 
 #include <cstddef>
-#include <cstdint>
 
 namespace spaix {
 
@@ -25,8 +24,8 @@ using ChildIndex = size_t;
 using ChildCount = size_t;
 
 enum class NodeType : size_t {
-  DIR, ///< Internal directory node
-  DAT, ///< Leaf data node
+  directory, ///< Internal directory node
+  data,      ///< Leaf data node
 };
 
 enum class Side { left, right };

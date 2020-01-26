@@ -227,7 +227,7 @@ public:
                       const Visitor&   visitor) const
   {
     switch (node.child_type) {
-    case NodeType::DIR:
+    case NodeType::directory:
       for (const auto& entry : node.dir_children) {
         if (predicate.directory(entry.key)) {
           fast_query_rec(*entry.node, predicate, visitor);
@@ -235,7 +235,7 @@ public:
       }
       break;
 
-    case NodeType::DAT:
+    case NodeType::data:
       for (const auto& entry : node.dat_children) {
         if (predicate.leaf(entry.key)) {
           visitor(entry);
@@ -278,13 +278,13 @@ public:
   void insert(const Key& key, const Data& data)
   {
     if (empty()) {
-      _root = {DirKey{key}, std::make_unique<DirNode>(NodeType::DAT)};
+      _root = {DirKey{key}, std::make_unique<DirNode>(NodeType::data)};
     }
 
     auto sides = insert_rec(_root, _root.key | key, key, data);
     if (sides[0].node) {
       _root = {sides[0].key | sides[1].key,
-               std::make_unique<DirNode>(NodeType::DIR)};
+               std::make_unique<DirNode>(NodeType::directory)};
 
       _root.node->append_child(std::move(sides[0]));
       _root.node->append_child(std::move(sides[1]));
@@ -325,7 +325,7 @@ private:
 
   static DirKey ideal_key(const DirNode& node)
   {
-    if (node.child_type == NodeType::DIR) {
+    if (node.child_type == NodeType::directory) {
       return parent_key(node.dir_children);
     } else {
       return parent_key(node.dat_children);
@@ -338,7 +338,7 @@ private:
                                 const Data&   data)
   {
     auto& parent = *parent_entry.node;
-    if (parent.child_type == NodeType::DIR) { // Recursing downwards
+    if (parent.child_type == NodeType::directory) { // Recursing downwards
       const auto choice   = Insertion::choose(parent.dir_children, key);
       const auto index    = choice.first;
       const auto expanded = choice.second;
@@ -439,7 +439,7 @@ private:
       for (ChildIndex i = 0u; i < node.num_children(); ++i) {
         path.push_back(i);
 
-        if (node.child_type == NodeType::DAT) {
+        if (node.child_type == NodeType::data) {
           const auto& child = node.dat_children[i];
           visit_dat(child.key, child.data, path);
         } else {

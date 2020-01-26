@@ -82,7 +82,7 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   {
     assert(!_stack.empty());
     assert(_stack.back().index < _stack.back().node->num_children());
-    assert(_stack.back().node->child_type == NodeType::DAT);
+    assert(_stack.back().node->child_type == NodeType::data);
 
     return _stack.back().node->dat_children[_stack.back().index];
   }
@@ -91,7 +91,7 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
   {
     assert(!_stack.empty());
     assert(_stack.back().index < _stack.back().node->num_children());
-    assert(_stack.back().node->child_type == NodeType::DAT);
+    assert(_stack.back().node->child_type == NodeType::data);
 
     return &_stack.back().node->dat_children[_stack.back().index];
   }
@@ -113,7 +113,7 @@ private:
   /// Move right until we reach a good leaf or the end of the parent
   bool move_right_leaf()
   {
-    assert(node()->child_type == NodeType::DAT);
+    assert(node()->child_type == NodeType::data);
     do {
       ++back().index;
     } while (index() < node()->dat_children.size() &&
@@ -125,7 +125,7 @@ private:
   /// Move right until we reach a good directory or the end of the parent
   void move_right_dir()
   {
-    assert(node()->child_type == NodeType::DIR);
+    assert(node()->child_type == NodeType::directory);
     do {
       ++back().index;
     } while (index() < node()->dir_children.size() &&
@@ -150,9 +150,9 @@ private:
   /// Move down/left until we reach a potentially matching leaf
   bool move_down_left()
   {
-    while (node()->child_type == NodeType::DIR) {
+    while (node()->child_type == NodeType::directory) {
       auto* const dir = node()->dir_children[index()].node.get();
-      if (dir->child_type == NodeType::DAT) {
+      if (dir->child_type == NodeType::data) {
         _stack.emplace_back(Frame{dir, 0});
       } else {
         const ChildIndex index = leftmost_child(*dir, _predicate);
@@ -180,7 +180,7 @@ private:
 
     // Now at a matching directory, and a matching child of that directory
     // assert(_predicate.directory(node()->key) &&
-    //        ((node()->child_type == NodeType::DIR &&
+    //        ((node()->child_type == NodeType::directory &&
     //          _predicate.directory(node()->dir_children[index()]->key)) ||
     //         (_predicate.leaf(node()->dat_children[index()]->key))));
 

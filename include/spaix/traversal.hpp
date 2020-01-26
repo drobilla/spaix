@@ -32,7 +32,7 @@ ChildIndex
 leftmost_child(const DirNode& dir, const Predicate& predicate)
 {
   switch (dir.child_type) {
-  case NodeType::DIR:
+  case NodeType::directory:
     for (size_t i = 0u; i < dir.dir_children.size(); ++i) {
       if (predicate.directory(dir.dir_children[i].key)) {
         return static_cast<ChildIndex>(i);
@@ -40,7 +40,7 @@ leftmost_child(const DirNode& dir, const Predicate& predicate)
     }
     return dir.dir_children.size();
 
-  case NodeType::DAT:
+  case NodeType::data:
     for (size_t i = 0u; i < dir.dat_children.size(); ++i) {
       if (predicate.leaf(dir.dat_children[i].key)) {
         return static_cast<ChildIndex>(i);

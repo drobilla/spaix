@@ -58,7 +58,7 @@ public:
 
   explicit DirectoryNode(const NodeType t) : child_type{t}
   {
-    if (child_type == NodeType::DAT) {
+    if (child_type == NodeType::data) {
       new (&dat_children) DatChildren();
     } else {
       new (&dir_children) DirChildren();
@@ -67,7 +67,7 @@ public:
 
   ~DirectoryNode()
   {
-    if (child_type == NodeType::DAT) {
+    if (child_type == NodeType::data) {
       dat_children.~DatChildren();
     } else {
       dir_children.~DirChildren();
@@ -82,20 +82,20 @@ public:
 
   void append_child(DatNode&& child)
   {
-    assert(child_type == NodeType::DAT);
+    assert(child_type == NodeType::data);
     dat_children.emplace_back(std::move(child));
   }
 
   void append_child(DirEntry entry)
   {
-    assert(child_type == NodeType::DIR);
+    assert(child_type == NodeType::directory);
     dir_children.emplace_back(std::move(entry));
   }
 
   size_t num_children() const
   {
-    return child_type == NodeType::DIR ? dir_children.size()
-                                       : dat_children.size();
+    return child_type == NodeType::directory ? dir_children.size()
+                                             : dat_children.size();
   }
 
   const NodeType child_type; ///< Type of children nodes
