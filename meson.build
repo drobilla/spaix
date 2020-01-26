@@ -35,6 +35,8 @@ elif meson.get_compiler('cpp').get_id() == 'gcc'
     '-fstrict-overflow',
     '-pedantic',
   ]
+else
+  warnings = []
 endif
 
 if meson.version() > '0.43.0'

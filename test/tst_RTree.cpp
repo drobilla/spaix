@@ -60,14 +60,14 @@ template <>
 Rect
 make_key<Rect>(const unsigned x, const unsigned y)
 {
-  return Rect{{x, x + 1}, {y, y + 1}};
+  return Rect{{float(x), x + 1.0f}, {float(y), y + 1.0f}};
 }
 
 template <class Tree>
 void
 test_empty_tree(const Tree& tree, const unsigned span)
 {
-  const Rect everything{{0, span}, {0, span}};
+  const Rect everything{{0.0f, float(span)}, {0.0f, float(span)}};
 
   CHECK(tree.empty());
   CHECK(tree.begin() == tree.end());
@@ -200,11 +200,11 @@ test_tree(const unsigned span, const unsigned n_queries)
 {
   using Key = typename Tree::Key;
 
-  const auto start_time = static_cast<uint64_t>(time(nullptr));
+  const auto start_time = static_cast<unsigned>(time(nullptr));
   const auto seed       = std::random_device{}() ^ start_time;
 
   std::mt19937                            rng{seed};
-  std::uniform_int_distribution<unsigned> dist{0, span - 1};
+  std::uniform_int_distribution<unsigned> dist{0, span - 1u};
 
   auto tree = make_tree<Tree>(rng, span);
 
@@ -226,8 +226,8 @@ test_tree(const unsigned span, const unsigned n_queries)
   unsigned count = 0;
 
   // Test a query that is in the tree bounds, but has no matches
-  const auto no_matches_query = Rect{{span / 2.0 + 0.1, span / 2.0 + 0.1},
-                                     {span / 2.0 + 0.9, span / 2.0 + 0.9}};
+  const auto no_matches_query = Rect{{span / 2.0f + 0.1f, span / 2.0f + 0.1f},
+                                     {span / 2.0f + 0.9f, span / 2.0f + 0.9f}};
   for (const auto& node : tree.query(spaix::within(no_matches_query))) {
     (void)node;
   }
@@ -239,13 +239,15 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto y0     = dist(rng);
     const auto y1     = dist(rng);
     const auto x_low  = std::min(x0, x1);
-    const auto x_high = std::max(x0, x1) + 1;
+    const auto x_high = std::max(x0, x1) + 1u;
     const auto y_low  = std::min(y0, y1);
-    const auto y_high = std::max(y0, y1) + 1;
+    const auto y_high = std::max(y0, y1) + 1u;
 
-    const auto x_span         = x_high - x_low;
-    const auto y_span         = y_high - y_low;
-    const auto query          = Rect{{x_low, x_high}, {y_low, y_high}};
+    const auto x_span = x_high - x_low;
+    const auto y_span = y_high - y_low;
+    const auto query  = Rect{{Scalar(x_low), Scalar(x_high)},
+                             {Scalar(y_low), Scalar(y_high)}};
+
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
     const auto verify = [&](const auto& node) {
@@ -317,8 +319,8 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
-      {"span", {"Dimension span", "NUMBER", "32"}},
-      {"queries", {"Number of queries", "COUNT", "1000"}}};
+      {"span", {"Dimension span", "NUMBER", "20"}},
+      {"queries", {"Number of queries", "COUNT", "400"}}};
 
   try {
     const auto args    = parse_options(opts, argc, argv);

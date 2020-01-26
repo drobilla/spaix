@@ -20,11 +20,18 @@
 
 #include <cassert>
 
+#ifdef _MSC_VER
+#define STATIC_CHECK(condition)     \
+  do {                              \
+    assert(condition); /* NOLINT */ \
+  } while (0)
+#else
 #define STATIC_CHECK(condition)     \
   do {                              \
     static_assert(condition, "");   \
     assert(condition); /* NOLINT */ \
   } while (0)
+#endif
 
 #define CHECK(condition) assert(condition)
 

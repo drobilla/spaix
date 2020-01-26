@@ -26,18 +26,20 @@ namespace test {
 static void
 test_intersection()
 {
-  constexpr auto rect = TestRect{{1, 3}, {2, 5}};
+  constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
 
-  STATIC_CHECK(((rect & TestRect{{2, 4}, {1, 4}}) == TestRect{{2, 3}, {2, 4}}));
-  STATIC_CHECK(((rect & TestRect{{5, 6}, {1, 4}}) == TestRect{}));
+  STATIC_CHECK(((rect & TestRect{{2, 4}, {1.0f, 4.0f}}) ==
+                TestRect{{2, 3}, {2.0f, 4.0f}}));
+  STATIC_CHECK(((rect & TestRect{{5, 6}, {1.0f, 4.0f}}) == TestRect{}));
 
-  STATIC_CHECK(((rect & TestPoint{1, 2}) == TestRect{{1, 1}, {2, 2}}));
-  STATIC_CHECK(((TestPoint{1, 2} & rect) == TestRect{{1, 1}, {2, 2}}));
+  STATIC_CHECK(((rect & TestPoint{1, 2.0f}) == TestRect{{1, 1}, {2.0f, 2.0f}}));
+  STATIC_CHECK(((TestPoint{1, 2.0f} & rect) == TestRect{{1, 1}, {2.0f, 2.0f}}));
 
   STATIC_CHECK(
-      ((TestPoint{1, 2} & TestPoint{1, 2}) == TestRect{{1, 1}, {2, 2}}));
+      ((TestPoint{1, 2.0f} & TestPoint{1, 2.0f}) ==
+       TestRect{{1, 1}, {2.0f, 2.0f}}));
 
-  STATIC_CHECK(((TestPoint{1, 2} & TestPoint{1, 3}) == TestRect{}));
+  STATIC_CHECK(((TestPoint{1, 2.0f} & TestPoint{1, 3.0f}) == TestRect{}));
 }
 
 } // namespace test

@@ -28,25 +28,26 @@ namespace test {
 static void
 test_union()
 {
-  constexpr auto rect = TestRect{{1, 3}, {2, 5}};
+  constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
 
-  STATIC_CHECK(((rect | TestRect{{2, 4}, {1, 5}}) == TestRect{{1, 4}, {1, 5}}));
+  STATIC_CHECK(((rect | TestRect{{2, 4}, {1.0f, 5.0f}}) ==
+                TestRect{{1, 4}, {1.0f, 5.0f}}));
 
-  STATIC_CHECK(((rect | TestPoint{0, 2}) == TestRect{{0, 3}, {2, 5}}));
-  STATIC_CHECK(((rect | TestPoint{4, 2}) == TestRect{{1, 4}, {2, 5}}));
-  STATIC_CHECK(((rect | TestPoint{1, 1}) == TestRect{{1, 3}, {1, 5}}));
-  STATIC_CHECK(((rect | TestPoint{1, 6}) == TestRect{{1, 3}, {2, 6}}));
+  STATIC_CHECK(((rect | TestPoint{0, 2.0f}) == TestRect{{0, 3}, {2.0f, 5.0f}}));
+  STATIC_CHECK(((rect | TestPoint{4, 2.0f}) == TestRect{{1, 4}, {2.0f, 5.0f}}));
+  STATIC_CHECK(((rect | TestPoint{1, 1.0f}) == TestRect{{1, 3}, {1.0f, 5.0f}}));
+  STATIC_CHECK(((rect | TestPoint{1, 6.0f}) == TestRect{{1, 3}, {2.0f, 6.0f}}));
 
-  STATIC_CHECK(((TestPoint{0, 2} | rect) == TestRect{{0, 3}, {2, 5}}));
-  STATIC_CHECK(((TestPoint{4, 2} | rect) == TestRect{{1, 4}, {2, 5}}));
-  STATIC_CHECK(((TestPoint{1, 1} | rect) == TestRect{{1, 3}, {1, 5}}));
-  STATIC_CHECK(((TestPoint{1, 6} | rect) == TestRect{{1, 3}, {2, 6}}));
+  STATIC_CHECK(((TestPoint{0, 2.0f} | rect) == TestRect{{0, 3}, {2.0f, 5.0f}}));
+  STATIC_CHECK(((TestPoint{4, 2.0f} | rect) == TestRect{{1, 4}, {2.0f, 5.0f}}));
+  STATIC_CHECK(((TestPoint{1, 1.0f} | rect) == TestRect{{1, 3}, {1.0f, 5.0f}}));
+  STATIC_CHECK(((TestPoint{1, 6.0f} | rect) == TestRect{{1, 3}, {2.0f, 6.0f}}));
 
-  STATIC_CHECK(((TestPoint{1, 2} | TestPoint{3, 5}) == rect));
+  STATIC_CHECK(((TestPoint{1, 2.0f} | TestPoint{3, 5.0f}) == rect));
 
-  auto mut = TestRect{{1, 3}, {2, 5}};
-  mut |= TestRect{{2, 4}, {1, 5}};
-  CHECK((mut == TestRect{{1, 4}, {1, 5}}));
+  auto mut = TestRect{{1, 3}, {2.0f, 5.0f}};
+  mut |= TestRect{{2, 4}, {1.0f, 5.0f}};
+  CHECK((mut == TestRect{{1, 4}, {1.0f, 5.0f}}));
 }
 
 } // namespace test

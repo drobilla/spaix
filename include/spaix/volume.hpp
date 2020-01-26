@@ -51,7 +51,7 @@ volume(const Rect<Ts...>& rect)
 }
 
 template <class... Ts>
-constexpr auto
+constexpr ProductOf<Ts...>
 volume(const Point<Ts...>&)
 {
   return 0;

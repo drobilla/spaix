@@ -37,13 +37,13 @@ constexpr double pad = 8;
 static inline std::string
 color(const NodePath& path, const double alpha)
 {
-  constexpr ChildCount fanout = 4;
-  constexpr uint32_t   max    = std::numeric_limits<uint8_t>::max();
+  constexpr uint32_t fanout = 4;
+  constexpr uint32_t max    = std::numeric_limits<uint8_t>::max();
 
   uint32_t components[3] = {0, 0, 0};
   int      c             = 0;
   for (ChildIndex index : path) {
-    components[c] += ((index * max) / ((fanout - 1)));
+    components[c] += (((uint32_t)index * max) / ((fanout - 1u)));
     c = (c + 1) % 3;
   }
 

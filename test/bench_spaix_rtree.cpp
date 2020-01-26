@@ -139,9 +139,9 @@ benchmark_queries(std::mt19937& rng,
     // metrics.visit_times.update(
     //     visit_dur.count()); // / std::max(1.0, double(n_results)));
 
-    metrics.result_counts.update(n_results);
-    metrics.checked_dirs.update(counts.n_checked_dirs);
-    metrics.checked_dats.update(counts.n_checked_dats);
+    metrics.result_counts.update(static_cast<double>(n_results));
+    metrics.checked_dirs.update(static_cast<double>(counts.n_checked_dirs));
+    metrics.checked_dats.update(static_cast<double>(counts.n_checked_dats));
   }
 
   return metrics;
@@ -242,7 +242,7 @@ run(const Parameters& params)
   using Config =
       spaix::Configuration<page_size, min_fill_divisor, Split, Insertion>;
 
-  return run<spaix::RTree<Rect2, Scalar, Config>>(params, std::cout);
+  return run<spaix::RTree<Rect2, Data, Config>>(params, std::cout);
 }
 
 template <class Insertion, class Split>
