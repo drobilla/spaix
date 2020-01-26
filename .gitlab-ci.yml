@@ -42,14 +42,14 @@ mac_rel:
 
 win_dbg:
   <<: *build_definition
-  tags: [windows]
+  tags: [windows,meson]
   script:
     - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
     - ninja -C build test
 
 win_rel:
   <<: *build_definition
-  tags: [windows]
+  tags: [windows,meson]
   script:
     - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
     - ninja -C build test
