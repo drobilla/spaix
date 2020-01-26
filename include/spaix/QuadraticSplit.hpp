@@ -88,16 +88,12 @@ public:
       const auto best = pick_next(deposit, lhs, rhs);
       assert(best.child_index < deposit.size());
 
-      if (best.child_index != deposit.size() - 1) {
-        std::iter_swap(deposit.begin() + best.child_index,
-                       deposit.begin() + deposit.size() - 1);
-      }
-
-      auto& parent = best.side == Side::left ? lhs : rhs;
+      const auto iter   = deposit.begin() + best.child_index;
+      auto&      parent = best.side == Side::left ? lhs : rhs;
 
       parent.key = best.new_parent_key;
-      parent.node->append_child(std::move(deposit.back()));
-      deposit.pop_back();
+      parent.node->append_child(std::move(*iter));
+      deposit.pop(iter);
 
       if (parent.node->num_children() == max_fanout) {
         auto&        other_parent = best.side == Side::left ? rhs : lhs;

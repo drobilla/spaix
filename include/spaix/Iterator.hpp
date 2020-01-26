@@ -22,32 +22,31 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iterator>
 #include <utility>
 #include <vector>
 
 namespace spaix {
 
-template <class Node>
-struct StackFrame
-{
-  const Node* node;  ///< Pointer to directory node
-  ChildIndex  index; ///< Index of node child
-
-  bool operator==(const StackFrame& rhs) const
-  {
-    return node == rhs.node && index == rhs.index;
-  }
-};
-
 template <class Predicate, class DirNode, class DatNode, size_t max_height>
-struct Iterator : public std::iterator<std::forward_iterator_tag,
-                                       DatNode,
-                                       intptr_t,
-                                       const DatNode*,
-                                       const DatNode&>
+struct Iterator
 {
-  using Frame    = StackFrame<DirNode>;
+  using iterator_category = std::forward_iterator_tag;
+  using value_type        = DatNode;
+  using difference_type   = intptr_t;
+  using pointer           = const DatNode*;
+  using reference         = const DatNode&;
+
+  struct Frame
+  {
+    const DirNode* node;  ///< Pointer to directory node
+    ChildIndex     index; ///< Index of child
+
+    bool operator==(const Frame& rhs) const
+    {
+      return node == rhs.node && index == rhs.index;
+    }
+  };
+
   using Stack    = StaticVector<Frame, size_t, max_height>;
   using DirEntry = typename DirNode::DirEntry;
   using DirKey   = typename DirNode::NodeKey;
@@ -71,14 +70,7 @@ struct Iterator : public std::iterator<std::forward_iterator_tag,
     return *this;
   }
 
-  const DatNode& operator*() const
-  {
-    assert(!_stack.empty());
-    assert(_stack.back().index < _stack.back().node->num_children());
-    assert(_stack.back().node->child_type == NodeType::data);
-
-    return _stack.back().node->dat_children[_stack.back().index];
-  }
+  const DatNode& operator*() const { return *operator->(); }
 
   const DatNode* operator->() const
   {

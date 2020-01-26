@@ -53,6 +53,22 @@ public:
   StaticVector& operator=(StaticVector&) = delete;
   StaticVector& operator=(StaticVector&&) = delete;
 
+  void pop(const iterator iter)
+  {
+    assert(iter < end());
+    if (iter != end() - 1) {
+      auto last = std::move(back());
+
+      if (!std::is_trivially_destructible<T>::value) {
+        reinterpret_cast<T*>(iter)->~T();
+      }
+
+      new (iter) T(std::move(last));
+    }
+
+    pop_back();
+  }
+
   void pop_back()
   {
     assert(!empty());

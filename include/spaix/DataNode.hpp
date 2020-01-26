@@ -16,15 +16,13 @@
 #ifndef SPAIX_DATANODE_HPP
 #define SPAIX_DATANODE_HPP
 
-#include <cstddef>
-
 namespace spaix {
 
 template <class Key, class Data>
 struct DataNode
 {
-  Key  key; // FIXME? const?
-  Data data;
+  const Key key;
+  Data      data;
 };
 
 } // namespace spaix

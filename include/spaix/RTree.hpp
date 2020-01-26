@@ -29,7 +29,6 @@
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -96,12 +95,10 @@ public:
   using DatNode = DataNode<Key, Data>;
   using DirNode = DirectoryNode<DirKey, DatNode, dir_fanout, dat_fanout>;
 
-  using DatNodePtr = std::unique_ptr<DatNode>;
-  using DirNodePtr = std::unique_ptr<DirNode>;
-  using DirEntry   = typename DirNode::DirEntry;
-
+  using DatNodePtr  = std::unique_ptr<DatNode>;
+  using DirNodePtr  = std::unique_ptr<DirNode>;
+  using DirEntry    = typename DirNode::DirEntry;
   using DirNodePair = std::array<DirEntry, 2>;
-  using Frame       = StackFrame<DirNode>;
 
   static_assert(sizeof(DirNodePtr) == sizeof(void*), "");
   static_assert(sizeof(DirNode) <= PageSize, "");
@@ -334,15 +331,13 @@ private:
                              ChildIndex                              index,
                              NodeType                                child_type)
   {
-    if (index != deposit.size() - 1) {
-      std::iter_swap(deposit.begin() + index,
-                     deposit.begin() + deposit.size() - 1);
-    }
-
-    DirKey     key{entry_key(deposit.back())};
+    const auto iter{deposit.begin() + index};
+    DirKey     key{entry_key(*iter)};
     DirNodePtr node{std::make_unique<DirNode>(child_type)};
-    node->append_child(std::move(deposit.back()));
-    deposit.pop_back();
+
+    node->append_child(std::move(*iter));
+    deposit.pop(iter);
+
     return {key, std::move(node)};
   }
 
