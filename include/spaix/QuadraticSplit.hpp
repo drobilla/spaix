@@ -17,16 +17,14 @@
 #define SPAIX_QUADRATICSPLIT_HPP
 
 #include "spaix/StaticVector.hpp"
+#include "spaix/distribute.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
 #include <array>
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <limits>
-#include <tuple>
-#include <type_traits>
 #include <utility>
 
 namespace spaix {
@@ -40,8 +38,8 @@ class QuadraticSplit
 {
 public:
   /// Return the indices of the children that should be used for split seeds
-  template <class Entry, size_t count, class DirKey>
-  static std::pair<size_t, size_t>
+  template <class Entry, ChildCount count, class DirKey>
+  static std::pair<ChildIndex, ChildIndex>
   pick_seeds(const StaticVector<Entry, ChildCount, count>& deposit,
              const DirKey&)
   {
@@ -49,7 +47,7 @@ public:
     using SeedWaste = Volume;
 
     assert(deposit.size() == deposit.capacity());
-    std::array<Volume, count> volumes;
+    Volume volumes[count];
     for (size_t i = 0; i < deposit.size(); ++i) {
       volumes[i] = volume(entry_key(deposit[i]));
     }
@@ -85,25 +83,16 @@ public:
   {
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
-      const auto best = pick_next(deposit, lhs, rhs);
-      assert(best.child_index < deposit.size());
-
+      const auto best   = pick_next(deposit, lhs, rhs);
       const auto iter   = deposit.begin() + best.child_index;
       auto&      parent = best.side == Side::left ? lhs : rhs;
 
-      parent.key = best.new_parent_key;
-      parent.node->append_child(std::move(*iter));
+      assert(best.child_index < deposit.size());
+      distribute_child(parent, best.new_parent_key, std::move(*iter));
       deposit.pop(iter);
 
       if (parent.node->num_children() == max_fanout) {
-        auto&        other_parent = best.side == Side::left ? rhs : lhs;
-        const size_t n_remaining  = deposit.size();
-        for (size_t j = 0; j < n_remaining; ++j) {
-          other_parent.key |= entry_key(deposit[j]);
-          other_parent.node->append_child(std::move(deposit[j]));
-        }
-
-        deposit.clear();
+        distribute_remaining(best.side == Side::left ? rhs : lhs, deposit);
         return;
       }
     }

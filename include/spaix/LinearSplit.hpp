@@ -18,13 +18,14 @@
 
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
+#include "spaix/distribute.hpp"
 #include "spaix/types.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
 #include <limits>
-#include <memory>
 #include <utility>
 
 namespace spaix {
@@ -185,12 +186,7 @@ public:
       if (side == Side::left) {
         distribute_child(lhs, l_key, std::move(child));
         if (lhs.node->num_children() == max_fanout) {
-          // Left is now full, insert remaining entries into right
-          for (size_t j = 0; j < deposit.size(); ++j) {
-            rhs.key |= deposit[j].key;
-            rhs.node->append_child(std::move(deposit[j]));
-          }
-          deposit.clear();
+          distribute_remaining(rhs, std::forward<Deposit>(deposit));
           return;
         }
 
@@ -198,27 +194,13 @@ public:
       } else {
         distribute_child(rhs, r_key, std::move(child));
         if (rhs.node->num_children() == max_fanout) {
-          // Right is now full, insert remaining entries into left
-          for (size_t j = 0; j < deposit.size(); ++j) {
-            lhs.key |= deposit[j].key;
-            lhs.node->append_child(std::move(deposit[j]));
-          }
-          deposit.clear();
+          distribute_remaining(lhs, std::forward<Deposit>(deposit));
           return;
         }
 
         rhs_volume = r_volume;
       }
     }
-  }
-
-private:
-  template <class DirNode, class DirKey, class Entry>
-  static void
-  distribute_child(DirNode& parent, const DirKey& parent_key, Entry&& child)
-  {
-    parent.key = parent_key;
-    parent.node->append_child(std::forward<Entry>(child));
   }
 };
 
