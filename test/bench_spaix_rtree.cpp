@@ -306,7 +306,7 @@ main(int argc, char** argv)
       {"seed", {"Random number generator seed", "SEED", "5489"}},
       {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},
       {"span", {"Dimension span", "NUMBER", "10000000"}},
-      {"split", {"Split (linear, quadratic)", "ALGORITHM", "linear"}},
+      {"split", {"Split (linear, quadratic)", "ALGORITHM", "quadratic"}},
       {"steps", {"Number of benchmarking steps", "RECORDS", "10"}},
   };
 

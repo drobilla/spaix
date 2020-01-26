@@ -151,7 +151,7 @@ main(int argc, char** argv)
       {"seed", {"Random number generator seed", "SEED", "5489"}},
       {"size", {"Number of elements", "ELEMENTS", "1024"}},
       {"span", {"Dimension span", "NUMBER", "1024"}},
-      {"split", {"Split (linear, quadratic)", "ALGORITHM", "linear"}},
+      {"split", {"Split (linear, quadratic)", "ALGORITHM", "quadratic"}},
   };
 
   try {
