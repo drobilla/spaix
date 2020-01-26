@@ -17,10 +17,10 @@
 #define SPAIX_ITERATOR_HPP
 
 #include "spaix/StaticVector.hpp"
-#include "spaix/traversal.hpp"
 #include "spaix/types.hpp"
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <utility>
 #include <vector>
@@ -90,6 +90,30 @@ struct Iterator
   bool operator!=(const Iterator& rhs) const { return !operator==(rhs); }
 
 private:
+  static ChildIndex
+  leftmost_child(const DirNode& dir, const Predicate& predicate)
+  {
+    switch (dir.child_type) {
+    case NodeType::directory:
+      for (size_t i = 0u; i < dir.dir_children.size(); ++i) {
+        if (predicate.directory(dir.dir_children[i].key)) {
+          return static_cast<ChildIndex>(i);
+        }
+      }
+      return dir.dir_children.size();
+
+    case NodeType::data:
+      for (size_t i = 0u; i < dir.dat_children.size(); ++i) {
+        if (predicate.leaf(dir.dat_children[i].key)) {
+          return static_cast<ChildIndex>(i);
+        }
+      }
+      return dir.dat_children.size();
+    }
+
+    return 0; // Unreached
+  }
+
   Frame& back()
   {
     assert(!_stack.empty());

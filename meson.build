@@ -62,7 +62,6 @@ headers = [
   'include/spaix/intersection.hpp',
   'include/spaix/intersects.hpp',
   'include/spaix/touching.hpp',
-  'include/spaix/traversal.hpp',
   'include/spaix/types.hpp',
   'include/spaix/union.hpp',
   'include/spaix/volume.hpp',
