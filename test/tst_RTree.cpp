@@ -60,7 +60,7 @@ template <>
 Rect
 make_key<Rect>(const unsigned x, const unsigned y)
 {
-  return Rect{{float(x), x + 1.0f}, {float(y), y + 1.0f}};
+  return Rect{{float(x), float(x) + 1.0f}, {float(y), float(y) + 1.0f}};
 }
 
 template <class Tree>
@@ -226,8 +226,9 @@ test_tree(const unsigned span, const unsigned n_queries)
   unsigned count = 0;
 
   // Test a query that is in the tree bounds, but has no matches
-  const auto no_matches_query = Rect{{span / 2.0f + 0.1f, span / 2.0f + 0.1f},
-                                     {span / 2.0f + 0.9f, span / 2.0f + 0.9f}};
+  const auto mid = float(span) / 2.0f;
+  const auto no_matches_query =
+      Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
   for (const auto& node : tree.query(spaix::within(no_matches_query))) {
     (void)node;
   }
@@ -245,8 +246,8 @@ test_tree(const unsigned span, const unsigned n_queries)
 
     const auto x_span = x_high - x_low;
     const auto y_span = y_high - y_low;
-    const auto query  = Rect{{Scalar(x_low), Scalar(x_high)},
-                             {Scalar(y_low), Scalar(y_high)}};
+    const auto query =
+        Rect{{Scalar(x_low), Scalar(x_high)}, {Scalar(y_low), Scalar(y_high)}};
 
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
