@@ -278,150 +278,39 @@ public:
 
 private:
   template <class Children>
-  static Box parent_key(const Children& children)
-  {
-    Box key;
+  static Box parent_key(const Children& children);
 
-    for (const auto& entry : children) {
-      key |= entry_key(entry);
-    }
-
-    return key;
-  }
-
-  static Box ideal_key(const DirNode& node)
-  {
-    if (node.child_type == NodeType::directory) {
-      return parent_key(node.dir_children);
-    } else {
-      return parent_key(node.dat_children);
-    }
-  }
+  static Box ideal_key(const DirNode& node);
 
   static DirNodePair insert_rec(DirEntry&   parent_entry,
                                 const Box&  new_parent_key,
                                 const Key&  key,
-                                const Data& data)
-  {
-    auto& parent = *parent_entry.node;
-    if (parent.child_type == NodeType::directory) { // Recursing downwards
-      const auto choice   = Insertion::choose(parent.dir_children, key);
-      const auto index    = choice.first;
-      const auto expanded = choice.second;
-      auto&      entry    = parent.dir_children[index];
-
-      auto sides = insert_rec(entry, expanded, key, data);
-
-      if (sides[0].node) { // Child was split, replace it
-        parent.dir_children[index] = std::move(sides[0]);
-        if (parent.dir_children.size() == dir_fanout) {
-          return split(parent.dir_children,
-                       std::move(sides[1]),
-                       parent_entry.key | key,
-                       parent.child_type);
-        }
-
-        parent.append_child(std::move(sides[1]));
-        parent_entry.key = parent_key(parent.dir_children);
-      } else {
-        parent_entry.key = new_parent_key;
-        assert(parent_entry.key == ideal_key(parent));
-      }
-
-    } else if (parent.dat_children.size() < dat_fanout) { // Simple leaf insert
-      parent.append_child(DatNode{key, data});
-      parent_entry.key = new_parent_key;
-      assert(parent_entry.key == ideal_key(parent));
-
-    } else { // Split leaf insert
-      return split(parent.dat_children,
-                   DatNode{key, data},
-                   parent_entry.key | key,
-                   parent.child_type);
-    }
-
-    return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
-  }
+                                const Data& data);
 
   /// Create a new parent seeded with a child
   template <class Entry, ChildCount count>
   static DirEntry new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                              ChildIndex                              index,
-                             NodeType                                child_type)
-  {
-    const auto iter{deposit.begin() + index};
-    Box        key{entry_key(*iter)};
-    DirNodePtr node{std::make_unique<DirNode>(child_type)};
-
-    node->append_child(std::move(*iter));
-    deposit.pop(iter);
-
-    return {key, std::move(node)};
-  }
+                             NodeType child_type);
 
   /// Split `nodes` plus `node` in two and return the resulting sides
   template <class Entry, ChildCount fanout>
   static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                            Entry                                    entry,
                            const Box&                               bounds,
-                           const NodeType                           type)
-  {
-    constexpr auto max_fanout = fanout - (fanout / min_fill_divisor);
-
-    // Make an array of all nodes to deposit
-    StaticVector<Entry, ChildCount, fanout + 1> deposit;
-    for (auto&& e : nodes) {
-      deposit.emplace_back(std::move(e));
-    }
-    deposit.emplace_back(std::move(entry));
-    assert(bounds == parent_key(deposit));
-
-    // Pick two nodes to seed the left and right groups
-    const auto seeds = Split::pick_seeds(deposit, bounds);
-    assert(seeds.first < seeds.second);
-
-    // Create left and right parent nodes with seeds
-    DirNodePair sides{new_parent(deposit, seeds.second, type),
-                      new_parent(deposit, seeds.first, type)};
-
-    // Distribute remaining nodes between seeds
-    Split::distribute_children(
-        std::move(deposit), sides[0], sides[1], max_fanout);
-    assert(sides[0].node->num_children() + sides[1].node->num_children() ==
-           fanout + 1);
-    assert(sides[0].key == ideal_key(*sides[0].node));
-    assert(sides[1].key == ideal_key(*sides[1].node));
-
-    return sides;
-  }
+                           const NodeType                           type);
 
   static void visit_structure_rec(const DirEntry& entry,
                                   DirVisitor      visit_dir,
                                   DatVisitor      visit_dat,
-                                  NodePath&       path)
-  {
-    const auto& node = *entry.node;
-    if (visit_dir(entry.key, path, node.num_children())) {
-      for (ChildIndex i = 0u; i < node.num_children(); ++i) {
-        path.push_back(i);
-
-        if (node.child_type == NodeType::data) {
-          const auto& child = node.dat_children[i];
-          visit_dat(child.key, child.data, path);
-        } else {
-          const auto& child = node.dir_children[i];
-          visit_structure_rec(child, visit_dir, visit_dat, path);
-        }
-
-        path.pop_back();
-      }
-    }
-  }
+                                  NodePath&       path);
 
   size_t   _size{};               ///< Number of elements
   DirEntry _root{Box{}, nullptr}; ///< Key and pointer to root node
 };
 
 } // namespace spaix
+
+#include "spaix/RTree.ipp"
 
 #endif // SPAIX_RTREE_HPP

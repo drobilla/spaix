@@ -55,6 +55,7 @@ headers = [
   'include/spaix/Point.hpp',
   'include/spaix/QuadraticSplit.hpp',
   'include/spaix/RTree.hpp',
+  'include/spaix/RTree.ipp',
   'include/spaix/Rect.hpp',
   'include/spaix/StaticVector.hpp',
   'include/spaix/contains.hpp',
