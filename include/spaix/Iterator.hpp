@@ -108,7 +108,7 @@ private:
     case NodeType::directory:
       for (size_t i = 0u; i < dir.dir_children.size(); ++i) {
         if (predicate.directory(dir.dir_children[i].key)) {
-          return static_cast<ChildIndex>(i);
+          return i;
         }
       }
       return dir.dir_children.size();
@@ -116,7 +116,7 @@ private:
     case NodeType::data:
       for (size_t i = 0u; i < dir.dat_children.size(); ++i) {
         if (predicate.leaf(dir.dat_children[i].key)) {
-          return static_cast<ChildIndex>(i);
+          return i;
         }
       }
       return dir.dat_children.size();

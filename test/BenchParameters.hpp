@@ -27,12 +27,12 @@ namespace test {
 struct BenchParameters
 {
   explicit BenchParameters(const spaix::test::Arguments& args)
-    : n_elements{static_cast<size_t>(std::stoul(args.at("size")))}
-    , n_queries{static_cast<size_t>(std::stoul(args.at("queries")))}
-    , n_steps{static_cast<size_t>(std::stoul(args.at("steps")))}
+    : n_elements{std::stoul(args.at("size"))}
+    , n_queries{std::stoul(args.at("queries"))}
+    , n_steps{std::stoul(args.at("steps"))}
     , span{std::stof(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
-    , page_size{static_cast<size_t>(std::stoul(args.at("page-size")))}
+    , page_size{std::stoul(args.at("page-size"))}
   {
   }
 

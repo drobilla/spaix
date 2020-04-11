@@ -2,49 +2,18 @@ project('spaix', 'cpp',
         version: '0.0.0',
         default_options: [
           'buildtype=debugoptimized',
-          'warning_level=3',
           'cpp_std=c++14',
+          'warning_level=3',
         ],
         meson_version : '>= 0.43.0',
-        license: 'GPL')
+        license: 'GPLv3+')
 
 cxx = meson.get_compiler('cpp')
 versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
 
-if meson.get_compiler('cpp').get_id() == 'clang'
-  warnings = [
-    '-Weverything',
-    '-Wno-c++98-compat',
-    '-Wno-c++98-compat-pedantic',
-    '-Wno-padded',
-    '-Wno-float-equal',
-  ]
-elif meson.get_compiler('cpp').get_id() == 'gcc'
-  warnings = [
-    '-Wcast-align',
-    '-Wcast-qual',
-    '-Wlogical-op',
-    '-Wmissing-declarations',
-    '-Wredundant-decls',
-    '-Wshadow',
-    '-Wstrict-overflow',
-    '-Wsuggest-attribute=noreturn',
-    '-Wundef',
-    '-Wunsafe-loop-optimizations',
-    '-Wwrite-strings',
-    '-fstrict-overflow',
-    '-pedantic',
-  ]
-else
-  warnings = []
-endif
-
-if meson.version() > '0.43.0'
-  add_project_arguments(
-    cxx.get_supported_arguments(warnings),
-    language: 'cpp')
-else
-  add_project_arguments(warnings, language: 'cpp')
+if get_option('warning_level') == '3'
+  subdir('warnings')
+  add_project_arguments(cxx_warnings, language: ['cpp'])
 endif
 
 headers = [

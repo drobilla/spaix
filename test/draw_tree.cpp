@@ -42,8 +42,8 @@ using Point2 = spaix::Point<Scalar, Scalar>;
 struct Parameters
 {
   explicit Parameters(const spaix::test::Arguments& args)
-    : n_elements{static_cast<size_t>(std::stoul(args.at("size")))}
-    , page_size{static_cast<size_t>(std::stoul(args.at("page-size")))}
+    : n_elements{std::stoul(args.at("size"))}
+    , page_size{std::stoul(args.at("page-size"))}
     , scale{std::stod(args.at("scale"))}
     , span{std::stod(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}

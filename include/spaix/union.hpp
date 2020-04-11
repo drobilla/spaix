@@ -26,14 +26,14 @@ namespace spaix {
 namespace detail {
 
 template <class Lhs, class Rhs, size_t n_dims>
-constexpr auto
+SPAIX_ALWAYS_INLINE constexpr auto
 union_rec(const Lhs&, const Rhs&, EndIndex<n_dims>)
 {
   return std::make_tuple();
 }
 
 template <class Lhs, class Rhs, size_t dim, size_t n_dims>
-constexpr auto
+SPAIX_ALWAYS_INLINE constexpr auto
 union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 {
   const auto l = range<dim>(lhs);
@@ -46,13 +46,13 @@ union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 }
 
 template <class Lhs, class Rhs, size_t n_dims>
-constexpr auto
+SPAIX_ALWAYS_INLINE constexpr auto
 expand_rec(Lhs&, const Rhs&, EndIndex<n_dims>)
 {
 }
 
 template <class Lhs, class Rhs, size_t dim, size_t n_dims>
-constexpr auto
+SPAIX_ALWAYS_INLINE constexpr auto
 expand_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 {
   auto&      l = range<dim>(lhs);
@@ -68,7 +68,7 @@ expand_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 
 /// Return the geometric union of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...>
+SPAIX_ALWAYS_INLINE constexpr Rect<Ts...>
 operator|(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
@@ -76,7 +76,7 @@ operator|(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 
 /// Return the geometric union of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...>
+SPAIX_ALWAYS_INLINE constexpr Rect<Ts...>
 operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
@@ -84,7 +84,7 @@ operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 
 /// Expand `lhs` to include `rhs`
 template <class... Ts>
-constexpr Rect<Ts...>&
+SPAIX_ALWAYS_INLINE constexpr Rect<Ts...>&
 operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   detail::expand_rec(lhs, rhs, ibegin<Ts...>());
@@ -93,7 +93,7 @@ operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 
 /// Expand `lhs` to include `rhs`
 template <class... Ts>
-constexpr Rect<Ts...>
+SPAIX_ALWAYS_INLINE constexpr Rect<Ts...>
 operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 {
   detail::expand_rec(lhs, rhs, ibegin<Ts...>());
@@ -102,7 +102,7 @@ operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 
 /// Return the geometric union of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...>
+SPAIX_ALWAYS_INLINE constexpr Rect<Ts...>
 operator|(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
@@ -110,7 +110,7 @@ operator|(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 
 /// Return the geometric union of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...>
+SPAIX_ALWAYS_INLINE constexpr Rect<Ts...>
 operator|(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, rhs.ibegin())};

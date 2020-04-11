@@ -1,0 +1,148 @@
+clang_common_warnings = [
+  '-Weverything',
+  '-Wno-float-equal',
+  '-Wno-padded',
+]
+
+clang_cxx_warnings = [
+  '-Wno-c++98-compat',
+  '-Wno-c++98-compat-pedantic',
+]
+
+gcc_common_warnings = [
+  # '-Waggregate-return',
+  '-Waggressive-loop-optimizations',
+  # '-Wall', # Set by Meson
+  '-Walloc-zero',
+  '-Walloca',
+  # '-Walloca-larger-than=0',
+  '-Wattribute-alias',
+  '-Wattributes',
+  '-Wbuiltin-declaration-mismatch',
+  '-Wbuiltin-macro-redefined',
+  '-Wcast-align',
+  '-Wcast-align=strict',
+  '-Wcast-qual',
+  # '-Wconversion',
+  '-Wcoverage-mismatch',
+  '-Wcpp',
+  '-Wdate-time',
+  '-Wdeprecated',
+  '-Wdeprecated-declarations',
+  '-Wdisabled-optimization',
+  '-Wdiv-by-zero',
+  '-Wdouble-promotion',
+  '-Wduplicated-branches',
+  '-Wduplicated-cond',
+  # '-Wextra', # Set by Meson
+  # '-Wfloat-equal',
+  '-Wformat-signedness',
+  '-Wnormalized',
+  '-Wframe-larger-than=65535',
+  '-Wfree-nonheap-object',
+  '-Whsa',
+  '-Wif-not-aligned',
+  '-Wignored-attributes',
+  # '-Winline',
+  '-Wint-to-pointer-cast',
+  '-Winvalid-memory-model',
+  '-Winvalid-pch',
+  '-Wlarger-than=65535',
+  '-Wlogical-op',
+  '-Wlto-type-mismatch',
+  '-Wmissing-declarations',
+  '-Wmissing-include-dirs',
+  '-Wmultichar',
+  '-Wnull-dereference',
+  '-Wodr',
+  '-Woverflow',
+  '-Wpacked',
+  '-Wpacked-bitfield-compat',
+  # '-Wpadded',
+  # '-Wpedantic', # Set by Meson
+  '-Wpointer-compare',
+  '-Wpragmas',
+  '-Wredundant-decls',
+  '-Wreturn-local-addr',
+  '-Wscalar-storage-order',
+  '-Wshadow',
+  '-Wshift-count-negative',
+  '-Wshift-count-overflow',
+  '-Wshift-negative-value',
+  '-Wshift-overflow=2',
+  '-Wsizeof-array-argument',
+  '-Wstack-protector',
+  '-Wstack-usage=32768',
+  '-Wstrict-aliasing',
+  '-Wstrict-overflow',
+  '-Wsuggest-attribute=cold',
+  # '-Wsuggest-attribute=const',
+  '-Wsuggest-attribute=format',
+  '-Wsuggest-attribute=malloc',
+  '-Wsuggest-attribute=noreturn',
+  # '-Wsuggest-attribute=pure',
+  '-Wswitch-bool',
+  '-Wnormalized',
+  # '-Wswitch-default',
+  '-Wswitch-enum',
+  '-Wswitch-unreachable',
+  '-Wsync-nand',
+  # '-Wsystem-headers',
+  '-Wtrampolines',
+  '-Wundef',
+  '-Wunused-macros',
+  '-Wunused-result',
+  '-Wvarargs',
+  '-Wvector-operation-performance',
+  '-Wvla',
+  # '-Wvla-larger-than=0',
+  '-Wwrite-strings',
+]
+
+gcc_cxx_warnings = [
+  '-Wconditionally-supported',
+  '-Wconversion-null',
+  '-Wctor-dtor-privacy',
+  '-Wdelete-incomplete',
+  # '-Weffc++',
+  '-Wextra-semi',
+  '-Winherited-variadic-ctor',
+  '-Winvalid-offsetof',
+  '-Wliteral-suffix',
+  '-Wmultiple-inheritance',
+  # '-Wnamespaces',
+  '-Wnoexcept',
+  '-Wnon-template-friend',
+  '-Wold-style-cast',
+  '-Woverloaded-virtual',
+  '-Wplacement-new=2',
+  '-Wpmf-conversions',
+  '-Wregister',
+  '-Wsign-promo',
+  '-Wstrict-null-sentinel',
+  '-Wsubobject-linkage',
+  '-Wsuggest-final-methods',
+  '-Wsuggest-final-types',
+  '-Wsuggest-override',
+  '-Wsynth',
+  # '-Wtemplates',
+  '-Wterminate',
+  '-Wuseless-cast',
+  '-Wvirtual-inheritance',
+  '-Wvirtual-move-assign',
+  '-Wzero-as-null-pointer-constant',
+]
+
+# Select C++ warnings
+cxx = meson.get_compiler('cpp')
+cxx_warnings = []
+if cxx.get_id() == 'clang'
+  cxx_warnings += clang_common_warnings + clang_cxx_warnings
+elif cxx.get_id() == 'gcc'
+  cxx_warnings += gcc_common_warnings + gcc_cxx_warnings
+endif
+
+# Filter out unsupported warnings
+if meson.version() >= '0.43.0'
+  cxx_warnings = cxx.get_supported_arguments(cxx_warnings)
+endif

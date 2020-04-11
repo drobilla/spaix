@@ -28,9 +28,8 @@ template <class DirKey>
 constexpr ChildCount
 internal_fanout(const size_t page_size = 128u)
 {
-  return static_cast<ChildCount>(
-      (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
-      (sizeof(DirKey) + sizeof(void*)));
+  return (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
+         (sizeof(DirKey) + sizeof(void*));
 }
 
 /// Return a leaf fanout where nodes nodes fit within `page_size` bytes
@@ -38,9 +37,8 @@ template <class DatKey, class Data>
 constexpr ChildCount
 leaf_fanout(const size_t page_size = 128u)
 {
-  return static_cast<ChildCount>(
-      (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
-      (sizeof(DatKey) + sizeof(Data)));
+  return (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
+         (sizeof(DatKey) + sizeof(Data));
 }
 
 /// Return log_2(n)

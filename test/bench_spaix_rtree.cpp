@@ -193,7 +193,7 @@ run(const Parameters& params, std::ostream& os)
     const Rect2 key{{std::min(x1, x2), std::max(x1, x2)},
                     {std::min(y1, y2), std::max(y1, y2)}};
 
-    const auto value = static_cast<Data>(i);
+    const auto value = i;
 
     const auto t_start = std::chrono::steady_clock::now();
     t.insert(key, value);

@@ -21,6 +21,12 @@
 #include <tuple>
 #include <type_traits>
 
+#if defined(__GNUC__)
+#  define SPAIX_ALWAYS_INLINE __attribute__((always_inline))
+#else
+#  define SPAIX_ALWAYS_INLINE
+#endif
+
 namespace spaix {
 
 template <size_t n, typename... Ts>

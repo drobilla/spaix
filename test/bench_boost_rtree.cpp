@@ -115,7 +115,7 @@ benchmark_queries(std::mt19937& rng,
     metrics.iter_times.update(
         iter_dur.count()); // / std::max(1.0, double(n_results)));
 
-    metrics.result_counts.update(n_results);
+    metrics.result_counts.update(static_cast<double>(n_results));
   }
 
   return metrics;
@@ -168,7 +168,7 @@ run(const Parameters& params)
     const Box key{{std::min(x1, x2), std::min(y1, y2)},
                   {std::max(x1, x2), std::max(y1, y2)}};
 
-    const auto value = static_cast<Data>(i);
+    const auto value = i;
 
     const auto t_start = std::chrono::steady_clock::now();
     t.insert(std::make_pair(key, value));
