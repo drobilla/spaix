@@ -85,6 +85,8 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard:        Cpp11
+StatementMacros:
+  - _Pragma
 TabWidth:        2
 UseTab:          Never
 ...
