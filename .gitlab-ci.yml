@@ -44,7 +44,7 @@ win_dbg:
   <<: *build_definition
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - meson . build -Dbuildtype=debug -Dwerror=true -Dtest=true
     - ninja -C build test
 
 win_rel:
