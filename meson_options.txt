@@ -1,9 +1,6 @@
 option('benchmark', type: 'boolean', value: true,
        description: 'Build benchmarks')
 
-option('strict', type: 'boolean', value: true,
-       description: 'Enable strict warnings')
-
 option('test', type: 'boolean', value: false,
        description: 'Build tests')
 

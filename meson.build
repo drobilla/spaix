@@ -13,7 +13,27 @@ versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
 
 if get_option('warning_level') == '3'
   subdir('warnings')
-  add_project_arguments(cxx_warnings, language: ['cpp'])
+
+  if cxx.get_id() == 'clang'
+    cxx_warnings += [
+      '-Wno-float-equal',
+      '-Wno-implicit-int-float-conversion',
+      '-Wno-padded',
+    ]
+  elif cxx.get_id() == 'gcc'
+    cxx_warnings += [
+      '-Wno-conversion',
+      '-Wno-effc++',
+      '-Wno-float-equal',
+      '-Wno-padded',
+      '-Wno-suggest-attribute=const',
+      '-Wno-suggest-attribute=pure',
+      '-Wno-switch-default',
+    ]
+  endif
+
+  add_project_arguments(cxx.get_supported_arguments(cxx_warnings),
+                        language: ['cpp'])
 endif
 
 headers = [

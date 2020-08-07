@@ -1,7 +1,5 @@
 clang_common_warnings = [
   '-Weverything',
-  '-Wno-float-equal',
-  '-Wno-padded',
 ]
 
 clang_cxx_warnings = [
@@ -23,7 +21,7 @@ gcc_common_warnings = [
   '-Wcast-align',
   '-Wcast-align=strict',
   '-Wcast-qual',
-  # '-Wconversion',
+  '-Wconversion',
   '-Wcoverage-mismatch',
   '-Wcpp',
   '-Wdate-time',
@@ -35,7 +33,7 @@ gcc_common_warnings = [
   '-Wduplicated-branches',
   '-Wduplicated-cond',
   # '-Wextra', # Set by Meson
-  # '-Wfloat-equal',
+  '-Wfloat-equal',
   '-Wformat-signedness',
   '-Wnormalized',
   '-Wframe-larger-than=65535',
@@ -58,7 +56,7 @@ gcc_common_warnings = [
   '-Woverflow',
   '-Wpacked',
   '-Wpacked-bitfield-compat',
-  # '-Wpadded',
+  '-Wpadded',
   # '-Wpedantic', # Set by Meson
   '-Wpointer-compare',
   '-Wpragmas',
@@ -76,14 +74,14 @@ gcc_common_warnings = [
   '-Wstrict-aliasing',
   '-Wstrict-overflow',
   '-Wsuggest-attribute=cold',
-  # '-Wsuggest-attribute=const',
+  '-Wsuggest-attribute=const',
   '-Wsuggest-attribute=format',
   '-Wsuggest-attribute=malloc',
   '-Wsuggest-attribute=noreturn',
-  # '-Wsuggest-attribute=pure',
+  '-Wsuggest-attribute=pure',
   '-Wswitch-bool',
   '-Wnormalized',
-  # '-Wswitch-default',
+  '-Wswitch-default',
   '-Wswitch-enum',
   '-Wswitch-unreachable',
   '-Wsync-nand',
@@ -104,7 +102,7 @@ gcc_cxx_warnings = [
   '-Wconversion-null',
   '-Wctor-dtor-privacy',
   '-Wdelete-incomplete',
-  # '-Weffc++',
+  '-Weffc++',
   '-Wextra-semi',
   '-Winherited-variadic-ctor',
   '-Winvalid-offsetof',
@@ -140,9 +138,4 @@ if cxx.get_id() == 'clang'
   cxx_warnings += clang_common_warnings + clang_cxx_warnings
 elif cxx.get_id() == 'gcc'
   cxx_warnings += gcc_common_warnings + gcc_cxx_warnings
-endif
-
-# Filter out unsupported warnings
-if meson.version() >= '0.43.0'
-  cxx_warnings = cxx.get_supported_arguments(cxx_warnings)
 endif
