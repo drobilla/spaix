@@ -27,8 +27,8 @@ namespace test {
 template <class Tag, class Rep>
 struct Scalar
 {
-  constexpr Scalar() : _value{} {}
-	constexpr Scalar(const Rep v) : _value{v} {} // NOLINT
+  constexpr Scalar() = default;
+  constexpr Scalar(const Rep v) : _value{v} {} // NOLINT
 
   constexpr bool operator==(const Scalar& rhs) const
   {
@@ -53,7 +53,7 @@ struct Scalar
   constexpr Rep value() const { return _value; }
 
 private:
-  Rep _value;
+  Rep _value{};
 };
 
 template <class Tag, class Rep>

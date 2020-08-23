@@ -298,7 +298,7 @@ private:
   static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                            Entry                                    entry,
                            const Box&                               bounds,
-                           const NodeType                           type);
+                           NodeType                                 type);
 
   static void visit_structure_rec(const DirEntry& entry,
                                   DirVisitor      visit_dir,
