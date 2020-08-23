@@ -16,6 +16,7 @@
 #ifndef SPAIX_SIZES_HPP
 #define SPAIX_SIZES_HPP
 
+#include "spaix/NodeAllocationPolicy.hpp"
 #include "spaix/types.hpp"
 
 #include <cstddef>
@@ -33,12 +34,18 @@ internal_fanout(const size_t page_size = 128u)
 }
 
 /// Return a leaf fanout where nodes nodes fit within `page_size` bytes
-template <class DatKey, class Data>
+template <class DatKey, class Data, NodeAllocationPolicy policy>
 constexpr ChildCount
 leaf_fanout(const size_t page_size = 128u)
 {
-  return (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
-         (sizeof(DatKey) + sizeof(Data));
+  switch (policy) {
+  case NodeAllocationPolicy::inlineData:
+    return (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
+           (sizeof(DatKey) + sizeof(Data));
+  case NodeAllocationPolicy::separateData:;
+    return (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
+           (sizeof(void*));
+  }
 }
 
 /// Return log_2(n)

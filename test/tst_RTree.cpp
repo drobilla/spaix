@@ -277,41 +277,49 @@ test_tree(const unsigned span, const unsigned n_queries)
   test_empty_tree(tree, span);
 }
 
-template <class Key, size_t page_size>
+template <class Key, spaix::NodeAllocationPolicy policy, size_t page_size>
 void
 test_page_size(const unsigned span, const unsigned n_queries)
 {
   // Test a small tree where the root has leaf children
-  test_tree<
-      spaix::RTree<Key,
-                   Data,
-                   spaix::Configuration<page_size, 3, spaix::LinearSplit>>>(
+  test_tree<spaix::RTree<
+      Key,
+      Data,
+      spaix::Configuration<page_size, 3, policy, spaix::LinearSplit>>>(
       2, n_queries);
 
-  test_tree<
-      spaix::RTree<Key,
-                   Data,
-                   spaix::Configuration<page_size, 3, spaix::LinearSplit>>>(
+  test_tree<spaix::RTree<
+      Key,
+      Data,
+      spaix::Configuration<page_size, 3, policy, spaix::LinearSplit>>>(
       span, n_queries);
 
-  test_tree<
-      spaix::RTree<Key,
-                   Data,
-                   spaix::Configuration<page_size, 3, spaix::QuadraticSplit>>>(
+  test_tree<spaix::RTree<
+      Key,
+      Data,
+      spaix::Configuration<page_size, 3, policy, spaix::QuadraticSplit>>>(
       span, n_queries);
+}
+
+template <class Key, spaix::NodeAllocationPolicy policy>
+void
+test_policy(const unsigned span, const unsigned n_queries)
+{
+  /* test_page_size<Key, policy, 128>(span, n_queries); */
+  test_page_size<Key, policy, 256>(span, n_queries);
+  test_page_size<Key, policy, 512>(span, n_queries);
+  test_page_size<Key, policy, 1024>(span, n_queries);
+  test_page_size<Key, policy, 2048>(span, n_queries);
+  test_page_size<Key, policy, 4096>(span, n_queries);
+  test_page_size<Key, policy, 8192>(span, n_queries);
 }
 
 template <class Key>
 void
 test_key(const unsigned span, const unsigned n_queries)
 {
-  /* test_page_size<Key, 128>(span, n_queries); */
-  test_page_size<Key, 256>(span, n_queries);
-  test_page_size<Key, 512>(span, n_queries);
-  test_page_size<Key, 1024>(span, n_queries);
-  test_page_size<Key, 2048>(span, n_queries);
-  test_page_size<Key, 4096>(span, n_queries);
-  test_page_size<Key, 8192>(span, n_queries);
+  test_policy<Key, spaix::NodeAllocationPolicy::inlineData>(span, n_queries);
+  test_policy<Key, spaix::NodeAllocationPolicy::separateData>(span, n_queries);
 }
 
 } // namespace

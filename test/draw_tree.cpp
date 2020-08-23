@@ -17,6 +17,7 @@
 
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
+#include "spaix/NodeAllocationPolicy.hpp"
 #include "spaix/Point.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
@@ -88,7 +89,11 @@ template <class Insertion, class Split, size_t page_size>
 int
 run(const Parameters& params)
 {
-  using Config = spaix::Configuration<page_size, 2, Split, Insertion>;
+  using Config = spaix::Configuration<page_size,
+                                      2,
+                                      spaix::NodeAllocationPolicy::separateData,
+                                      Split,
+                                      Insertion>;
 
   return run<spaix::RTree<Point2, Scalar, Config>>(params);
 }

@@ -17,6 +17,7 @@
 #define SPAIX_ITERATOR_HPP
 
 #include "spaix/StaticVector.hpp"
+#include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/types.hpp"
 
 #include <cassert>
@@ -71,7 +72,7 @@ struct Iterator
     assert(_stack.back().index < _stack.back().node->num_children());
     assert(_stack.back().node->child_type == NodeType::data);
 
-    return &_stack.back().node->dat_children[_stack.back().index];
+    return entry_ptr(_stack.back().node->dat_children[_stack.back().index]);
   }
 
   bool operator==(const Iterator& rhs) const
@@ -115,7 +116,7 @@ private:
 
     case NodeType::data:
       for (size_t i = 0u; i < dir.dat_children.size(); ++i) {
-        if (predicate.leaf(dir.dat_children[i].key)) {
+        if (predicate.leaf(entry_key(dir.dat_children[i]))) {
           return i;
         }
       }
@@ -141,7 +142,7 @@ private:
     do {
       ++back().index;
     } while (index() < node()->dat_children.size() &&
-             !_predicate.leaf(node()->dat_children[index()].key));
+             !_predicate.leaf(entry_key(node()->dat_children[index()])));
 
     return index() < node()->dat_children.size();
   }
@@ -205,7 +206,7 @@ private:
     // Now at a matching directory, and a matching child of that directory
     assert((node()->child_type == NodeType::directory &&
             _predicate.directory(node()->dir_children[index()].key)) ||
-           (_predicate.leaf(node()->dat_children[index()].key)));
+           (_predicate.leaf(entry_key(node()->dat_children[index()]))));
 
     return move_down_left();
   }
@@ -216,7 +217,7 @@ private:
       if (!increment()) {
         return;
       }
-    } while (!_predicate.leaf(node()->dat_children[index()].key));
+    } while (!_predicate.leaf(entry_key(node()->dat_children[index()])));
   }
 
   Stack     _stack;

@@ -19,6 +19,7 @@
 #include "spaix/DataNode.hpp"
 #include "spaix/Iterator.hpp"
 #include "spaix/LinearInsertion.hpp"
+#include "spaix/NodeAllocationPolicy.hpp"
 #include "spaix/Point.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/Rect.hpp"
@@ -61,14 +62,16 @@ using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
    @tparam InsertionAlgorithm Insert position selection algorithm.
 */
-template <size_t   PageSize        = 4096u,
-          unsigned MinFillDivisor  = 3u,
-          class SplitAlgorithm     = QuadraticSplit,
-          class InsertionAlgorithm = LinearInsertion>
+template <size_t               PageSize       = 4096u,
+          unsigned             MinFillDivisor = 3u,
+          NodeAllocationPolicy Policy = NodeAllocationPolicy::separateData,
+          class SplitAlgorithm        = QuadraticSplit,
+          class InsertionAlgorithm    = LinearInsertion>
 struct Configuration
 {
   static constexpr const auto page_size        = PageSize;
   static constexpr const auto min_fill_divisor = MinFillDivisor;
+  static constexpr const auto policy           = Policy;
 
   using Insertion = InsertionAlgorithm;
   using Split     = SplitAlgorithm;
@@ -94,10 +97,11 @@ public:
 
   static constexpr auto page_size        = Config::page_size;
   static constexpr auto min_fill_divisor = Config::min_fill_divisor;
+  static constexpr auto policy           = Config::policy;
   static constexpr auto dir_fanout       = internal_fanout<Box>(page_size);
-  static constexpr auto dat_fanout       = leaf_fanout<Key, Data>(page_size);
-  static constexpr auto min_dir_fanout   = dir_fanout / min_fill_divisor;
-  static constexpr auto min_dat_fanout   = dat_fanout / min_fill_divisor;
+  static constexpr auto dat_fanout = leaf_fanout<Key, Data, policy>(page_size);
+  static constexpr auto min_dir_fanout = dir_fanout / min_fill_divisor;
+  static constexpr auto min_dat_fanout = dat_fanout / min_fill_divisor;
 
   static_assert(dir_fanout > 1, "");
   static_assert(dat_fanout > 1, "");
@@ -105,17 +109,18 @@ public:
   static_assert(min_dat_fanout > 1, "");
 
   using DatNode = DataNode<Key, Data>;
-  using DirNode = DirectoryNode<Box, DatNode, dir_fanout, dat_fanout>;
+  using DirNode = DirectoryNode<Box, DatNode, policy, dir_fanout, dat_fanout>;
 
   using DatNodePtr  = std::unique_ptr<DatNode>;
   using DirNodePtr  = std::unique_ptr<DirNode>;
   using DirEntry    = typename DirNode::DirEntry;
+  using DatEntry    = typename DirNode::DatEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 
   static_assert(sizeof(DirNodePtr) == sizeof(void*), "");
   static_assert(sizeof(DirNode) <= page_size, "");
-  static_assert(sizeof(DirNode) > page_size - sizeof(Box) - sizeof(void*), "");
-  static_assert(sizeof(DirNode) > page_size - sizeof(Key) - sizeof(Data), "");
+  static_assert(sizeof(DirNode) > page_size - sizeof(DirEntry), "");
+  static_assert(sizeof(DirNode) > page_size - sizeof(DatEntry), "");
 
   template <class Predicate>
   using Iter = Iterator<Predicate,
@@ -203,8 +208,8 @@ public:
 
     case NodeType::data:
       for (const auto& entry : node.dat_children) {
-        if (predicate.leaf(entry.key)) {
-          visitor(entry);
+        if (predicate.leaf(entry_key(entry))) {
+          visitor(entry_ref(entry));
         }
       }
     }

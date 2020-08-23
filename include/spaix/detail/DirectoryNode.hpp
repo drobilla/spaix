@@ -17,6 +17,7 @@
 #define SPAIX_DIRECTORYNODE_HPP
 
 #include "spaix/DataNode.hpp"
+#include "spaix/NodeAllocationPolicy.hpp"
 #include "spaix/StaticVector.hpp"
 #include "spaix/types.hpp"
 
@@ -36,22 +37,54 @@ struct NodeEntry
   std::unique_ptr<Node> node{};
 };
 
+template <class DatNode, NodeAllocationPolicy policy>
+struct DatEntryType;
+
+template <class DatNode>
+struct DatEntryType<DatNode, NodeAllocationPolicy::inlineData>
+{
+  using Type = DatNode;
+
+  template <class Key, class Data>
+  static Type make(Key key, Data data)
+  {
+    return DatNode{std::move(key), std::move(data)};
+  }
+};
+
+template <class DatNode>
+struct DatEntryType<DatNode, NodeAllocationPolicy::separateData>
+{
+  using Type = std::unique_ptr<DatNode>;
+
+  template <class Key, class Data>
+  static Type make(Key key, Data data)
+  {
+    return std::unique_ptr<DatNode>(
+        new DatNode{std::move(key), std::move(data)});
+  }
+};
+
 template <class DirKey,
           class DatNode,
-          ChildCount DirFanout,
-          ChildCount DatFanout>
+          NodeAllocationPolicy Policy,
+          ChildCount           DirFanout,
+          ChildCount           DatFanout>
 struct DirectoryNode
 {
 public:
-  using DirNode = DirectoryNode<DirKey, DatNode, DirFanout, DatFanout>;
+  using DirNode = DirectoryNode<DirKey, DatNode, Policy, DirFanout, DatFanout>;
   using Key     = decltype(std::declval<DatNode>().key);
+  using Data    = decltype(std::declval<DatNode>().data);
   using NodeKey = DirKey;
 
   using DirNodePtr = std::unique_ptr<DirNode>;
   using DatNodePtr = std::unique_ptr<DatNode>;
 
   using DirEntry = NodeEntry<DirKey, DirNode>;
-  using DatEntry = DatNode;
+  // using DatEntry = DatNodePtr;
+  // using DatEntry = DatNode;
+  using DatEntry = typename DatEntryType<DatNode, Policy>::Type;
 
   using DirChildren = StaticVector<DirEntry, ChildCount, DirFanout>;
   using DatChildren = StaticVector<DatEntry, ChildCount, DatFanout>;
@@ -80,7 +113,12 @@ public:
   DirectoryNode(DirectoryNode&&) = delete;
   DirectoryNode& operator=(DirectoryNode&&) = delete;
 
-  void append_child(DatNode&& child)
+  static DatEntry make_dat_entry(Key key, Data data)
+  {
+    return DatEntryType<DatNode, Policy>::make(key, data);
+  }
+
+  void append_child(DatEntry child)
   {
     assert(child_type == NodeType::data);
     dat_children.emplace_back(std::move(child));
@@ -118,6 +156,55 @@ const auto&
 entry_key(const DataNode<Key, Data>& entry)
 {
   return entry.key;
+}
+
+template <class Key, class Data>
+const auto&
+entry_data(const DataNode<Key, Data>& entry)
+{
+  return entry.data;
+}
+
+template <class Key, class Data>
+const auto&
+entry_data(const std::unique_ptr<DataNode<Key, Data>>& entry)
+{
+  return entry->data;
+}
+
+template <class Key, class Data>
+const auto&
+entry_key(const std::unique_ptr<DataNode<Key, Data>>& entry)
+{
+  return entry->key;
+}
+
+template <class Key, class Data>
+const auto&
+entry_ref(const DataNode<Key, Data>& entry)
+{
+  return entry;
+}
+
+template <class Key, class Data>
+const auto&
+entry_ref(const std::unique_ptr<DataNode<Key, Data>>& entry)
+{
+  return *entry;
+}
+
+template <class Key, class Data>
+const auto*
+entry_ptr(const DataNode<Key, Data>& entry)
+{
+  return &entry;
+}
+
+template <class Key, class Data>
+const auto*
+entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry)
+{
+  return entry.get();
 }
 
 } // namespace spaix

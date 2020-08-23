@@ -57,7 +57,7 @@ def plot(sources,
 
     min_col = y_col + "_min" if show_error else y_col
     max_col = y_col + "_max" if show_error else y_col
-    
+
     if y_max is None:
         y_max = 0.0
         for source in sources:
@@ -104,7 +104,7 @@ def bench_name(prog):
     # print("{} => {}".format(prog, name))
     return name
 
-    
+
 def tsv_path(prog, insert, split):
     # print("tsv path {} {} {} => {}".format(prog, insert, split, os.path.join(options.dir,
     #                     "{}_insert_{}_split_{}.tsv".format(
@@ -140,6 +140,8 @@ if __name__ == "__main__":
                    help="do not plot benchmarks")
     opt.add_option("--page-size", type="int", default=512,
                    help="page size for directory nodes")
+    opt.add_option("--inline", type="int", default=False,
+                   help="inline data nodes in parents")
     opt.add_option("--program", type="string", default=["build/bench_spaix_rtree"],
                    action="append",
                    help="path to benchmarking program",)
@@ -164,6 +166,7 @@ if __name__ == "__main__":
 
     bench_opts = [
         "--page-size", str(options.page_size),
+        "--policy", "inline" if options.inline else "separate",
         "--queries", str(options.queries),
         "--seed", str(options.seed),
         "--size", str(options.size),

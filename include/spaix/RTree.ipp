@@ -97,13 +97,13 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
     }
 
   } else if (parent.dat_children.size() < dat_fanout) { // Simple leaf insert
-    parent.append_child(DatNode{key, data});
+    parent.append_child(DirNode::make_dat_entry(key, data));
     parent_entry.key = new_parent_key;
     assert(parent_entry.key == ideal_key(parent));
 
   } else { // Split leaf insert
     return split(parent.dat_children,
-                 DatNode{key, data},
+                 DirNode::make_dat_entry(key, data),
                  parent_entry.key | key,
                  parent.child_type);
   }
@@ -181,7 +181,7 @@ RTree<K, D, C>::visit_structure_rec(const DirEntry& entry,
 
       if (node.child_type == NodeType::data) {
         const auto& child = node.dat_children[i];
-        visit_dat(child.key, child.data, path);
+        visit_dat(entry_key(child), entry_data(child), path);
       } else {
         const auto& child = node.dir_children[i];
         visit_structure_rec(child, visit_dir, visit_dat, path);
