@@ -17,9 +17,9 @@
 #define SPAIX_RTREE_HPP
 
 #include "spaix/DataNode.hpp"
+#include "spaix/DataPlacement.hpp"
 #include "spaix/Iterator.hpp"
 #include "spaix/LinearInsertion.hpp"
-#include "spaix/NodeAllocationPolicy.hpp"
 #include "spaix/Point.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/Rect.hpp"
@@ -65,7 +65,7 @@ public:
   using Split     = typename Config::Split;
 
   static constexpr auto min_fill_divisor = Config::min_fill_divisor;
-  static constexpr auto policy           = Config::policy;
+  static constexpr auto placement        = Config::placement;
   static constexpr auto dir_fanout       = Config::dir_fanout;
   static constexpr auto dat_fanout       = Config::dat_fanout;
   static constexpr auto min_dir_fanout   = dir_fanout / min_fill_divisor;
@@ -77,7 +77,8 @@ public:
   static_assert(min_dat_fanout > 1, "");
 
   using DatNode = DataNode<Key, Data>;
-  using DirNode = DirectoryNode<Box, DatNode, policy, dir_fanout, dat_fanout>;
+  using DirNode =
+      DirectoryNode<Box, DatNode, placement, dir_fanout, dat_fanout>;
 
   using DatNodePtr  = std::unique_ptr<DatNode>;
   using DirNodePtr  = std::unique_ptr<DirNode>;

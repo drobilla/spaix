@@ -13,16 +13,26 @@
   this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SPAIX_NODEALLOCATIONPOLICY_HPP
-#define SPAIX_NODEALLOCATIONPOLICY_HPP
+#ifndef SPAIX_DATAPLACEMENT_HPP
+#define SPAIX_DATAPLACEMENT_HPP
 
 namespace spaix {
 
-enum class NodeAllocationPolicy {
-  inlineData,
-  separateData,
+/**
+   Policy for the allocation and placement of data nodes.
+
+   This can be used to control whether data nodes are stored within the entries
+   of their directory nodes (which makes sense if the key and data types are
+   small), or allocated as separate nodes.
+
+   Pointers to data nodes are only stable across tree modifications if they are
+   allocated separately.
+*/
+enum class DataPlacement {
+  inlined,  //!< Data nodes stored within directory node entries
+  separate, //!< Data nodes separately allocated
 };
 
 } // namespace spaix
 
-#endif // SPAIX_NODEALLOCATIONPOLICY_HPP
+#endif // SPAIX_DATAPLACEMENT_HPP

@@ -38,6 +38,7 @@ endif
 
 headers = [
   'include/spaix/DataNode.hpp',
+  'include/spaix/DataPlacement.hpp',
   'include/spaix/FanoutConfiguration.hpp',
   'include/spaix/Iterator.hpp',
   'include/spaix/LinearInsertion.hpp',

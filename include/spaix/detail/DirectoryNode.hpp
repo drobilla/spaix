@@ -17,7 +17,7 @@
 #define SPAIX_DIRECTORYNODE_HPP
 
 #include "spaix/DataNode.hpp"
-#include "spaix/NodeAllocationPolicy.hpp"
+#include "spaix/DataPlacement.hpp"
 #include "spaix/StaticVector.hpp"
 #include "spaix/types.hpp"
 
@@ -37,11 +37,11 @@ struct NodeEntry
   std::unique_ptr<Node> node{};
 };
 
-template <class DatNode, NodeAllocationPolicy policy>
+template <class DatNode, DataPlacement placement>
 struct DatEntryType;
 
 template <class DatNode>
-struct DatEntryType<DatNode, NodeAllocationPolicy::inlineData>
+struct DatEntryType<DatNode, DataPlacement::inlined>
 {
   using Type = DatNode;
 
@@ -53,7 +53,7 @@ struct DatEntryType<DatNode, NodeAllocationPolicy::inlineData>
 };
 
 template <class DatNode>
-struct DatEntryType<DatNode, NodeAllocationPolicy::separateData>
+struct DatEntryType<DatNode, DataPlacement::separate>
 {
   using Type = std::unique_ptr<DatNode>;
 
@@ -67,13 +67,13 @@ struct DatEntryType<DatNode, NodeAllocationPolicy::separateData>
 
 template <class DirKey,
           class DatNode,
-          NodeAllocationPolicy Policy,
-          ChildCount           DirFanout,
-          ChildCount           DatFanout>
+          DataPlacement Placement,
+          ChildCount    DirFanout,
+          ChildCount    DatFanout>
 struct DirectoryNode
 {
 public:
-  using DirNode = DirectoryNode<DirKey, DatNode, Policy, DirFanout, DatFanout>;
+  using DirNode = DirectoryNode<DirKey, DatNode, Placement, DirFanout, DatFanout>;
   using Key     = decltype(std::declval<DatNode>().key);
   using Data    = decltype(std::declval<DatNode>().data);
   using NodeKey = DirKey;
@@ -84,7 +84,7 @@ public:
   using DirEntry = NodeEntry<DirKey, DirNode>;
   // using DatEntry = DatNodePtr;
   // using DatEntry = DatNode;
-  using DatEntry = typename DatEntryType<DatNode, Policy>::Type;
+  using DatEntry = typename DatEntryType<DatNode, Placement>::Type;
 
   using DirChildren = StaticVector<DirEntry, ChildCount, DirFanout>;
   using DatChildren = StaticVector<DatEntry, ChildCount, DatFanout>;
@@ -115,7 +115,7 @@ public:
 
   static DatEntry make_dat_entry(Key key, Data data)
   {
-    return DatEntryType<DatNode, Policy>::make(key, data);
+    return DatEntryType<DatNode, Placement>::make(key, data);
   }
 
   void append_child(DatEntry child)

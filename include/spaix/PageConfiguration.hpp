@@ -16,7 +16,7 @@
 #ifndef SPAIX_PAGECONFIGURATION_HPP
 #define SPAIX_PAGECONFIGURATION_HPP
 
-#include "spaix/NodeAllocationPolicy.hpp"
+#include "spaix/DataPlacement.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
@@ -46,11 +46,11 @@ class QuadraticSplit;
 */
 template <class K,
           class D,
-          size_t               page_size      = 4096u,
-          unsigned             MinFillDivisor = 3u,
-          NodeAllocationPolicy Policy = NodeAllocationPolicy::separateData,
-          class SplitAlgorithm        = QuadraticSplit,
-          class InsertionAlgorithm    = LinearInsertion>
+          size_t        page_size      = 4096u,
+          unsigned      MinFillDivisor = 3u,
+          DataPlacement Placement      = DataPlacement::separate,
+          class SplitAlgorithm         = QuadraticSplit,
+          class InsertionAlgorithm     = LinearInsertion>
 struct PageConfiguration
 {
   using Box       = decltype(std::declval<K>() | std::declval<K>());
@@ -58,14 +58,16 @@ struct PageConfiguration
   using Split     = SplitAlgorithm;
 
   static constexpr auto dir_fanout = page_internal_fanout<Box>(page_size);
-  static constexpr auto dat_fanout = page_leaf_fanout<K, D, Policy>(page_size);
+  static constexpr auto dat_fanout =
+      page_leaf_fanout<K, D, Placement>(page_size);
 
   static constexpr auto min_fill_divisor = MinFillDivisor;
-  static constexpr auto policy           = Policy;
+  static constexpr auto placement        = Placement;
 
 private:
-  using DatNode  = DataNode<K, D>;
-  using DirNode  = DirectoryNode<Box, DatNode, Policy, dir_fanout, dat_fanout>;
+  using DatNode = DataNode<K, D>;
+  using DirNode =
+      DirectoryNode<Box, DatNode, Placement, dir_fanout, dat_fanout>;
   using DirEntry = typename DirNode::DirEntry;
   using DatEntry = typename DirNode::DatEntry;
 

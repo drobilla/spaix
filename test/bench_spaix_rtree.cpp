@@ -238,8 +238,8 @@ run(const Parameters& params, std::ostream& os)
 
 template <class Insertion,
           class Split,
-          spaix::NodeAllocationPolicy policy,
-          size_t                      page_size>
+          spaix::DataPlacement placement,
+          size_t               page_size>
 int
 run(const Parameters& params)
 {
@@ -247,25 +247,25 @@ run(const Parameters& params)
                                           Data,
                                           page_size,
                                           min_fill_divisor,
-                                          policy,
+                                          placement,
                                           Split,
                                           Insertion>;
 
   return run<spaix::RTree<Rect2, Data, Config>>(params, std::cout);
 }
 
-template <class Insertion, class Split, spaix::NodeAllocationPolicy policy>
+template <class Insertion, class Split, spaix::DataPlacement placement>
 int
 run(const Parameters& params)
 {
   switch (params.page_size) {
   // case 128: return run<Insertion, Split, 128>(params);
-  case 256: return run<Insertion, Split, policy, 256>(params);
-  case 512: return run<Insertion, Split, policy, 512>(params);
-  case 1024: return run<Insertion, Split, policy, 1024>(params);
-  case 2048: return run<Insertion, Split, policy, 2048>(params);
-  case 4096: return run<Insertion, Split, policy, 4096>(params);
-  case 8192: return run<Insertion, Split, policy, 8192>(params);
+  case 256: return run<Insertion, Split, placement, 256>(params);
+  case 512: return run<Insertion, Split, placement, 512>(params);
+  case 1024: return run<Insertion, Split, placement, 1024>(params);
+  case 2048: return run<Insertion, Split, placement, 2048>(params);
+  case 4096: return run<Insertion, Split, placement, 4096>(params);
+  case 8192: return run<Insertion, Split, placement, 8192>(params);
   }
 
   throw std::runtime_error("Invalid page size '" +
@@ -276,16 +276,14 @@ template <class Insertion, class Split>
 int
 run(const Parameters& params, const Args& args)
 {
-  const auto policy = args.at("policy");
-  if (policy == "inline") {
-    return run<Insertion, Split, spaix::NodeAllocationPolicy::inlineData>(
-        params);
-  } else if (policy == "separate") {
-    return run<Insertion, Split, spaix::NodeAllocationPolicy::separateData>(
-        params);
+  const auto placement = args.at("placement");
+  if (placement == "inline") {
+    return run<Insertion, Split, spaix::DataPlacement::inlined>(params);
+  } else if (placement == "separate") {
+    return run<Insertion, Split, spaix::DataPlacement::separate>(params);
   }
 
-  throw std::runtime_error("Invalid policy '" + policy + "'");
+  throw std::runtime_error("Invalid placement '" + placement + "'");
 }
 
 template <class Insertion>
@@ -321,7 +319,8 @@ main(int argc, char** argv)
   const spaix::test::Options opts{
       {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
       {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
-      {"policy", {"Node allocation (inline or separate)", "POLICY", "inline"}},
+      {"placement",
+       {"Data placement (inline or separate)", "PLACEMENT", "inline"}},
       {"queries", {"Number of queries per step", "COUNT", "100"}},
       {"seed", {"Random number generator seed", "SEED", "5489"}},
       {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},

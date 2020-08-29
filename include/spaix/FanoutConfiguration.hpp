@@ -16,7 +16,7 @@
 #ifndef SPAIX_FANOUTCONFIGURATION_HPP
 #define SPAIX_FANOUTCONFIGURATION_HPP
 
-#include "spaix/NodeAllocationPolicy.hpp"
+#include "spaix/DataPlacement.hpp"
 #include "spaix/types.hpp"
 
 namespace spaix {
@@ -44,18 +44,18 @@ class QuadraticSplit;
 
    @tparam InsertionAlgorithm Insert position selection algorithm.
 */
-template <ChildCount           DirFanout,
-          ChildCount           DatFanout,
-          unsigned             MinFillDivisor = 3u,
-          NodeAllocationPolicy Policy = NodeAllocationPolicy::separateData,
-          class SplitAlgorithm        = QuadraticSplit,
-          class InsertionAlgorithm    = LinearInsertion>
+template <ChildCount    DirFanout,
+          ChildCount    DatFanout,
+          unsigned      MinFillDivisor = 3u,
+          DataPlacement Placement      = DataPlacement::separate,
+          class SplitAlgorithm         = QuadraticSplit,
+          class InsertionAlgorithm     = LinearInsertion>
 struct FanoutConfiguration
 {
   static constexpr auto       dir_fanout       = DirFanout;
   static constexpr auto       dat_fanout       = DatFanout;
   static constexpr const auto min_fill_divisor = MinFillDivisor;
-  static constexpr const auto policy           = Policy;
+  static constexpr const auto placement        = Placement;
 
   using Insertion = InsertionAlgorithm;
   using Split     = SplitAlgorithm;
