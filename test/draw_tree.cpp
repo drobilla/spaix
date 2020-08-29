@@ -26,6 +26,7 @@
 #include "spaix/draw_dot.hpp"
 #include "spaix/draw_svg.hpp"
 
+#include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <fstream>

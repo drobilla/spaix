@@ -18,6 +18,7 @@
 #include "options.hpp"
 #include "write_row.hpp"
 
+#include "spaix/DataPlacement.hpp"
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
 #include "spaix/PageConfiguration.hpp"
@@ -30,12 +31,10 @@
 #include <chrono>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <iostream>
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <utility>
 
 namespace {
 

@@ -15,9 +15,11 @@
 
 #undef NDEBUG
 
+#include "Scalar.hpp"
 #include "TestRect.hpp"
 #include "check.hpp"
 
+#include "spaix/Rect.hpp"
 #include "spaix/intersection.hpp"
 
 namespace spaix {
@@ -35,9 +37,8 @@ test_intersection()
   STATIC_CHECK(((rect & TestPoint{1, 2.0f}) == TestRect{{1, 1}, {2.0f, 2.0f}}));
   STATIC_CHECK(((TestPoint{1, 2.0f} & rect) == TestRect{{1, 1}, {2.0f, 2.0f}}));
 
-  STATIC_CHECK(
-      ((TestPoint{1, 2.0f} & TestPoint{1, 2.0f}) ==
-       TestRect{{1, 1}, {2.0f, 2.0f}}));
+  STATIC_CHECK(((TestPoint{1, 2.0f} & TestPoint{1, 2.0f}) ==
+                TestRect{{1, 1}, {2.0f, 2.0f}}));
 
   STATIC_CHECK(((TestPoint{1, 2.0f} & TestPoint{1, 3.0f}) == TestRect{}));
 }
