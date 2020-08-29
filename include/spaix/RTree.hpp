@@ -47,37 +47,6 @@ template <class K>
 using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
 /**
-   Configuration for an RTree.
-
-   @tparam PageSize Size of internal nodes in bytes.  The fanout will be set as
-   large as possible without exceeding this.
-
-   @tparam MinFillDivisor Minimum fill divisor when splitting nodes.  The
-   maximum fanout divided by this is the minimum number of children that a
-   split node will receive.  For example, the default value of 3 means that
-   split nodes must have at least a third of the maximum fanout.
-
-   @tparam SplitAlgorithm Node splitting algorithm, spaix::LinearSplit or
-   spaix::QuadraticSplit.
-
-   @tparam InsertionAlgorithm Insert position selection algorithm.
-*/
-template <size_t               PageSize       = 4096u,
-          unsigned             MinFillDivisor = 3u,
-          NodeAllocationPolicy Policy = NodeAllocationPolicy::separateData,
-          class SplitAlgorithm        = QuadraticSplit,
-          class InsertionAlgorithm    = LinearInsertion>
-struct Configuration
-{
-  static constexpr const auto page_size        = PageSize;
-  static constexpr const auto min_fill_divisor = MinFillDivisor;
-  static constexpr const auto policy           = Policy;
-
-  using Insertion = InsertionAlgorithm;
-  using Split     = SplitAlgorithm;
-};
-
-/**
    An R-tree which spatially indexes points or rectangles.
 
    @tparam K Geometric key type for elements.
@@ -95,13 +64,12 @@ public:
   using Insertion = typename Config::Insertion;
   using Split     = typename Config::Split;
 
-  static constexpr auto page_size        = Config::page_size;
   static constexpr auto min_fill_divisor = Config::min_fill_divisor;
   static constexpr auto policy           = Config::policy;
-  static constexpr auto dir_fanout       = internal_fanout<Box>(page_size);
-  static constexpr auto dat_fanout = leaf_fanout<Key, Data, policy>(page_size);
-  static constexpr auto min_dir_fanout = dir_fanout / min_fill_divisor;
-  static constexpr auto min_dat_fanout = dat_fanout / min_fill_divisor;
+  static constexpr auto dir_fanout       = Config::dir_fanout;
+  static constexpr auto dat_fanout       = Config::dat_fanout;
+  static constexpr auto min_dir_fanout   = dir_fanout / min_fill_divisor;
+  static constexpr auto min_dat_fanout   = dat_fanout / min_fill_divisor;
 
   static_assert(dir_fanout > 1, "");
   static_assert(dat_fanout > 1, "");
@@ -116,11 +84,6 @@ public:
   using DirEntry    = typename DirNode::DirEntry;
   using DatEntry    = typename DirNode::DatEntry;
   using DirNodePair = std::array<DirEntry, 2>;
-
-  static_assert(sizeof(DirNodePtr) == sizeof(void*), "");
-  static_assert(sizeof(DirNode) <= page_size, "");
-  static_assert(sizeof(DirNode) > page_size - sizeof(DirEntry), "");
-  static_assert(sizeof(DirNode) > page_size - sizeof(DatEntry), "");
 
   template <class Predicate>
   using Iter = Iterator<Predicate,

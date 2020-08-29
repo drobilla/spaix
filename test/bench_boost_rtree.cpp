@@ -211,7 +211,7 @@ template <size_t page_size>
 int
 run(const Parameters& params, const Args& args)
 {
-  constexpr auto max_fill = spaix::internal_fanout<Box>(page_size);
+  constexpr auto max_fill = spaix::page_internal_fanout<Box>(page_size);
   constexpr auto min_fill = std::max(size_t(1), max_fill / min_fill_divisor);
 
   const auto split = args.at("split");

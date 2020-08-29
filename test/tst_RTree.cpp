@@ -18,6 +18,7 @@
 
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
+#include "spaix/PageConfiguration.hpp"
 #include "spaix/Point.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
@@ -282,22 +283,34 @@ void
 test_page_size(const unsigned span, const unsigned n_queries)
 {
   // Test a small tree where the root has leaf children
-  test_tree<spaix::RTree<
-      Key,
-      Data,
-      spaix::Configuration<page_size, 3, policy, spaix::LinearSplit>>>(
+  test_tree<spaix::RTree<Key,
+                         Data,
+                         spaix::PageConfiguration<Key,
+                                                  Data,
+                                                  page_size,
+                                                  3,
+                                                  policy,
+                                                  spaix::LinearSplit>>>(
       2, n_queries);
 
-  test_tree<spaix::RTree<
-      Key,
-      Data,
-      spaix::Configuration<page_size, 3, policy, spaix::LinearSplit>>>(
+  test_tree<spaix::RTree<Key,
+                         Data,
+                         spaix::PageConfiguration<Key,
+                                                  Data,
+                                                  page_size,
+                                                  3,
+                                                  policy,
+                                                  spaix::LinearSplit>>>(
       span, n_queries);
 
-  test_tree<spaix::RTree<
-      Key,
-      Data,
-      spaix::Configuration<page_size, 3, policy, spaix::QuadraticSplit>>>(
+  test_tree<spaix::RTree<Key,
+                         Data,
+                         spaix::PageConfiguration<Key,
+                                                  Data,
+                                                  page_size,
+                                                  3,
+                                                  policy,
+                                                  spaix::QuadraticSplit>>>(
       span, n_queries);
 }
 

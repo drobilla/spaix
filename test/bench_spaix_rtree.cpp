@@ -20,6 +20,7 @@
 
 #include "spaix/LinearInsertion.hpp"
 #include "spaix/LinearSplit.hpp"
+#include "spaix/PageConfiguration.hpp"
 #include "spaix/QuadraticSplit.hpp"
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
@@ -242,8 +243,13 @@ template <class Insertion,
 int
 run(const Parameters& params)
 {
-  using Config = spaix::
-      Configuration<page_size, min_fill_divisor, policy, Split, Insertion>;
+  using Config = spaix::PageConfiguration<Rect2,
+                                          Data,
+                                          page_size,
+                                          min_fill_divisor,
+                                          policy,
+                                          Split,
+                                          Insertion>;
 
   return run<spaix::RTree<Rect2, Data, Config>>(params, std::cout);
 }

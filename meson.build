@@ -38,9 +38,11 @@ endif
 
 headers = [
   'include/spaix/DataNode.hpp',
+  'include/spaix/FanoutConfiguration.hpp',
   'include/spaix/Iterator.hpp',
   'include/spaix/LinearInsertion.hpp',
   'include/spaix/LinearSplit.hpp',
+  'include/spaix/PageConfiguration.hpp',
   'include/spaix/Point.hpp',
   'include/spaix/QuadraticSplit.hpp',
   'include/spaix/RTree.hpp',
