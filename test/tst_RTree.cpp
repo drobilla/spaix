@@ -318,13 +318,9 @@ template <class Key, spaix::DataPlacement placement>
 void
 test_placement(const unsigned span, const unsigned n_queries)
 {
-  /* test_page_size<Key, placement, 128>(span, n_queries); */
   test_page_size<Key, placement, 256>(span, n_queries);
   test_page_size<Key, placement, 512>(span, n_queries);
-  test_page_size<Key, placement, 1024>(span, n_queries);
-  test_page_size<Key, placement, 2048>(span, n_queries);
   test_page_size<Key, placement, 4096>(span, n_queries);
-  test_page_size<Key, placement, 8192>(span, n_queries);
 }
 
 template <class Key>
