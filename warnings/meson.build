@@ -138,4 +138,9 @@ if cxx.get_id() == 'clang'
   cxx_warnings += clang_common_warnings + clang_cxx_warnings
 elif cxx.get_id() == 'gcc'
   cxx_warnings += gcc_common_warnings + gcc_cxx_warnings
+elif cxx.get_id() == 'msvc'
+  cxx_warnings += ['/Wall',
+                   '/experimental:external',
+                   '/external:W0',
+                   '/external:anglebrackets']
 endif

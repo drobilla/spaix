@@ -30,6 +30,24 @@ if get_option('warning_level') == '3'
       '-Wno-suggest-attribute=pure',
       '-Wno-switch-default',
     ]
+  elif cxx.get_id() == 'msvc'
+    cxx_warnings += [
+      '/wd4514',  # unreferenced inline function has been removed
+      '/wd4571',  # structured exceptions are no longer caught
+      '/wd4582',  # constructor is not explicitly called
+      '/wd4583',  # destructor is not explicitly called
+      '/wd4623',  # default constructor implicitly deleted
+      '/wd4625',  # copy constructor implicitly deleted
+      '/wd4626',  # copy assignment operator implicitly deleted
+      '/wd4710',  # function not inlined
+      '/wd4711',  # function selected for automatic inline expansion
+      '/wd4774',  # format string not a string literal
+      '/wd4820',  # padding added after construct
+      '/wd4868',  # may not enforce left-to-right evaluation order
+      '/wd5026',  # move constructor implicitly deleted
+      '/wd5027',  # move assignment operator implicitly deleted
+      '/wd5045',  # will insert Spectre mitigation for memory load
+    ]
   endif
 
   add_project_arguments(cxx.get_supported_arguments(cxx_warnings),

@@ -88,8 +88,8 @@ make_tree(std::mt19937& rng, const unsigned span)
   std::vector<unsigned> y_values(span + 1);
   std::vector<unsigned> x_values(span + 1);
 
-  std::iota(y_values.begin(), y_values.end(), 0);
-  std::iota(x_values.begin(), x_values.end(), 0);
+  std::iota(y_values.begin(), y_values.end(), 0u);
+  std::iota(x_values.begin(), x_values.end(), 0u);
 
   std::shuffle(y_values.begin(), y_values.end(), rng);
   std::shuffle(x_values.begin(), x_values.end(), rng);
