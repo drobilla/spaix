@@ -156,29 +156,6 @@ public:
     }
   }
 
-  template <class Predicate, class Visitor>
-  void fast_query_rec(const DirNode&   node,
-                      const Predicate& predicate,
-                      const Visitor&   visitor) const
-  {
-    switch (node.child_type) {
-    case NodeType::directory:
-      for (const auto& entry : node.dir_children) {
-        if (predicate.directory(entry.key)) {
-          fast_query_rec(*entry.node, predicate, visitor);
-        }
-      }
-      break;
-
-    case NodeType::data:
-      for (const auto& entry : node.dat_children) {
-        if (predicate.leaf(entry_key(entry))) {
-          visitor(entry_ref(entry));
-        }
-      }
-    }
-  }
-
   /// Remove all items from the tree
   void clear() { _root = {Box{}, nullptr}; }
 
@@ -255,6 +232,29 @@ private:
                                 const Box&  new_parent_key,
                                 const Key&  key,
                                 const Data& data);
+
+  template <class Predicate, class Visitor>
+  void fast_query_rec(const DirNode&   node,
+                      const Predicate& predicate,
+                      const Visitor&   visitor) const
+  {
+    switch (node.child_type) {
+    case NodeType::directory:
+      for (const auto& entry : node.dir_children) {
+        if (predicate.directory(entry.key)) {
+          fast_query_rec(*entry.node, predicate, visitor);
+        }
+      }
+      break;
+
+    case NodeType::data:
+      for (const auto& entry : node.dat_children) {
+        if (predicate.leaf(entry_key(entry))) {
+          visitor(entry_ref(entry));
+        }
+      }
+    }
+  }
 
   /// Create a new parent seeded with a child
   template <class Entry, ChildCount count>
