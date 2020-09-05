@@ -77,7 +77,7 @@ template <class Tree>
 void
 draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
 {
-	using Key    = typename Tree::Key;
+  using Key    = typename Tree::Key;
   using Data   = typename Tree::Data;
   using DirKey = typename Tree::Box;
 

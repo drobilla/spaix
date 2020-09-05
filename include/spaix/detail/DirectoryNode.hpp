@@ -73,7 +73,8 @@ template <class DirKey,
 struct DirectoryNode
 {
 public:
-  using DirNode = DirectoryNode<DirKey, DatNode, Placement, DirFanout, DatFanout>;
+  using DirNode =
+      DirectoryNode<DirKey, DatNode, Placement, DirFanout, DatFanout>;
   using Key     = decltype(std::declval<DatNode>().key);
   using Data    = decltype(std::declval<DatNode>().data);
   using NodeKey = DirKey;

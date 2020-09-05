@@ -32,7 +32,8 @@ using YRange = Range<YCoord>;
 using TestRect  = Rect<XCoord, YCoord>;
 using TestPoint = Point<XCoord, YCoord>;
 
-constexpr auto operator*(const XCoord& lhs, const YCoord& rhs)
+constexpr auto
+operator*(const XCoord& lhs, const YCoord& rhs)
 {
   return lhs.value() * rhs.value();
 }

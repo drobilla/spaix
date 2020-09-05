@@ -57,21 +57,24 @@ operator&(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 
 /// Return the geometric intersection of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...> operator&(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+constexpr Rect<Ts...>
+operator&(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
 }
 
 /// Return the geometric intersection of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...> operator&(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+constexpr Rect<Ts...>
+operator&(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
 }
 
 /// Return the geometric intersection of `lhs` and `rhs`
 template <class... Ts>
-constexpr Rect<Ts...> operator&(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
+constexpr Rect<Ts...>
+operator&(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
 }

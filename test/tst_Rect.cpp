@@ -47,11 +47,11 @@ test_rect()
                                    {std::numeric_limits<float>::max(),
                                     std::numeric_limits<float>::lowest()}}));
 
-  STATIC_CHECK((TestRect{TestPoint{1, 2.0f}} ==
-                TestRect{{1, 1}, {2.0f, 2.0f}}));
+  STATIC_CHECK(
+      (TestRect{TestPoint{1, 2.0f}} == TestRect{{1, 1}, {2.0f, 2.0f}}));
 
-  STATIC_CHECK((TestRect{std::make_tuple(XRange{1, 3}, YRange{2.0f, 5.0f})} ==
-                rect));
+  STATIC_CHECK(
+      (TestRect{std::make_tuple(XRange{1, 3}, YRange{2.0f, 5.0f})} == rect));
 
   // Comparison
   STATIC_CHECK((rect == make_rect(XRange{1, 3}, YRange{2.0f, 5.0f})));
@@ -59,8 +59,8 @@ test_rect()
   STATIC_CHECK((rect != make_rect(XRange{1, 3}, YRange{4.0f, 5.0f})));
 
   // Basic access
-  STATIC_CHECK((ranges(rect) == std::make_tuple(XRange{1, 3},
-                                                YRange{2.0f, 5.0f})));
+  STATIC_CHECK(
+      (ranges(rect) == std::make_tuple(XRange{1, 3}, YRange{2.0f, 5.0f})));
   STATIC_CHECK((rect.size() == 2));
   STATIC_CHECK((get<0>(rect) == XRange{1, 3}));
   STATIC_CHECK((get<1>(rect) == YRange{2.0f, 5.0f}));

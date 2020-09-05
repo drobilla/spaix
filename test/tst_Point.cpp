@@ -42,8 +42,8 @@ test_point()
   STATIC_CHECK((point != TestPoint{1, 3.0f}));
 
   // Basic access
-  STATIC_CHECK((ranges(point) == std::make_tuple(XRange{1, 1},
-                                                 YRange{2.0f, 2.0f})));
+  STATIC_CHECK(
+      (ranges(point) == std::make_tuple(XRange{1, 1}, YRange{2.0f, 2.0f})));
   STATIC_CHECK((point.size() == 2));
   STATIC_CHECK((get<0>(point) == 1));
   STATIC_CHECK((get<1>(point) == 2.0f));
