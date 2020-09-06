@@ -152,15 +152,18 @@ draw_svg(std::ostream&  os,
   svg::write_attr(os, "height", (span<1>(bounds) * scale) + (2 * svg::pad));
   os << ">\n";
 
-  tree.visit_structure(
+  tree.visit(
       [&os, bounds, scale, max_depth](
-          const DirKey& key, const NodePath& path, const size_t n_children) {
+          const NodePath& path, const DirKey& key, const size_t n_children) {
         return svg::draw_dir(os, key, path, n_children, bounds, scale) &&
-               (!max_depth || path.size() <= max_depth);
+                       (!max_depth || path.size() <= max_depth)
+                   ? VisitStatus::proceed
+                   : VisitStatus::finish;
       },
       [&os, bounds, scale](
-          const Key& key, const Data& data, const NodePath& path) {
+          const NodePath& path, const Key& key, const Data& data) {
         svg::draw_dat(os, key, data, path, bounds, scale);
+        return VisitStatus::proceed;
       });
 
   os << "</svg>\n";

@@ -46,6 +46,8 @@ using NodePath = std::vector<ChildIndex>;
 template <class K>
 using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
+enum class VisitStatus { proceed, finish };
+
 /**
    An R-tree which spatially indexes points or rectangles.
 
@@ -206,20 +208,34 @@ public:
     ++_size;
   }
 
-  using DirVisitor = std::function<
-      bool(const Box& key, const NodePath& path, ChildCount n_children)>;
+  /**
+     Visit every node in the tree.
 
-  using DatVisitor = std::function<
-      void(const Key& key, const Data& data, const NodePath& path)>;
+     The traversal is terminated immediately if any visitor returns
+     VisitStatus::finish.
 
-  void visit_structure(
-      DirVisitor visit_dir,
-      DatVisitor visit_dat = [](const Key&, const Data&, const NodePath&) {
-      }) const
+     @param visit_dir Function called for every internal directory node, with
+     prototype VisitStatus(const NodePath&, const Box&, ChildCount)>.
+
+     @param visit_dat Function called for every internal directory node, with
+     prototype VisitStatus(const NodePath&, const Key&, const Data&)>.
+  */
+  template <typename DirVisitor, typename DatVisitor>
+  void visit(DirVisitor visit_dir, DatVisitor visit_dat) const
   {
     NodePath path{0};
-    visit_structure_rec(
-        _root, std::move(visit_dir), std::move(visit_dat), path);
+    visit_rec(_root, std::move(visit_dir), std::move(visit_dat), path);
+  }
+
+  template <typename DirVisitor>
+  void visit(DirVisitor visit_dir) const
+  {
+    NodePath path{0};
+    visit_rec(
+        _root,
+        std::move(visit_dir),
+        [](auto, auto, auto) { return VisitStatus::proceed; },
+        path);
   }
 
 private:
@@ -269,10 +285,11 @@ private:
                            const Box&                               bounds,
                            NodeType                                 type);
 
-  static void visit_structure_rec(const DirEntry& entry,
-                                  DirVisitor      visit_dir,
-                                  DatVisitor      visit_dat,
-                                  NodePath&       path);
+  template <typename DirVisitor, typename DatVisitor>
+  static VisitStatus visit_rec(const DirEntry& entry,
+                               DirVisitor      visit_dir,
+                               DatVisitor      visit_dat,
+                               NodePath&       path);
 
   size_t   _size{};               ///< Number of elements
   DirEntry _root{Box{}, nullptr}; ///< Key and pointer to root node

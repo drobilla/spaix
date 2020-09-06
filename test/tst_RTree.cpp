@@ -139,17 +139,18 @@ check_node(const std::map<NodePath, Rect>& dir_keys,
 
 template <class Tree>
 void
-test_visit_structure(const Tree& tree)
+test_visit(const Tree& tree)
 {
   using DirKey = typename Tree::Box;
 
   std::vector<NodePath> top_paths;
 
   // Check that structure visitation ends when visitors return false
-  tree.visit_structure([&](const DirKey&, const NodePath& path, const size_t) {
+  tree.visit([&](const NodePath& path, const DirKey&, const size_t) {
     CHECK(path.size() <= 2);
     top_paths.emplace_back(path);
-    return path.size() < 2;
+    return path.size() < 2 ? spaix::VisitStatus::proceed
+                           : spaix::VisitStatus::finish;
   });
 
   for (const auto& path : top_paths) {
@@ -158,12 +159,25 @@ test_visit_structure(const Tree& tree)
 
   // Visit every directory
   size_t n_dirs = 0;
-  tree.visit_structure([&](const DirKey&, const NodePath&, const size_t) {
+  tree.visit([&](const NodePath&, const DirKey&, const size_t) {
     ++n_dirs;
-    return true;
+    return spaix::VisitStatus::proceed;
   });
 
   CHECK(n_dirs >= top_paths.size());
+
+  // Visit every leaf
+  size_t n_leaves = 0;
+  tree.visit(
+	  [&](const NodePath&, const DirKey&, const size_t) {
+        return spaix::VisitStatus::proceed;
+      },
+      [&](const NodePath&, const typename Tree::Key&, const Data&) {
+        return (++n_leaves == tree.size() / 2) ? spaix::VisitStatus::finish
+                                               : spaix::VisitStatus::proceed;
+      });
+
+  CHECK(n_leaves == tree.size() / 2);
 }
 
 template <class Tree>
@@ -177,19 +191,20 @@ test_structure(const Tree& tree)
   std::set<NodePath>         dat_paths;
 
   size_t n_leaves = 0;
-  tree.visit_structure(
-      [&](const DirKey& key, const NodePath& path, const size_t n_children) {
+  tree.visit(
+      [&](const NodePath& path, const DirKey& key, const size_t n_children) {
         (void)n_children;
         CHECK(n_children <= std::max(Tree::internal_fanout(), Tree::leaf_fanout()));
         check_node(dir_keys, key, path);
         dir_keys.emplace(path, key);
-        return true;
+        return spaix::VisitStatus::proceed;
       },
-      [&](const Key& key, const Data&, const NodePath& path) {
+      [&](const NodePath& path, const Key& key, const Data&) {
         check_node(dir_keys, key, path);
         CHECK(dat_paths.find(path) == dat_paths.end());
         dat_paths.emplace(path);
         ++n_leaves;
+        return spaix::VisitStatus::proceed;
       });
 
   CHECK(n_leaves == tree.size());
@@ -209,7 +224,7 @@ test_tree(const unsigned span, const unsigned n_queries)
 
   auto tree = make_tree<Tree>(rng, span);
 
-  test_visit_structure(tree);
+  test_visit(tree);
   test_structure(tree);
 
   CHECK(tree.begin() == tree.begin());

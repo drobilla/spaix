@@ -83,14 +83,17 @@ draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
 
   os << "graph Tree {\n";
   os << "  node [shape=box];\n";
-  tree.visit_structure(
+  tree.visit(
       [&os, max_depth](
-          const DirKey& key, const NodePath& path, const size_t n_children) {
+          const NodePath& path, const DirKey& key, const size_t n_children) {
         return detail::draw_dir_dot(os, key, path, n_children) &&
-               (!max_depth || path.size() <= max_depth);
+                       (!max_depth || path.size() <= max_depth)
+                   ? VisitStatus::proceed
+                   : VisitStatus::finish;
       },
-      [&os](const Key& key, const Data& data, const NodePath& path) {
+      [&os](const NodePath& path, const Key& key, const Data& data) {
         detail::draw_dat_dot(os, key, data, path);
+        return VisitStatus::proceed;
       });
 
   os << "}\n";

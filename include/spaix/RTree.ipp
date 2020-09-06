@@ -168,28 +168,33 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 }
 
 template <class K, class D, class C>
-void
-RTree<K, D, C>::visit_structure_rec(const DirEntry& entry,
-                                    DirVisitor      visit_dir,
-                                    DatVisitor      visit_dat,
-                                    NodePath&       path)
+template <typename DirVisitor, typename DatVisitor>
+VisitStatus
+RTree<K, D, C>::visit_rec(const DirEntry& entry,
+                          DirVisitor      visit_dir,
+                          DatVisitor      visit_dat,
+                          NodePath&       path)
 {
-  const auto& node = *entry.node;
-  if (visit_dir(entry.key, path, node.num_children())) {
-    for (ChildIndex i = 0u; i < node.num_children(); ++i) {
-      path.push_back(i);
+  const auto& node   = *entry.node;
+  VisitStatus status = visit_dir(path, entry.key, node.num_children());
 
-      if (node.child_type == NodeType::data) {
-        const auto& child = node.dat_children[i];
-        visit_dat(entry_key(child), entry_data(child), path);
-      } else {
-        const auto& child = node.dir_children[i];
-        visit_structure_rec(child, visit_dir, visit_dat, path);
-      }
+  for (ChildIndex i = 0u;
+       i < node.num_children() && status == VisitStatus::proceed;
+       ++i) {
+    path.push_back(i);
 
-      path.pop_back();
+    if (node.child_type == NodeType::data) {
+      const auto& child = node.dat_children[i];
+      status            = visit_dat(path, entry_key(child), entry_data(child));
+    } else {
+      const auto& child = node.dir_children[i];
+      status            = visit_rec(child, visit_dir, visit_dat, path);
     }
+
+    path.pop_back();
   }
+
+  return status;
 }
 
 } // namespace spaix
