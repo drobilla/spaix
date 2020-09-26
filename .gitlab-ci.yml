@@ -10,7 +10,7 @@ x64_dbg:
   <<: *build_definition
   image: lv2plugin/debian-x64
   script:
-    - meson . build -Dbuildtype=debug -Dwerror=true -Dtest=true -Db_coverage=true
+    - meson . build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Dtest=true -Db_coverage=true
     - ninja -C build test
     - ninja -C build coverage-html
   artifacts:
@@ -21,7 +21,7 @@ x64_rel:
   <<: *build_definition
   image: lv2plugin/debian-x64
   script:
-    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - meson . build -Dbuildtype=release -Dwarning_level=3 -Dwerror=true -Dtest=true
     - ninja -C build test
 
 
@@ -29,14 +29,14 @@ mac_dbg:
   <<: *build_definition
   tags: [macos]
   script:
-    - meson . build -Dbuildtype=debug -Dwerror=true -Dtest=true
+    - meson . build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Dtest=true
     - ninja -C build test
 
 mac_rel:
   <<: *build_definition
   tags: [macos]
   script:
-    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - meson . build -Dbuildtype=release -Dwarning_level=3 -Dwerror=true -Dtest=true
     - ninja -C build test
 
 
@@ -44,14 +44,14 @@ win_dbg:
   <<: *build_definition
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=debug -Dwerror=true -Dtest=true
+    - meson . build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Dtest=true
     - ninja -C build test
 
 win_rel:
   <<: *build_definition
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=release -Dwerror=true -Dtest=true
+    - meson . build -Dbuildtype=release -Dwarning_level=3 -Dwerror=true -Dtest=true
     - ninja -C build test
 
 
