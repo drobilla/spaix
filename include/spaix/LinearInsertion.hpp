@@ -16,12 +16,8 @@
 #ifndef SPAIX_LINEARINSERTION_HPP
 #define SPAIX_LINEARINSERTION_HPP
 
-#include "spaix/types.hpp"
-
 #include <cstddef>
-#include <cstdint>
 #include <limits>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 

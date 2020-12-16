@@ -16,8 +16,9 @@
 #ifndef SPAIX_TOUCHING_HPP
 #define SPAIX_TOUCHING_HPP
 
-#include "spaix/Rect.hpp"
 #include "spaix/intersects.hpp"
+
+#include <utility>
 
 namespace spaix {
 

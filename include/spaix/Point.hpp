@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <iosfwd>
+#include <ostream>
 #include <tuple>
 #include <utility>
 

@@ -16,10 +16,16 @@
 #ifndef SPAIX_PAGECONFIGURATION_HPP
 #define SPAIX_PAGECONFIGURATION_HPP
 
+// IWYU pragma: no_include "spaix/LinearInsertion.hpp"
+// IWYU pragma: no_include "spaix/QuadraticSplit.hpp"
+
+#include "spaix/DataNode.hpp"
 #include "spaix/DataPlacement.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/sizes.hpp"
-#include "spaix/types.hpp"
+
+#include <cstddef>
+#include <type_traits>
 
 namespace spaix {
 

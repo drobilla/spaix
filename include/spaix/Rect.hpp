@@ -20,12 +20,10 @@
 #include "spaix/detail/meta.hpp"
 #include "spaix/types.hpp"
 
-#include <algorithm>
 #include <cstddef>
-#include <iosfwd>
 #include <limits>
+#include <ostream>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 
 namespace spaix {

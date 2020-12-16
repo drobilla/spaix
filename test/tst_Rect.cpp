@@ -20,6 +20,8 @@
 #include "check.hpp"
 
 #include "spaix/Rect.hpp"
+#include "spaix/detail/meta.hpp"
+#include "spaix/types.hpp"
 
 #include <limits>
 #include <sstream>

@@ -20,6 +20,8 @@
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
 
+#include <cstddef>
+
 namespace spaix {
 namespace detail {
 

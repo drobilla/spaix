@@ -16,18 +16,22 @@
 #ifndef SPAIX_QUADRATICSPLIT_HPP
 #define SPAIX_QUADRATICSPLIT_HPP
 
-#include "spaix/StaticVector.hpp"
+#include "spaix/detail/DirectoryNode.hpp"
+
 #include "spaix/distribute.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
-#include <array>
 #include <cassert>
 #include <cstddef>
 #include <limits>
+#include <type_traits>
 #include <utility>
 
 namespace spaix {
+
+template <class T, class Size, Size Capacity>
+class StaticVector;
 
 /**
    Quadratic node split.

@@ -1,0 +1,4 @@
+[
+  { "symbol": [ "std::tuple_element", "private", "<tuple>",   "public" ] },
+  { "symbol": [ "std::ofstream",      "private", "<fstream>", "public" ] }
+]

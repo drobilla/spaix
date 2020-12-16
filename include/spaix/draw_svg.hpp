@@ -16,6 +16,8 @@
 #ifndef SPAIX_DRAW_SVG_HPP
 #define SPAIX_DRAW_SVG_HPP
 
+#include "spaix/Point.hpp"
+#include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/types.hpp"
 

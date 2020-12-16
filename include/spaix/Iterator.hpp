@@ -23,8 +23,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <utility>
-#include <vector>
+#include <iterator>
 
 namespace spaix {
 

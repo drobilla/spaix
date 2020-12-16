@@ -16,26 +16,14 @@
 #ifndef SPAIX_RTREE_IPP
 #define SPAIX_RTREE_IPP
 
-#include "spaix/DataNode.hpp"
-#include "spaix/Iterator.hpp"
-#include "spaix/LinearInsertion.hpp"
-#include "spaix/Point.hpp"
-#include "spaix/QuadraticSplit.hpp"
-#include "spaix/Rect.hpp"
+#include "spaix/StaticVector.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
-#include "spaix/everything.hpp"
-#include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
 
-#include <array>
 #include <cassert>
-#include <cstddef>
-#include <functional>
-#include <limits>
 #include <memory>
 #include <utility>
-#include <vector>
 
 namespace spaix {
 

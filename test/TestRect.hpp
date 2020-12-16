@@ -18,7 +18,9 @@
 
 #include "Scalar.hpp"
 
+#include "spaix/Point.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/types.hpp"
 
 namespace spaix {
 namespace test {

@@ -16,8 +16,11 @@
 #ifndef SPAIX_INTERSECTS_HPP
 #define SPAIX_INTERSECTS_HPP
 
+#include "spaix/Point.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
+
+#include <cstddef>
 
 namespace spaix {
 namespace detail {

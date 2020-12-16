@@ -21,6 +21,9 @@
 #include "spaix/detail/meta.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <tuple>
+#include <utility>
 
 namespace spaix {
 namespace detail {

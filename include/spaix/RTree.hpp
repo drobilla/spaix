@@ -17,13 +17,7 @@
 #define SPAIX_RTREE_HPP
 
 #include "spaix/DataNode.hpp"
-#include "spaix/DataPlacement.hpp"
 #include "spaix/Iterator.hpp"
-#include "spaix/LinearInsertion.hpp"
-#include "spaix/Point.hpp"
-#include "spaix/QuadraticSplit.hpp"
-#include "spaix/Rect.hpp"
-#include "spaix/contains.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/everything.hpp"
 #include "spaix/sizes.hpp"
@@ -33,9 +27,9 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
-#include <functional>
 #include <limits>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -45,6 +39,9 @@ using NodePath = std::vector<ChildIndex>;
 
 template <class K>
 using UnionOf = decltype(std::declval<K>() | std::declval<K>());
+
+template <class T, class Size, Size Capacity>
+class StaticVector;
 
 enum class VisitStatus { proceed, finish };
 
@@ -297,6 +294,6 @@ private:
 
 } // namespace spaix
 
-#include "spaix/RTree.ipp"
+#include "spaix/RTree.ipp" // IWYU pragma: keep
 
 #endif // SPAIX_RTREE_HPP

@@ -17,7 +17,6 @@
 #define SPAIX_META_HPP
 
 #include <cstddef>
-#include <ostream>
 #include <tuple>
 #include <type_traits>
 

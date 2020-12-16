@@ -16,16 +16,21 @@
 #ifndef SPAIX_DIRECTORYNODE_HPP
 #define SPAIX_DIRECTORYNODE_HPP
 
-#include "spaix/DataNode.hpp"
 #include "spaix/DataPlacement.hpp"
 #include "spaix/StaticVector.hpp"
 #include "spaix/types.hpp"
 
+#include <cassert>
+#include <cstddef>
 #include <memory>
+#include <new>
 #include <type_traits>
 #include <utility>
 
 namespace spaix {
+
+template <class Key, class Data>
+struct DataNode;
 
 template <class ChildKey, class ChildNode>
 struct NodeEntry

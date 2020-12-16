@@ -15,11 +15,9 @@
 
 #undef NDEBUG
 
-#include "Scalar.hpp"
 #include "TestRect.hpp"
 #include "check.hpp"
 
-#include "spaix/Point.hpp"
 #include "spaix/intersects.hpp"
 
 namespace spaix {
