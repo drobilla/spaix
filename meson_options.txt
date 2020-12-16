@@ -1,8 +1,8 @@
-option('benchmark', type: 'boolean', value: true,
+option('benchmark', type: 'boolean', value: false,
        description: 'Build benchmarks')
 
-option('test', type: 'boolean', value: false,
-       description: 'Build tests')
+option('boost', type: 'combo', choices: ['yes', 'no', 'auto'], value: 'auto',
+       description : 'Build boost benchmarking program')
 
-option('no_boost', type: 'boolean', value: false,
-       description: 'Do not build boost benchmarking program')
+option('test', type: 'boolean', value: true,
+       description: 'Build tests')

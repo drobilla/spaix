@@ -81,8 +81,19 @@ headers = [
   'include/spaix/within.hpp',
 ]
 
-if not get_option('no_boost')
+# Boost for comparison benchmark program
+boost_dep = []
+enable_boost = get_option('boost')
+have_boost = false
+if enable_boost == 'no'
+  message('Boost support explicitly disabled')
+else
   boost_dep = dependency('boost', required: false)
+  if boost_dep.found()
+    have_boost = true
+  elif enable_boost == 'yes' and not have_boost
+    error('Boost support not found, but was explicitly requested.')
+  endif
 endif
 
 spaix_dep = declare_dependency(
@@ -140,7 +151,7 @@ if get_option('benchmark')
   bench_exe = executable('bench_spaix_rtree', 'test/bench_spaix_rtree.cpp',
                          dependencies: spaix_dep)
 
-  if not get_option('no_boost') and boost_dep.found()
+  if have_boost
     boost_bench_exe = executable('bench_boost_rtree',
                                  'test/bench_boost_rtree.cpp',
                                  dependencies: [boost_dep, spaix_dep])
