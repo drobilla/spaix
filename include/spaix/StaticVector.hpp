@@ -53,7 +53,7 @@ public:
   StaticVector& operator=(StaticVector&) = delete;
   StaticVector& operator=(StaticVector&&) = delete;
 
-  void pop(const iterator iter)
+  void pop(T* const iter)
   {
     assert(iter < end());
     if (iter != end() - 1) {
