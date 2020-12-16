@@ -59,9 +59,9 @@ RTree<K, D, C>::ideal_key(const DirNode& node)
 {
   if (node.child_type == NodeType::directory) {
     return parent_key(node.dir_children);
-  } else {
-    return parent_key(node.dat_children);
   }
+
+  return parent_key(node.dat_children);
 }
 
 template <class K, class D, class C>

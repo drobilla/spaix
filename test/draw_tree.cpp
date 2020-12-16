@@ -127,7 +127,9 @@ run(const Parameters& params, const Args& args)
   const auto split = args.at("split");
   if (split == "linear") {
     return run<Insertion, spaix::LinearSplit>(params);
-  } else if (split == "quadratic") {
+  }
+
+  if (split == "quadratic") {
     return run<Insertion, spaix::QuadraticSplit>(params);
   }
 

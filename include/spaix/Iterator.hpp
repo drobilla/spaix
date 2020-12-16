@@ -199,7 +199,9 @@ private:
   {
     if (move_right_leaf()) {
       return true; // Moved to next leaf child
-    } else if (!move_up_right()) {
+    }
+
+    if (!move_up_right()) {
       return false; // Reached end of tree
     }
 
