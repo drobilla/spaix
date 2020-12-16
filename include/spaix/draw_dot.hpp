@@ -81,6 +81,8 @@ draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
   using Data   = typename Tree::Data;
   using DirKey = typename Tree::Box;
 
+  using spaix::VisitStatus;
+
   os << "graph Tree {\n";
   os << "  node [shape=box];\n";
   tree.visit(
