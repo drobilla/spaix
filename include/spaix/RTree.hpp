@@ -37,10 +37,10 @@ namespace spaix {
 
 using NodePath = std::vector<ChildIndex>;
 
-template <class K>
+template<class K>
 using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
-template <class T, class Size, Size Capacity>
+template<class T, class Size, Size Capacity>
 class StaticVector;
 
 enum class VisitStatus { proceed, finish };
@@ -52,7 +52,7 @@ enum class VisitStatus { proceed, finish };
    @tparam D Data type for elements.
    @tparam C Tree configuration (an instantiation of spaix::Configuration).
 */
-template <class K, class D, class C>
+template<class K, class D, class C>
 class RTree
 {
 public:
@@ -77,7 +77,7 @@ public:
 
   using DatNode = DataNode<Key, Data>;
   using DirNode =
-      DirectoryNode<Box, DatNode, placement, dir_fanout, dat_fanout>;
+    DirectoryNode<Box, DatNode, placement, dir_fanout, dat_fanout>;
 
   using DatNodePtr  = std::unique_ptr<DatNode>;
   using DirNodePtr  = std::unique_ptr<DirNode>;
@@ -85,13 +85,13 @@ public:
   using DatEntry    = typename DirNode::DatEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 
-  template <class Predicate>
+  template<class Predicate>
   using Iter = Iterator<Predicate,
                         DirNode,
                         DatNode,
                         max_height(sizeof(DatNode), min_dir_fanout)>;
 
-  template <class Predicate>
+  template<class Predicate>
   using ConstIter = Iterator<Predicate,
                              const DirNode,
                              const DatNode,
@@ -105,9 +105,8 @@ public:
      nodes are not actually contiguous internally as the underlying iterators
      automatically skip nodes that do not match.
   */
-  template <class Predicate>
-  struct Range
-  {
+  template<class Predicate>
+  struct Range {
     ConstIter<Predicate>& begin() { return first; }
     ConstIter<Predicate>& end() { return last; }
 
@@ -131,7 +130,7 @@ public:
 
   iterator end() { return iterator{{Box{}, nullptr}, Everything{}}; }
 
-  template <class Predicate>
+  template<class Predicate>
   Range<Predicate> query(Predicate predicate) const
   {
     if (empty()) {
@@ -147,7 +146,7 @@ public:
     return {std::move(first), std::move(last)};
   }
 
-  template <class Predicate, class Visitor>
+  template<class Predicate, class Visitor>
   void fast_query(const Predicate& predicate, const Visitor& visitor) const
   {
     if (_root.node && predicate.directory(_root.key)) {
@@ -217,26 +216,26 @@ public:
      @param visit_dat Function called for every internal directory node, with
      prototype VisitStatus(const NodePath&, const Key&, const Data&)>.
   */
-  template <typename DirVisitor, typename DatVisitor>
+  template<typename DirVisitor, typename DatVisitor>
   void visit(DirVisitor visit_dir, DatVisitor visit_dat) const
   {
     NodePath path{0};
     visit_rec(_root, std::move(visit_dir), std::move(visit_dat), path);
   }
 
-  template <typename DirVisitor>
+  template<typename DirVisitor>
   void visit(DirVisitor visit_dir) const
   {
     NodePath path{0};
     visit_rec(
-        _root,
-        std::move(visit_dir),
-        [](auto, auto, auto) { return VisitStatus::proceed; },
-        path);
+      _root,
+      std::move(visit_dir),
+      [](auto, auto, auto) { return VisitStatus::proceed; },
+      path);
   }
 
 private:
-  template <class Children>
+  template<class Children>
   static Box parent_key(const Children& children);
 
   static Box ideal_key(const DirNode& node);
@@ -246,7 +245,7 @@ private:
                                 const Key&  key,
                                 const Data& data);
 
-  template <class Predicate, class Visitor>
+  template<class Predicate, class Visitor>
   void fast_query_rec(const DirNode&   node,
                       const Predicate& predicate,
                       const Visitor&   visitor) const
@@ -270,19 +269,19 @@ private:
   }
 
   /// Create a new parent seeded with a child
-  template <class Entry, ChildCount count>
+  template<class Entry, ChildCount count>
   static DirEntry new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                              ChildIndex                              index,
                              NodeType child_type);
 
   /// Split `nodes` plus `node` in two and return the resulting sides
-  template <class Entry, ChildCount fanout>
+  template<class Entry, ChildCount fanout>
   static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                            Entry                                    entry,
                            const Box&                               bounds,
                            NodeType                                 type);
 
-  template <typename DirVisitor, typename DatVisitor>
+  template<typename DirVisitor, typename DatVisitor>
   static VisitStatus visit_rec(const DirEntry& entry,
                                DirVisitor      visit_dir,
                                DatVisitor      visit_dat,

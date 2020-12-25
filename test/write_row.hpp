@@ -21,14 +21,14 @@
 namespace spaix {
 namespace test {
 
-template <class Last>
+template<class Last>
 void
 write_row(std::ostream& os, Last last)
 {
   os << last << '\n';
 }
 
-template <class First, class... Rest>
+template<class First, class... Rest>
 void
 write_row(std::ostream& os, First first, Rest... rest)
 {

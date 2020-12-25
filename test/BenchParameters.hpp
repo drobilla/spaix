@@ -24,8 +24,7 @@
 namespace spaix {
 namespace test {
 
-struct BenchParameters
-{
+struct BenchParameters {
   explicit BenchParameters(const spaix::test::Arguments& args)
     : n_elements{std::stoul(args.at("size"))}
     , n_queries{std::stoul(args.at("queries"))}
@@ -33,8 +32,7 @@ struct BenchParameters
     , span{std::stof(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
     , page_size{std::stoul(args.at("page-size"))}
-  {
-  }
+  {}
 
   size_t   n_elements;
   size_t   n_queries;

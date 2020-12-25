@@ -27,8 +27,8 @@
 
 namespace spaix {
 
-template <class K, class D, class C>
-template <class Children>
+template<class K, class D, class C>
+template<class Children>
 typename RTree<K, D, C>::Box
 RTree<K, D, C>::parent_key(const Children& children)
 {
@@ -41,7 +41,7 @@ RTree<K, D, C>::parent_key(const Children& children)
   return key;
 }
 
-template <class K, class D, class C>
+template<class K, class D, class C>
 typename RTree<K, D, C>::Box
 RTree<K, D, C>::ideal_key(const DirNode& node)
 {
@@ -52,7 +52,7 @@ RTree<K, D, C>::ideal_key(const DirNode& node)
   return parent_key(node.dat_children);
 }
 
-template <class K, class D, class C>
+template<class K, class D, class C>
 typename RTree<K, D, C>::DirNodePair
 RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
                            const Box&  new_parent_key,
@@ -100,8 +100,8 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
 }
 
 /// Create a new parent seeded with a child
-template <class K, class D, class C>
-template <class Entry, ChildCount count>
+template<class K, class D, class C>
+template<class Entry, ChildCount count>
 typename RTree<K, D, C>::DirEntry
 RTree<K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                            ChildIndex                              index,
@@ -118,8 +118,8 @@ RTree<K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
 }
 
 /// Split `nodes` plus `node` in two and return the resulting sides
-template <class K, class D, class C>
-template <class Entry, ChildCount fanout>
+template<class K, class D, class C>
+template<class Entry, ChildCount fanout>
 typename RTree<K, D, C>::DirNodePair
 RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                       Entry                                    entry,
@@ -146,7 +146,7 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 
   // Distribute remaining nodes between seeds
   Split::distribute_children(
-      std::move(deposit), sides[0], sides[1], max_fanout);
+    std::move(deposit), sides[0], sides[1], max_fanout);
   assert(sides[0].node->num_children() + sides[1].node->num_children() ==
          fanout + 1);
   assert(sides[0].key == ideal_key(*sides[0].node));
@@ -155,8 +155,8 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
   return sides;
 }
 
-template <class K, class D, class C>
-template <typename DirVisitor, typename DatVisitor>
+template<class K, class D, class C>
+template<typename DirVisitor, typename DatVisitor>
 VisitStatus
 RTree<K, D, C>::visit_rec(const DirEntry& entry,
                           DirVisitor      visit_dir,

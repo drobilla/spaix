@@ -27,8 +27,7 @@
 namespace spaix {
 namespace test {
 
-struct Option
-{
+struct Option {
   const char* help;
   const char* value_name;
   const char* default_value;

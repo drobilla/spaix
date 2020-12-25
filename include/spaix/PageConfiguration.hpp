@@ -50,22 +50,21 @@ class QuadraticSplit;
 
    @tparam InsertionAlgorithm Insert position selection algorithm.
 */
-template <class K,
-          class D,
-          size_t        page_size      = 4096u,
-          unsigned      MinFillDivisor = 3u,
-          DataPlacement Placement      = DataPlacement::separate,
-          class SplitAlgorithm         = QuadraticSplit,
-          class InsertionAlgorithm     = LinearInsertion>
-struct PageConfiguration
-{
+template<class K,
+         class D,
+         size_t        page_size      = 4096u,
+         unsigned      MinFillDivisor = 3u,
+         DataPlacement Placement      = DataPlacement::separate,
+         class SplitAlgorithm         = QuadraticSplit,
+         class InsertionAlgorithm     = LinearInsertion>
+struct PageConfiguration {
   using Box       = decltype(std::declval<K>() | std::declval<K>());
   using Insertion = InsertionAlgorithm;
   using Split     = SplitAlgorithm;
 
   static constexpr auto dir_fanout = page_internal_fanout<Box>(page_size);
   static constexpr auto dat_fanout =
-      page_leaf_fanout<K, D, Placement>(page_size);
+    page_leaf_fanout<K, D, Placement>(page_size);
 
   static constexpr auto min_fill_divisor = MinFillDivisor;
   static constexpr auto placement        = Placement;
@@ -73,7 +72,7 @@ struct PageConfiguration
 private:
   using DatNode = DataNode<K, D>;
   using DirNode =
-      DirectoryNode<Box, DatNode, Placement, dir_fanout, dat_fanout>;
+    DirectoryNode<Box, DatNode, Placement, dir_fanout, dat_fanout>;
   using DirEntry = typename DirNode::DirEntry;
   using DatEntry = typename DirNode::DatEntry;
 

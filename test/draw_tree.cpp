@@ -42,16 +42,14 @@ using Scalar = double;
 using Rect2  = spaix::Rect<Scalar, Scalar>;
 using Point2 = spaix::Point<Scalar, Scalar>;
 
-struct Parameters
-{
+struct Parameters {
   explicit Parameters(const spaix::test::Arguments& args)
     : n_elements{std::stoul(args.at("size"))}
     , page_size{std::stoul(args.at("page-size"))}
     , scale{std::stod(args.at("scale"))}
     , span{std::stod(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
-  {
-  }
+  {}
 
   size_t   n_elements;
   size_t   page_size;
@@ -60,7 +58,7 @@ struct Parameters
   uint32_t seed;
 };
 
-template <class Tree>
+template<class Tree>
 int
 run(const Parameters& params)
 {
@@ -87,7 +85,7 @@ run(const Parameters& params)
   return 0;
 }
 
-template <class Insertion, class Split, size_t page_size>
+template<class Insertion, class Split, size_t page_size>
 int
 run(const Parameters& params)
 {
@@ -102,25 +100,30 @@ run(const Parameters& params)
   return run<spaix::RTree<Point2, Scalar, Config>>(params);
 }
 
-template <class Insertion, class Split>
+template<class Insertion, class Split>
 int
 run(const Parameters& params)
 {
   switch (params.page_size) {
   // case 64: return run<Insertion, Split, 64>(params);
   // case 128: return run<Insertion, Split, 128>(params);
-  case 256: return run<Insertion, Split, 256>(params);
-  case 512: return run<Insertion, Split, 512>(params);
-  case 1024: return run<Insertion, Split, 1024>(params);
-  case 2048: return run<Insertion, Split, 2048>(params);
-  case 4096: return run<Insertion, Split, 4096>(params);
+  case 256:
+    return run<Insertion, Split, 256>(params);
+  case 512:
+    return run<Insertion, Split, 512>(params);
+  case 1024:
+    return run<Insertion, Split, 1024>(params);
+  case 2048:
+    return run<Insertion, Split, 2048>(params);
+  case 4096:
+    return run<Insertion, Split, 4096>(params);
   }
 
   throw std::runtime_error("Invalid page size '" +
                            std::to_string(params.page_size) + "'");
 }
 
-template <class Insertion>
+template<class Insertion>
 int
 run(const Parameters& params, const Args& args)
 {
@@ -153,13 +156,13 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
-      {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
-      {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
-      {"scale", {"Scale factor for SVG output", "NUMBER", "1.0"}},
-      {"seed", {"Random number generator seed", "SEED", "5489"}},
-      {"size", {"Number of elements", "ELEMENTS", "1024"}},
-      {"span", {"Dimension span", "NUMBER", "1024"}},
-      {"split", {"Split (linear, quadratic)", "ALGORITHM", "quadratic"}},
+    {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
+    {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
+    {"scale", {"Scale factor for SVG output", "NUMBER", "1.0"}},
+    {"seed", {"Random number generator seed", "SEED", "5489"}},
+    {"size", {"Number of elements", "ELEMENTS", "1024"}},
+    {"span", {"Dimension span", "NUMBER", "1024"}},
+    {"split", {"Split (linear, quadratic)", "ALGORITHM", "quadratic"}},
   };
 
   try {

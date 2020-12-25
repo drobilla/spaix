@@ -24,11 +24,13 @@
 namespace spaix {
 namespace test {
 
-template <class Tag, class Rep>
-struct Scalar
-{
+template<class Tag, class Rep>
+struct Scalar {
   constexpr Scalar() = default;
-  constexpr Scalar(const Rep v) : _value{v} {} // NOLINT
+
+  constexpr Scalar(const Rep v) // NOLINT
+    : _value{v}
+  {}
 
   constexpr bool operator==(const Scalar& rhs) const
   {
@@ -56,7 +58,7 @@ private:
   Rep _value{};
 };
 
-template <class Tag, class Rep>
+template<class Tag, class Rep>
 std::ostream&
 operator<<(std::ostream& os, const Scalar<Tag, Rep>& scalar)
 {
@@ -68,10 +70,9 @@ operator<<(std::ostream& os, const Scalar<Tag, Rep>& scalar)
 
 namespace std {
 
-template <class Tag, class Rep>
+template<class Tag, class Rep>
 class numeric_limits<spaix::test::Scalar<Tag, Rep>> : public numeric_limits<Rep>
-{
-};
+{};
 
 } // namespace std
 

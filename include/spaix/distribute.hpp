@@ -21,7 +21,7 @@
 
 namespace spaix {
 
-template <class DirEntry, class DirKey, class Entry>
+template<class DirEntry, class DirKey, class Entry>
 static void
 distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
 {
@@ -29,7 +29,7 @@ distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
   parent.node->append_child(std::forward<Entry>(child));
 }
 
-template <class DirEntry, class Deposit>
+template<class DirEntry, class Deposit>
 static void
 distribute_remaining(DirEntry& parent, Deposit&& deposit)
 {

@@ -24,7 +24,7 @@ namespace spaix {
 using ChildIndex = size_t;
 using ChildCount = size_t;
 
-template <class T>
+template<class T>
 using Range = std::pair<T, T>;
 
 enum class NodeType : size_t {

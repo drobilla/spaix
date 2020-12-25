@@ -44,14 +44,13 @@ class QuadraticSplit;
 
    @tparam InsertionAlgorithm Insert position selection algorithm.
 */
-template <ChildCount    DirFanout,
-          ChildCount    DatFanout,
-          unsigned      MinFillDivisor = 3u,
-          DataPlacement Placement      = DataPlacement::separate,
-          class SplitAlgorithm         = QuadraticSplit,
-          class InsertionAlgorithm     = LinearInsertion>
-struct FanoutConfiguration
-{
+template<ChildCount    DirFanout,
+         ChildCount    DatFanout,
+         unsigned      MinFillDivisor = 3u,
+         DataPlacement Placement      = DataPlacement::separate,
+         class SplitAlgorithm         = QuadraticSplit,
+         class InsertionAlgorithm     = LinearInsertion>
+struct FanoutConfiguration {
   static constexpr auto       dir_fanout       = DirFanout;
   static constexpr auto       dat_fanout       = DatFanout;
   static constexpr const auto min_fill_divisor = MinFillDivisor;

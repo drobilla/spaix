@@ -25,7 +25,7 @@
 namespace spaix {
 
 /// Return a directory fanout where nodes fit within `page_size` bytes
-template <class DirKey>
+template<class DirKey>
 constexpr ChildCount
 page_internal_fanout(const size_t page_size)
 {
@@ -34,7 +34,7 @@ page_internal_fanout(const size_t page_size)
 }
 
 /// Return a leaf fanout where nodes nodes fit within `page_size` bytes
-template <class DatKey, class Data, DataPlacement placement>
+template<class DatKey, class Data, DataPlacement placement>
 constexpr ChildCount
 page_leaf_fanout(const size_t page_size)
 {
@@ -49,7 +49,7 @@ page_leaf_fanout(const size_t page_size)
 }
 
 /// Return log_2(n)
-template <class T>
+template<class T>
 constexpr T
 log_2(const T n)
 {
@@ -57,7 +57,7 @@ log_2(const T n)
 }
 
 /// Return log_b(n)
-template <class T>
+template<class T>
 constexpr T
 log_b(const T n, const T b)
 {

@@ -25,34 +25,34 @@
 namespace spaix {
 namespace detail {
 
-template <class... Ts, size_t last_dim>
+template<class... Ts, size_t last_dim>
 constexpr auto
 volume_rec(const Rect<Ts...>& rect, LastIndex<last_dim>)
 {
   return span<last_dim>(rect);
 }
 
-template <class... Ts, size_t dim, size_t last_dim>
+template<class... Ts, size_t dim, size_t last_dim>
 constexpr auto
 volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
 {
   const auto r = range<dim>(rect);
 
   return ((r.first < r.second)
-              ? ((r.second - r.first) * volume_rec(rect, ++index))
-              : 0);
+            ? ((r.second - r.first) * volume_rec(rect, ++index))
+            : 0);
 }
 
 } // namespace detail
 
-template <class... Ts>
+template<class... Ts>
 constexpr auto
 volume(const Rect<Ts...>& rect)
 {
   return detail::volume_rec(rect, ibegin_inclusive<Ts...>());
 }
 
-template <class... Ts>
+template<class... Ts>
 constexpr ProductOf<Ts...>
 volume(const Point<Ts...>&)
 {

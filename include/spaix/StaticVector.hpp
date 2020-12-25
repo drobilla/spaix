@@ -23,7 +23,7 @@
 
 namespace spaix {
 
-template <class T, class Size, Size Capacity>
+template<class T, class Size, Size Capacity>
 class StaticVector
 {
 public:
@@ -79,7 +79,7 @@ public:
     }
   }
 
-  template <class... Args>
+  template<class... Args>
   void emplace_back(Args&&... args)
   {
     assert(_size < Capacity);

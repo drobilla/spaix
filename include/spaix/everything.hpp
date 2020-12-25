@@ -18,15 +18,14 @@
 
 namespace spaix {
 
-struct Everything
-{
-  template <class DirKey>
+struct Everything {
+  template<class DirKey>
   static constexpr bool directory(const DirKey&)
   {
     return true;
   }
 
-  template <class DatKey>
+  template<class DatKey>
   static constexpr bool leaf(const DatKey&)
   {
     return true;

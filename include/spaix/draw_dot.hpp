@@ -41,7 +41,7 @@ to_string(const NodePath& path)
   return s;
 }
 
-template <class DirKey>
+template<class DirKey>
 static inline bool
 draw_dir_dot(std::ostream&   os,
              const DirKey&   key,
@@ -61,7 +61,7 @@ draw_dir_dot(std::ostream&   os,
   return true;
 }
 
-template <class Key, class Data>
+template<class Key, class Data>
 static inline void
 draw_dat_dot(std::ostream& os,
              const Key&    key,
@@ -73,7 +73,7 @@ draw_dat_dot(std::ostream& os,
 
 } // namespace detail
 
-template <class Tree>
+template<class Tree>
 void
 draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
 {
@@ -86,17 +86,17 @@ draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
   os << "graph Tree {\n";
   os << "  node [shape=box];\n";
   tree.visit(
-      [&os, max_depth](
-          const NodePath& path, const DirKey& key, const size_t n_children) {
-        return detail::draw_dir_dot(os, key, path, n_children) &&
-                       (!max_depth || path.size() <= max_depth)
-                   ? VisitStatus::proceed
-                   : VisitStatus::finish;
-      },
-      [&os](const NodePath& path, const Key& key, const Data& data) {
-        detail::draw_dat_dot(os, key, data, path);
-        return VisitStatus::proceed;
-      });
+    [&os, max_depth](
+      const NodePath& path, const DirKey& key, const size_t n_children) {
+      return detail::draw_dir_dot(os, key, path, n_children) &&
+                 (!max_depth || path.size() <= max_depth)
+               ? VisitStatus::proceed
+               : VisitStatus::finish;
+    },
+    [&os](const NodePath& path, const Key& key, const Data& data) {
+      detail::draw_dat_dot(os, key, data, path);
+      return VisitStatus::proceed;
+    });
 
   os << "}\n";
 }

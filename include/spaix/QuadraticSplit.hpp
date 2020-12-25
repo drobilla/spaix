@@ -30,7 +30,7 @@
 
 namespace spaix {
 
-template <class T, class Size, Size Capacity>
+template<class T, class Size, Size Capacity>
 class StaticVector;
 
 /**
@@ -42,10 +42,10 @@ class QuadraticSplit
 {
 public:
   /// Return the indices of the children that should be used for split seeds
-  template <class Entry, ChildCount count, class DirKey>
-  static std::pair<ChildIndex, ChildIndex>
-  pick_seeds(const StaticVector<Entry, ChildCount, count>& deposit,
-             const DirKey&)
+  template<class Entry, ChildCount count, class DirKey>
+  static std::pair<ChildIndex, ChildIndex> pick_seeds(
+    const StaticVector<Entry, ChildCount, count>& deposit,
+    const DirKey&)
   {
     using Volume    = decltype(volume(std::declval<DirKey>()));
     using SeedWaste = Volume;
@@ -79,7 +79,7 @@ public:
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
-  template <class Deposit, class DirEntry>
+  template<class Deposit, class DirEntry>
   static void distribute_children(Deposit&&        deposit,
                                   DirEntry&        lhs,
                                   DirEntry&        rhs,
@@ -104,23 +104,22 @@ public:
 
 private:
   /// Assignment of a child to a parent during a split
-  template <class DirKey>
-  struct ChildAssignment
-  {
+  template<class DirKey>
+  struct ChildAssignment {
     size_t child_index;
     DirKey new_parent_key;
     Side   side;
   };
 
   /// Return |a - b| safely for unsigned types
-  template <class T>
+  template<class T>
   static constexpr T abs_diff(T a, T b)
   {
     return a > b ? a - b : b - a;
   }
 
   /// Choose the next child to distribute during a split
-  template <class Deposit, class DirEntry>
+  template<class Deposit, class DirEntry>
   static ChildAssignment<typename DirEntry::Key>
   pick_next(const Deposit& deposit, const DirEntry& lhs, const DirEntry& rhs)
   {

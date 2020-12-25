@@ -22,16 +22,15 @@
 
 namespace spaix {
 
-template <class QueryKey>
-struct Touching
-{
-  template <class DirKey>
+template<class QueryKey>
+struct Touching {
+  template<class DirKey>
   constexpr bool directory(const DirKey& k) const
   {
     return intersects(key, k);
   }
 
-  template <class DatKey>
+  template<class DatKey>
   constexpr bool leaf(const DatKey& k) const
   {
     return intersects(key, k);
@@ -41,7 +40,7 @@ struct Touching
 };
 
 /// Return a query predicate that matches items that intersect a region
-template <class QueryKey>
+template<class QueryKey>
 Touching<QueryKey>
 touching(QueryKey key)
 {

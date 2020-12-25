@@ -23,7 +23,7 @@ namespace spaix {
 namespace test {
 
 /// Distribution of numbers that can be incrementally updated
-template <class T>
+template<class T>
 class Distribution
 {
 public:

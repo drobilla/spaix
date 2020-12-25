@@ -28,14 +28,14 @@
 namespace spaix {
 namespace detail {
 
-template <class Lhs, class Rhs, size_t num_dims>
+template<class Lhs, class Rhs, size_t num_dims>
 constexpr auto
 intersection_rec(const Lhs&, const Rhs&, EndIndex<num_dims>)
 {
   return std::make_tuple();
 }
 
-template <class Lhs, class Rhs, size_t dim, size_t num_dims>
+template<class Lhs, class Rhs, size_t dim, size_t num_dims>
 constexpr auto
 intersection_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 {
@@ -43,15 +43,15 @@ intersection_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
   const auto r = range<dim>(rhs);
 
   return std::tuple_cat(
-      std::make_tuple(std::make_pair(std::max(l.first, r.first),
-                                     std::min(l.second, r.second))),
-      intersection_rec(lhs, rhs, ++index));
+    std::make_tuple(
+      std::make_pair(std::max(l.first, r.first), std::min(l.second, r.second))),
+    intersection_rec(lhs, rhs, ++index));
 }
 
 } // namespace detail
 
 /// Return the geometric intersection of `lhs` and `rhs`
-template <class... Ts>
+template<class... Ts>
 constexpr Rect<Ts...>
 operator&(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 {
@@ -59,7 +59,7 @@ operator&(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 }
 
 /// Return the geometric intersection of `lhs` and `rhs`
-template <class... Ts>
+template<class... Ts>
 constexpr Rect<Ts...>
 operator&(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
@@ -67,7 +67,7 @@ operator&(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 }
 
 /// Return the geometric intersection of `lhs` and `rhs`
-template <class... Ts>
+template<class... Ts>
 constexpr Rect<Ts...>
 operator&(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 {
@@ -75,7 +75,7 @@ operator&(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 }
 
 /// Return the geometric intersection of `lhs` and `rhs`
-template <class... Ts>
+template<class... Ts>
 constexpr Rect<Ts...>
 operator&(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 {

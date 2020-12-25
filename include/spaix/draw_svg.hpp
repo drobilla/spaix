@@ -61,21 +61,21 @@ color(const NodePath& path, const double alpha)
   return buf;
 }
 
-template <size_t axis, class Key, class DirKey>
+template<size_t axis, class Key, class DirKey>
 static inline double
 coord(const Key& key, const DirKey& bounds, const double scale)
 {
   return (min<axis>(key) - min<axis>(bounds)) * scale + pad;
 }
 
-template <class T>
+template<class T>
 static inline void
 write_attr(std::ostream& os, const std::string& key, const T& value)
 {
   os << " " << key << "=\"" << value << "\"";
 }
 
-template <class DirKey>
+template<class DirKey>
 static bool
 draw_dir(std::ostream&   os,
          const DirKey&   key,
@@ -89,7 +89,7 @@ draw_dir(std::ostream&   os,
   }
 
   const auto style =
-      "fill: " + color(path, 0.2) + "; stroke: " + color(path, 1.0);
+    "fill: " + color(path, 0.2) + "; stroke: " + color(path, 1.0);
 
   os << "  <rect";
   write_attr(os, "style", style);
@@ -102,7 +102,7 @@ draw_dir(std::ostream&   os,
   return true;
 }
 
-template <class... Values, class Data>
+template<class... Values, class Data>
 static inline void
 draw_dat(std::ostream&          os,
          const Rect<Values...>& key,
@@ -114,7 +114,7 @@ draw_dat(std::ostream&          os,
   draw_dir(os, key, path, bounds, scale);
 }
 
-template <class... Values, class Data>
+template<class... Values, class Data>
 static void
 draw_dat(std::ostream&           os,
          const Point<Values...>& key,
@@ -135,7 +135,7 @@ draw_dat(std::ostream&           os,
 
 } // namespace svg
 
-template <class Tree>
+template<class Tree>
 void
 draw_svg(std::ostream&  os,
          const Tree&    tree,
@@ -155,18 +155,18 @@ draw_svg(std::ostream&  os,
   os << ">\n";
 
   tree.visit(
-      [&os, bounds, scale, max_depth](
-          const NodePath& path, const DirKey& key, const size_t n_children) {
-        return svg::draw_dir(os, key, path, n_children, bounds, scale) &&
-                       (!max_depth || path.size() <= max_depth)
-                   ? VisitStatus::proceed
-                   : VisitStatus::finish;
-      },
-      [&os, bounds, scale](
-          const NodePath& path, const Key& key, const Data& data) {
-        svg::draw_dat(os, key, data, path, bounds, scale);
-        return VisitStatus::proceed;
-      });
+    [&os, bounds, scale, max_depth](
+      const NodePath& path, const DirKey& key, const size_t n_children) {
+      return svg::draw_dir(os, key, path, n_children, bounds, scale) &&
+                 (!max_depth || path.size() <= max_depth)
+               ? VisitStatus::proceed
+               : VisitStatus::finish;
+    },
+    [&os, bounds, scale](
+      const NodePath& path, const Key& key, const Data& data) {
+      svg::draw_dat(os, key, data, path, bounds, scale);
+      return VisitStatus::proceed;
+    });
 
   os << "</svg>\n";
 }

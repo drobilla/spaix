@@ -44,28 +44,26 @@ using Scalar     = float;
 using Data       = size_t;
 using Rect2      = spaix::Rect<Scalar, Scalar>;
 
-template <class T>
+template<class T>
 using Distribution = spaix::test::Distribution<T>;
 
 constexpr unsigned min_fill_divisor = 3;
 
-struct Counts
-{
+struct Counts {
   size_t n_checked_dirs = 0u;
   size_t n_checked_dats = 0u;
 };
 
-template <class QueryKey>
-struct BenchmarkWithin
-{
-  template <class DirKey>
+template<class QueryKey>
+struct BenchmarkWithin {
+  template<class DirKey>
   constexpr bool directory(const DirKey& k) const
   {
     ++counts->n_checked_dirs;
     return spaix::intersects(key, k);
   }
 
-  template <class DatKey>
+  template<class DatKey>
   constexpr bool leaf(const DatKey& k) const
   {
     ++counts->n_checked_dats;
@@ -76,8 +74,7 @@ struct BenchmarkWithin
   Counts*        counts{};
 };
 
-struct QueryMetrics
-{
+struct QueryMetrics {
   Distribution<double> iter_times;
   // Distribution<double> visit_times;
   Distribution<double> checked_dirs;
@@ -85,7 +82,7 @@ struct QueryMetrics
   Distribution<double> result_counts;
 };
 
-template <class Tree, class Scalar>
+template<class Tree, class Scalar>
 QueryMetrics
 benchmark_queries(std::mt19937& rng,
                   const Tree&   tree,
@@ -126,9 +123,9 @@ benchmark_queries(std::mt19937& rng,
     const auto t_iter_end = std::chrono::steady_clock::now();
 
     const auto iter_dur =
-        std::chrono::duration<double>(t_iter_end - t_iter_start);
+      std::chrono::duration<double>(t_iter_end - t_iter_start);
     metrics.iter_times.update(
-        iter_dur.count()); // / std::max(1.0, double(n_results)));
+      iter_dur.count()); // / std::max(1.0, double(n_results)));
 
     // const auto t_visit_start = std::chrono::steady_clock::now();
     // tree.fast_query(predicate, [&n_results](const auto&) { ++n_results; });
@@ -147,7 +144,7 @@ benchmark_queries(std::mt19937& rng,
   return metrics;
 }
 
-template <class Tree>
+template<class Tree>
 int
 run(const Parameters& params, std::ostream& os)
 {
@@ -207,27 +204,27 @@ run(const Parameters& params, std::ostream& os)
       const auto metrics = benchmark_queries(rng, t, span, params.n_queries);
 
       spaix::test::write_row(
-          os,
-          total_times.n(),
-          params.page_size,
-          t.internal_fanout(),
-          std::chrono::duration<double>(t_end - t_bench_start).count(),
-          times.mean(),
-          times.min(),
-          times.max(),
-          metrics.iter_times.mean(),
-          metrics.iter_times.min(),
-          metrics.iter_times.max(),
-          // metrics.visit_times.mean(),
-          // metrics.visit_times.min(),
-          // metrics.visit_times.max(),
-          metrics.checked_dirs.mean(),
-          metrics.checked_dirs.min(),
-          metrics.checked_dirs.max(),
-          metrics.checked_dats.mean(),
-          metrics.checked_dats.min(),
-          metrics.checked_dats.max(),
-          metrics.result_counts.mean());
+        os,
+        total_times.n(),
+        params.page_size,
+        t.internal_fanout(),
+        std::chrono::duration<double>(t_end - t_bench_start).count(),
+        times.mean(),
+        times.min(),
+        times.max(),
+        metrics.iter_times.mean(),
+        metrics.iter_times.min(),
+        metrics.iter_times.max(),
+        // metrics.visit_times.mean(),
+        // metrics.visit_times.min(),
+        // metrics.visit_times.max(),
+        metrics.checked_dirs.mean(),
+        metrics.checked_dirs.min(),
+        metrics.checked_dirs.max(),
+        metrics.checked_dats.mean(),
+        metrics.checked_dats.min(),
+        metrics.checked_dats.max(),
+        metrics.result_counts.mean());
       times = {};
     }
   }
@@ -235,10 +232,10 @@ run(const Parameters& params, std::ostream& os)
   return 0;
 }
 
-template <class Insertion,
-          class Split,
-          spaix::DataPlacement placement,
-          size_t               page_size>
+template<class Insertion,
+         class Split,
+         spaix::DataPlacement placement,
+         size_t               page_size>
 int
 run(const Parameters& params)
 {
@@ -253,25 +250,31 @@ run(const Parameters& params)
   return run<spaix::RTree<Rect2, Data, Config>>(params, std::cout);
 }
 
-template <class Insertion, class Split, spaix::DataPlacement placement>
+template<class Insertion, class Split, spaix::DataPlacement placement>
 int
 run(const Parameters& params)
 {
   switch (params.page_size) {
   // case 128: return run<Insertion, Split, 128>(params);
-  case 256: return run<Insertion, Split, placement, 256>(params);
-  case 512: return run<Insertion, Split, placement, 512>(params);
-  case 1024: return run<Insertion, Split, placement, 1024>(params);
-  case 2048: return run<Insertion, Split, placement, 2048>(params);
-  case 4096: return run<Insertion, Split, placement, 4096>(params);
-  case 8192: return run<Insertion, Split, placement, 8192>(params);
+  case 256:
+    return run<Insertion, Split, placement, 256>(params);
+  case 512:
+    return run<Insertion, Split, placement, 512>(params);
+  case 1024:
+    return run<Insertion, Split, placement, 1024>(params);
+  case 2048:
+    return run<Insertion, Split, placement, 2048>(params);
+  case 4096:
+    return run<Insertion, Split, placement, 4096>(params);
+  case 8192:
+    return run<Insertion, Split, placement, 8192>(params);
   }
 
   throw std::runtime_error("Invalid page size '" +
                            std::to_string(params.page_size) + "'");
 }
 
-template <class Insertion, class Split>
+template<class Insertion, class Split>
 int
 run(const Parameters& params, const Args& args)
 {
@@ -285,7 +288,7 @@ run(const Parameters& params, const Args& args)
   throw std::runtime_error("Invalid placement '" + placement + "'");
 }
 
-template <class Insertion>
+template<class Insertion>
 int
 run(const Parameters& params, const Args& args)
 {
@@ -316,16 +319,16 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
-      {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
-      {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
-      {"placement",
-       {"Data placement (inline or separate)", "PLACEMENT", "inline"}},
-      {"queries", {"Number of queries per step", "COUNT", "100"}},
-      {"seed", {"Random number generator seed", "SEED", "5489"}},
-      {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},
-      {"span", {"Dimension span", "NUMBER", "10000000"}},
-      {"split", {"Split (linear, quadratic)", "ALGORITHM", "quadratic"}},
-      {"steps", {"Number of benchmarking steps", "RECORDS", "10"}},
+    {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
+    {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
+    {"placement",
+     {"Data placement (inline or separate)", "PLACEMENT", "inline"}},
+    {"queries", {"Number of queries per step", "COUNT", "100"}},
+    {"seed", {"Random number generator seed", "SEED", "5489"}},
+    {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},
+    {"span", {"Dimension span", "NUMBER", "10000000"}},
+    {"split", {"Split (linear, quadratic)", "ALGORITHM", "quadratic"}},
+    {"steps", {"Number of benchmarking steps", "RECORDS", "10"}},
   };
 
   try {

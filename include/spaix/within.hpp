@@ -22,16 +22,15 @@
 
 namespace spaix {
 
-template <typename QueryKey>
-struct Within
-{
-  template <class DirKey>
+template<typename QueryKey>
+struct Within {
+  template<class DirKey>
   constexpr bool directory(const DirKey& k) const
   {
     return intersects(key, k);
   }
 
-  template <class DatKey>
+  template<class DatKey>
   constexpr bool leaf(const DatKey& k) const
   {
     return contains(key, k);
@@ -41,7 +40,7 @@ struct Within
 };
 
 /// Return a query predicate that matches items contained within a region
-template <class QueryKey>
+template<class QueryKey>
 Within<QueryKey>
 within(QueryKey key)
 {

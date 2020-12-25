@@ -46,25 +46,25 @@ using NodePath = spaix::NodePath;
 
 /* constexpr size_t page_size = 512u; */
 
-template <class Key>
+template<class Key>
 Key
 make_key(unsigned x, unsigned y);
 
-template <>
+template<>
 Point
 make_key<Point>(const unsigned x, const unsigned y)
 {
   return Point{float(x), float(y)};
 }
 
-template <>
+template<>
 Rect
 make_key<Rect>(const unsigned x, const unsigned y)
 {
   return Rect{{float(x), float(x) + 1.0f}, {float(y), float(y) + 1.0f}};
 }
 
-template <class Tree>
+template<class Tree>
 void
 test_empty_tree(const Tree& tree, const unsigned span)
 {
@@ -75,7 +75,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
   CHECK(tree.query(spaix::within(everything)).empty());
 }
 
-template <class Tree>
+template<class Tree>
 Tree
 make_tree(std::mt19937& rng, const unsigned span)
 {
@@ -103,25 +103,25 @@ make_tree(std::mt19937& rng, const unsigned span)
   return tree;
 }
 
-template <class Key>
+template<class Key>
 unsigned
 num_items_in_area(unsigned x_span, unsigned y_span);
 
-template <>
+template<>
 unsigned
 num_items_in_area<Point>(const unsigned x_span, const unsigned y_span)
 {
   return (x_span + 1) * (y_span + 1);
 }
 
-template <>
+template<>
 unsigned
 num_items_in_area<Rect>(const unsigned x_span, const unsigned y_span)
 {
   return x_span * y_span;
 }
 
-template <class NodeKey>
+template<class NodeKey>
 void
 check_node(const std::map<NodePath, Rect>& dir_keys,
            const NodeKey&                  key,
@@ -137,7 +137,7 @@ check_node(const std::map<NodePath, Rect>& dir_keys,
   }
 }
 
-template <class Tree>
+template<class Tree>
 void
 test_visit(const Tree& tree)
 {
@@ -169,18 +169,18 @@ test_visit(const Tree& tree)
   // Visit every leaf
   size_t n_leaves = 0;
   tree.visit(
-	  [&](const NodePath&, const DirKey&, const size_t) {
-        return spaix::VisitStatus::proceed;
-      },
-      [&](const NodePath&, const typename Tree::Key&, const Data&) {
-        return (++n_leaves == tree.size() / 2) ? spaix::VisitStatus::finish
-                                               : spaix::VisitStatus::proceed;
-      });
+    [&](const NodePath&, const DirKey&, const size_t) {
+      return spaix::VisitStatus::proceed;
+    },
+    [&](const NodePath&, const typename Tree::Key&, const Data&) {
+      return (++n_leaves == tree.size() / 2) ? spaix::VisitStatus::finish
+                                             : spaix::VisitStatus::proceed;
+    });
 
   CHECK(n_leaves == tree.size() / 2);
 }
 
-template <class Tree>
+template<class Tree>
 void
 test_structure(const Tree& tree)
 {
@@ -192,25 +192,24 @@ test_structure(const Tree& tree)
 
   size_t n_leaves = 0;
   tree.visit(
-      [&](const NodePath& path, const DirKey& key, const size_t n_children) {
-        (void)n_children;
-        CHECK(n_children <= std::max(Tree::internal_fanout(), Tree::leaf_fanout()));
-        check_node(dir_keys, key, path);
-        dir_keys.emplace(path, key);
-        return spaix::VisitStatus::proceed;
-      },
-      [&](const NodePath& path, const Key& key, const Data&) {
-        check_node(dir_keys, key, path);
-        CHECK(dat_paths.find(path) == dat_paths.end());
-        dat_paths.emplace(path);
-        ++n_leaves;
-        return spaix::VisitStatus::proceed;
-      });
+    [&](const NodePath& path, const DirKey& key, const size_t n_children) {
+      CHECK(n_children <= std::max(Tree::internal_fanout(), Tree::leaf_fanout()));
+      check_node(dir_keys, key, path);
+      dir_keys.emplace(path, key);
+      return spaix::VisitStatus::proceed;
+    },
+    [&](const NodePath& path, const Key& key, const Data&) {
+      check_node(dir_keys, key, path);
+      CHECK(dat_paths.find(path) == dat_paths.end());
+      dat_paths.emplace(path);
+      ++n_leaves;
+      return spaix::VisitStatus::proceed;
+    });
 
   CHECK(n_leaves == tree.size());
 }
 
-template <class Tree>
+template<class Tree>
 void
 test_tree(const unsigned span, const unsigned n_queries)
 {
@@ -244,7 +243,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   // Test a query that is in the tree bounds, but has no matches
   const auto mid = float(span) / 2.0f;
   const auto no_matches_query =
-      Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
+    Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
   for (const auto& node : tree.query(spaix::within(no_matches_query))) {
     (void)node;
   }
@@ -263,7 +262,7 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto x_span = x_high - x_low;
     const auto y_span = y_high - y_low;
     const auto query =
-        Rect{{Scalar(x_low), Scalar(x_high)}, {Scalar(y_low), Scalar(y_high)}};
+      Rect{{Scalar(x_low), Scalar(x_high)}, {Scalar(y_low), Scalar(y_high)}};
 
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
@@ -293,7 +292,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   test_empty_tree(tree, span);
 }
 
-template <class Key, spaix::DataPlacement placement, size_t page_size>
+template<class Key, spaix::DataPlacement placement, size_t page_size>
 void
 test_page_size(const unsigned span, const unsigned n_queries)
 {
@@ -306,7 +305,7 @@ test_page_size(const unsigned span, const unsigned n_queries)
                                                   3,
                                                   placement,
                                                   spaix::LinearSplit>>>(
-      2, n_queries);
+    2, n_queries);
 
   test_tree<spaix::RTree<Key,
                          Data,
@@ -316,7 +315,7 @@ test_page_size(const unsigned span, const unsigned n_queries)
                                                   3,
                                                   placement,
                                                   spaix::LinearSplit>>>(
-      span, n_queries);
+    span, n_queries);
 
   test_tree<spaix::RTree<Key,
                          Data,
@@ -326,10 +325,10 @@ test_page_size(const unsigned span, const unsigned n_queries)
                                                   3,
                                                   placement,
                                                   spaix::QuadraticSplit>>>(
-      span, n_queries);
+    span, n_queries);
 }
 
-template <class Key, spaix::DataPlacement placement>
+template<class Key, spaix::DataPlacement placement>
 void
 test_placement(const unsigned span, const unsigned n_queries)
 {
@@ -338,7 +337,7 @@ test_placement(const unsigned span, const unsigned n_queries)
   test_page_size<Key, placement, 4096>(span, n_queries);
 }
 
-template <class Key>
+template<class Key>
 void
 test_key(const unsigned span, const unsigned n_queries)
 {
@@ -352,8 +351,8 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
-      {"span", {"Dimension span", "NUMBER", "20"}},
-      {"queries", {"Number of queries", "COUNT", "400"}}};
+    {"span", {"Dimension span", "NUMBER", "20"}},
+    {"queries", {"Number of queries", "COUNT", "400"}}};
 
   try {
     const auto args    = parse_options(opts, argc, argv);

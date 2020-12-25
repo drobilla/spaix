@@ -32,9 +32,8 @@ namespace spaix {
 
    This iterates over data items in the tree which match the given predicate.
 */
-template <class Predicate, class DirNode, class DatNode, size_t max_height>
-struct Iterator
-{
+template<class Predicate, class DirNode, class DatNode, size_t max_height>
+struct Iterator {
   using iterator_category = std::forward_iterator_tag;
   using value_type        = DatNode;
   using difference_type   = intptr_t;
@@ -45,7 +44,8 @@ struct Iterator
   using DirKey   = typename DirNode::NodeKey;
 
   Iterator(const DirEntry& root_entry, Predicate predicate)
-    : _stack{}, _predicate{std::move(predicate)}
+    : _stack{}
+    , _predicate{std::move(predicate)}
   {
     const auto& root = root_entry.node;
     if (root && predicate.directory(root_entry.key)) {
@@ -83,8 +83,7 @@ struct Iterator
   bool operator!=(const Iterator& rhs) const { return !operator==(rhs); }
 
 private:
-  struct Frame
-  {
+  struct Frame {
     const DirNode* node;  ///< Pointer to directory node
     ChildIndex     index; ///< Index of child
 
@@ -101,8 +100,8 @@ private:
 
      Returns the end index (on past the last child) if no child matches.
   */
-  static ChildIndex
-  leftmost_child(const DirNode& dir, const Predicate& predicate)
+  static ChildIndex leftmost_child(const DirNode&   dir,
+                                   const Predicate& predicate)
   {
     switch (dir.child_type) {
     case NodeType::directory:

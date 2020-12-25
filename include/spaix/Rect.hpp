@@ -30,35 +30,35 @@ namespace spaix {
 
 namespace detail {
 
-template <class... Ts, size_t n_dims>
+template<class... Ts, size_t n_dims>
 constexpr auto empty_ranges_rec(EndIndex<n_dims>)
 {
   return std::make_tuple();
 }
 
-template <class... Ts, size_t dim, size_t n_dims>
+template<class... Ts, size_t dim, size_t n_dims>
 constexpr auto
 empty_ranges_rec(Index<dim, n_dims> index)
 {
   using T = Nth<dim, Ts...>;
 
   static_assert(
-      std::numeric_limits<T>::lowest() < std::numeric_limits<T>::max(), "");
+    std::numeric_limits<T>::lowest() < std::numeric_limits<T>::max(), "");
 
   return std::tuple_cat(
-      std::make_tuple(std::make_pair(std::numeric_limits<T>::max(),
-                                     std::numeric_limits<T>::lowest())),
-      empty_ranges_rec<Ts...>(++index));
+    std::make_tuple(std::make_pair(std::numeric_limits<T>::max(),
+                                   std::numeric_limits<T>::lowest())),
+    empty_ranges_rec<Ts...>(++index));
 }
 
-template <class Tuple, size_t n_dims>
+template<class Tuple, size_t n_dims>
 constexpr bool
 ranges_are_empty(const Tuple&, EndIndex<n_dims>)
 {
   return false;
 }
 
-template <class Tuple, size_t dim, size_t n_dims>
+template<class Tuple, size_t dim, size_t n_dims>
 constexpr bool
 ranges_are_empty(const Tuple& tuple, Index<dim, n_dims> index)
 {
@@ -69,7 +69,7 @@ ranges_are_empty(const Tuple& tuple, Index<dim, n_dims> index)
 } // namespace detail
 
 /// A multi-dimensional rectangle which suports heterogeneous types
-template <class T0, class... Ts>
+template<class T0, class... Ts>
 class Rect
 {
 public:
@@ -86,32 +86,30 @@ public:
   /// Construct an empty rectangle
   explicit constexpr Rect()
     : _ranges{detail::empty_ranges_rec<T0, Ts...>(ibegin())}
-  {
-  }
+  {}
 
   /// Construct a rectangle from a single point
   explicit constexpr Rect(const Point<T0, Ts...>& point)
     : _ranges{ranges(point)}
-  {
-  }
+  {}
 
   /// Construct a rectangle for the given ranges in each dimension
   explicit constexpr Rect(Range<T0>&& first, Range<Ts>&&... rest)
     : Rect{std::make_tuple(std::forward<Range<T0>>(first),
                            std::forward<Range<Ts>>(rest)...)}
-  {
-  }
+  {}
 
   /// Construct a rectangle for the given ranges in each dimension
 #if 1
   explicit constexpr Rect(Tuple ranges)
     : _ranges{detail::ranges_are_empty(ranges, ibegin())
-                  ? detail::empty_ranges_rec<T0, Ts...>(ibegin())
-                  : std::move(ranges)}
-  {
-  }
+                ? detail::empty_ranges_rec<T0, Ts...>(ibegin())
+                : std::move(ranges)}
+  {}
 #else
-  explicit constexpr Rect(Tuple ranges) : _ranges{std::move(ranges)} {}
+  explicit constexpr Rect(Tuple ranges)
+    : _ranges{std::move(ranges)}
+  {}
 #endif
 
   static constexpr auto   ibegin() { return spaix::ibegin<T0, Ts...>(); }
@@ -124,70 +122,70 @@ private:
   Tuple _ranges{};
 };
 
-template <class... Ts>
+template<class... Ts>
 constexpr Rect<Ts...>
 make_rect(Range<Ts>&&... ranges)
 {
   return Rect<Ts...>{std::forward<Range<Ts>>(ranges)...};
 }
 
-template <class... Ts>
+template<class... Ts>
 constexpr bool
 operator==(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return lhs.tuple() == rhs.tuple();
 }
 
-template <class... Ts>
+template<class... Ts>
 constexpr bool
 operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return !(lhs == rhs);
 }
 
-template <size_t dim, class... Ts>
+template<size_t dim, class... Ts>
 constexpr const Range<Nth<dim, Ts...>>&
 get(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
-template <size_t dim, class... Ts>
+template<size_t dim, class... Ts>
 constexpr const Range<Nth<dim, Ts...>>&
 range(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
-template <size_t dim, class... Ts>
+template<size_t dim, class... Ts>
 Range<Nth<dim, Ts...>>&
 range(Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
-template <class... Ts>
+template<class... Ts>
 constexpr const auto&
 ranges(const Rect<Ts...>& rect)
 {
   return rect.tuple();
 }
 
-template <size_t dim, class... Ts>
+template<size_t dim, class... Ts>
 constexpr const Nth<dim, Ts...>&
 min(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple()).first;
 }
 
-template <size_t dim, class... Ts>
+template<size_t dim, class... Ts>
 constexpr const Nth<dim, Ts...>&
 max(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple()).second;
 }
 
-template <size_t dim, class... Ts>
+template<size_t dim, class... Ts>
 constexpr Nth<dim, Ts...>
 span(const Rect<Ts...>& rect)
 {
@@ -197,13 +195,12 @@ span(const Rect<Ts...>& rect)
 
 namespace detail {
 
-template <class... Ts, size_t n_dims>
+template<class... Ts, size_t n_dims>
 void
 print_rec(std::ostream&, const Rect<Ts...>&, EndIndex<n_dims>)
-{
-}
+{}
 
-template <class... Ts, size_t dim, size_t n_dims>
+template<class... Ts, size_t dim, size_t n_dims>
 void
 print_rec(std::ostream& os, const Rect<Ts...>& rect, Index<dim, n_dims> index)
 {
@@ -215,7 +212,7 @@ print_rec(std::ostream& os, const Rect<Ts...>& rect, Index<dim, n_dims> index)
 
 } // namespace detail
 
-template <class... Ts>
+template<class... Ts>
 inline std::ostream&
 operator<<(std::ostream& os, const Rect<Ts...>& rect)
 {
