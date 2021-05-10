@@ -4,5 +4,8 @@ option('benchmark', type: 'boolean', value: false,
 option('boost', type: 'combo', choices: ['yes', 'no', 'auto'], value: 'auto',
        description : 'Build boost benchmarking program')
 
-option('test', type: 'boolean', value: true,
+option('strict', type: 'boolean', value: false,
+       description: 'Enable ultra-strict warnings')
+
+option('tests', type: 'boolean', value: true,
        description: 'Build tests')

@@ -11,7 +11,7 @@ project('spaix', 'cpp',
 cxx = meson.get_compiler('cpp')
 versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
 
-if get_option('warning_level') == '3'
+if get_option('strict')
   subdir('warnings')
 
   if cxx.get_id() == 'clang'
@@ -108,7 +108,7 @@ pkg.generate(name: 'Spaix',
              version: meson.project_version(),
              description: 'C++ spatial indexing library')
 
-if get_option('test')
+if get_option('tests')
   tests = [
     'Point',
     'RTree',
