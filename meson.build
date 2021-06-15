@@ -47,6 +47,7 @@ if get_option('strict')
       '/wd5026',  # move constructor implicitly deleted
       '/wd5027',  # move assignment operator implicitly deleted
       '/wd5045',  # will insert Spectre mitigation for memory load
+      '/wd5219',  # implicit conversion to float
     ]
   endif
 
