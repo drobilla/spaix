@@ -1,3 +1,6 @@
+# Copyright 2019-2020 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: CC0-1.0 OR GPL-3.0-only
+
 project('spaix', 'cpp',
         version: '0.0.0',
         default_options: [
@@ -113,6 +116,13 @@ if get_option('tests')
   autoship = find_program('autoship', required: false)
   if autoship.found()
     test('autoship', autoship, args: ['test', meson.current_source_dir()])
+  endif
+
+  reuse = find_program('reuse', required: false)
+  if reuse.found()
+    test('REUSE', reuse,
+         args: ['--root', meson.current_source_dir(), 'lint'],
+         suite: 'data')
   endif
 
   tests = [

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Copyright 2020 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: CC0-1.0 OR GPL-3.0-only
+
 import optparse
 import pandas
 import subprocess

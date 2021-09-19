@@ -1,3 +1,6 @@
+# Copyright 2019-2020 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: CC0-1.0 OR GPL-3.0-only
+
 clang_common_warnings = [
   '-Weverything',
 ]
