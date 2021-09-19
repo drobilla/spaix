@@ -110,6 +110,11 @@ pkg.generate(name: 'Spaix',
              description: 'C++ spatial indexing library')
 
 if get_option('tests')
+  autoship = find_program('autoship', required: false)
+  if autoship.found()
+    test('autoship', autoship, args: ['test', meson.current_source_dir()])
+  endif
+
   tests = [
     'Point',
     'RTree',
