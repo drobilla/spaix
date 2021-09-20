@@ -141,26 +141,28 @@ if get_option('tests')
                     dependencies: spaix_dep))
   endforeach
 
-  draw_exe = executable('draw_tree', 'test/draw_tree.cpp',
-                        dependencies:spaix_dep)
+  if get_option('tools')
+    draw_exe = executable('draw_tree', 'test/draw_tree.cpp',
+                          dependencies:spaix_dep)
 
-  test('draw', draw_exe)
-  test('draw', draw_exe, args: ['--insert', 'linear'])
-  test('draw', draw_exe, args: ['--split', 'linear'])
-  test('draw', draw_exe, args: ['--split', 'quadratic'])
-  # test('draw', draw_exe, args: ['--page-size', '64'])
-  # test('draw', draw_exe, args: ['--page-size', '128'])
-  test('draw', draw_exe, args: ['--page-size', '256'])
-  test('draw', draw_exe, args: ['--page-size', '512'])
-  test('draw', draw_exe, args: ['--page-size', '1024'])
-  test('draw', draw_exe, args: ['--page-size', '2048'])
-  test('draw', draw_exe, args: ['--page-size', '4096'])
+    test('draw', draw_exe)
+    test('draw', draw_exe, args: ['--insert', 'linear'])
+    test('draw', draw_exe, args: ['--split', 'linear'])
+    test('draw', draw_exe, args: ['--split', 'quadratic'])
+    # test('draw', draw_exe, args: ['--page-size', '64'])
+    # test('draw', draw_exe, args: ['--page-size', '128'])
+    test('draw', draw_exe, args: ['--page-size', '256'])
+    test('draw', draw_exe, args: ['--page-size', '512'])
+    test('draw', draw_exe, args: ['--page-size', '1024'])
+    test('draw', draw_exe, args: ['--page-size', '2048'])
+    test('draw', draw_exe, args: ['--page-size', '4096'])
 
-  test('draw', draw_exe, args: ['--insert', 'unknown'], should_fail: true)
-  test('draw', draw_exe, args: ['--split', 'unknown'], should_fail: true)
-  test('draw', draw_exe, args: ['--page-size', '16'], should_fail: true)
-  test('draw', draw_exe, args: ['--page-size', '8192'], should_fail: true)
-  test('draw', draw_exe, args: ['--bad-arg'], should_fail: true)
+    test('draw', draw_exe, args: ['--insert', 'unknown'], should_fail: true)
+    test('draw', draw_exe, args: ['--split', 'unknown'], should_fail: true)
+    test('draw', draw_exe, args: ['--page-size', '16'], should_fail: true)
+    test('draw', draw_exe, args: ['--page-size', '8192'], should_fail: true)
+    test('draw', draw_exe, args: ['--bad-arg'], should_fail: true)
+  endif
 endif
 
 if get_option('benchmark')
