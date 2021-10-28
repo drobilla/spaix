@@ -22,11 +22,11 @@ class Point
 public:
   using Tuple = std::tuple<Ts...>;
 
-  explicit constexpr Point(Ts... values)
+  constexpr explicit Point(Ts... values)
     : _values{std::move(values)...}
   {}
 
-  explicit constexpr Point(Tuple values)
+  constexpr explicit Point(Tuple values)
     : _values{std::move(values)}
   {}
 

@@ -72,30 +72,30 @@ public:
   ~Rect() = default;
 
   /// Construct an empty rectangle
-  explicit constexpr Rect()
+  constexpr explicit Rect()
     : _ranges{detail::empty_ranges_rec<T0, Ts...>(ibegin())}
   {}
 
   /// Construct a rectangle from a single point
-  explicit constexpr Rect(const Point<T0, Ts...>& point)
+  constexpr explicit Rect(const Point<T0, Ts...>& point)
     : _ranges{ranges(point)}
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
-  explicit constexpr Rect(Range<T0>&& first, Range<Ts>&&... rest)
+  constexpr explicit Rect(Range<T0>&& first, Range<Ts>&&... rest)
     : Rect{std::make_tuple(std::forward<Range<T0>>(first),
                            std::forward<Range<Ts>>(rest)...)}
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
 #if 1
-  explicit constexpr Rect(Tuple ranges)
+  constexpr explicit Rect(Tuple ranges)
     : _ranges{detail::ranges_are_empty(ranges, ibegin())
                 ? detail::empty_ranges_rec<T0, Ts...>(ibegin())
                 : std::move(ranges)}
   {}
 #else
-  explicit constexpr Rect(Tuple ranges)
+  constexpr explicit Rect(Tuple ranges)
     : _ranges{std::move(ranges)}
   {}
 #endif
