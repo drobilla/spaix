@@ -233,6 +233,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   const auto no_matches_query =
     Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
   for (const auto& node : tree.query(spaix::within(no_matches_query))) {
+    ++count;
     (void)node;
   }
   CHECK((count == 0));
