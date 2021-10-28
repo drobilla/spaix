@@ -15,8 +15,9 @@ template<class T, class Size, Size Capacity>
 class StaticVector
 {
 public:
-  using iterator       = T*;
   using const_iterator = const T*;
+  using iterator       = T*;
+  using value_type     = T;
 
   StaticVector() = default;
   ~StaticVector() { clear(); }
@@ -43,8 +44,8 @@ public:
 
   void pop(T* const iter)
   {
-    assert(iter < end());
-    if (iter != end() - 1) {
+    assert(iter < cend());
+    if (iter != cend() - 1) {
       auto last = std::move(back());
 
       if (!std::is_trivially_destructible<T>::value) {
@@ -120,8 +121,10 @@ public:
 
   iterator       begin() { return reinterpret_cast<T*>(_array); }
   const_iterator begin() const { return reinterpret_cast<const T*>(_array); }
+  const_iterator cbegin() const { return reinterpret_cast<const T*>(_array); }
   iterator       end() { return begin() + _size; }
   const_iterator end() const { return begin() + _size; }
+  const_iterator cend() const { return begin() + _size; }
 
 #if 0
   using reverse_iterator       = std::reverse_iterator<iterator>;
