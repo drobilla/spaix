@@ -37,12 +37,12 @@ union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 }
 
 template<class Lhs, class Rhs, size_t n_dims>
-SPAIX_ALWAYS_INLINE constexpr auto
+SPAIX_ALWAYS_INLINE constexpr void
 expand_rec(Lhs&, const Rhs&, EndIndex<n_dims>)
 {}
 
 template<class Lhs, class Rhs, size_t dim, size_t n_dims>
-SPAIX_ALWAYS_INLINE constexpr auto
+SPAIX_ALWAYS_INLINE constexpr void
 expand_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 {
   auto&      l = range<dim>(lhs);
