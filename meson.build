@@ -141,10 +141,13 @@ if get_option('tests')
                     dependencies: spaix_dep))
   endforeach
 
-  if get_option('tools')
-    draw_exe = executable('draw_tree', 'test/draw_tree.cpp',
-                          dependencies:spaix_dep)
+endif
 
+if get_option('tools')
+  draw_exe = executable('draw_tree', 'test/draw_tree.cpp',
+                        dependencies:spaix_dep)
+
+  if get_option('tests')
     test('draw', draw_exe)
     test('draw', draw_exe, args: ['--insert', 'linear'])
     test('draw', draw_exe, args: ['--split', 'linear'])
@@ -193,6 +196,5 @@ if get_option('benchmark')
     test('bench', bench_exe, args: ['--page-size', '64'], should_fail: true)
     test('bench', bench_exe, args: ['--page-size', '16384'], should_fail: true)
     test('bench', bench_exe, args: ['--bad-arg'], should_fail: true)
-
   endif
 endif
