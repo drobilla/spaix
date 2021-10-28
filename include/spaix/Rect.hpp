@@ -177,8 +177,10 @@ template<size_t dim, class... Ts>
 constexpr Nth<dim, Ts...>
 span(const Rect<Ts...>& rect)
 {
-  const auto& range = get<dim>(rect);
-  return (range.second < range.first) ? 0 : range.second - range.first;
+  const auto& dim_range = get<dim>(rect);
+  return (dim_range.second < dim_range.first)
+           ? 0
+           : dim_range.second - dim_range.first;
 }
 
 namespace detail {

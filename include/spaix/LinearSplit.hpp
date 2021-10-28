@@ -73,15 +73,13 @@ public:
       const auto l_expansion = l_volume - lhs_volume;
       const auto r_expansion = r_volume - rhs_volume;
 
-      Side side = Side::left;
+      Side side = Side::right;
       if (l_expansion < r_expansion) {
         side = Side::left;
       } else if (r_expansion < l_expansion) {
         side = Side::right;
       } else if (l_volume < r_volume) {
         side = Side::left;
-      } else {
-        side = Side::right;
       }
 
       if (side == Side::left) {

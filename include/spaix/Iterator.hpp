@@ -166,10 +166,10 @@ private:
       if (dir->child_type == NodeType::data) {
         _stack.emplace_back(Frame{dir, 0});
       } else {
-        const ChildIndex index = leftmost_child(*dir, _predicate);
-        _stack.emplace_back(Frame{dir, index});
+        const ChildIndex first_index = leftmost_child(*dir, _predicate);
+        _stack.emplace_back(Frame{dir, first_index});
 
-        if (index >= dir->dir_children.size()) {
+        if (first_index >= dir->dir_children.size()) {
           // Reached a non-matching directory, skip this subtree
           if (!move_up_right()) {
             return false; // Reached end of tree
