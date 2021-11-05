@@ -8,7 +8,7 @@ project('spaix', 'cpp',
           'cpp_std=c++14',
           'warning_level=2',
         ],
-        meson_version : '>= 0.43.0',
+        meson_version : '>= 0.45.0',
         license: 'GPLv3+')
 
 cxx = meson.get_compiler('cpp')
