@@ -125,23 +125,6 @@ public:
   const_iterator end() const { return begin() + _size; }
   const_iterator cend() const { return begin() + _size; }
 
-#if 0
-  using reverse_iterator       = std::reverse_iterator<iterator>;
-  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
-  reverse_iterator       rbegin() { return reverse_iterator(end()); }
-  const_reverse_iterator rbegin() const
-  {
-    return const_reverse_iterator(end());
-  }
-
-  reverse_iterator       rend() { return reverse_iterator(begin()); }
-  const_reverse_iterator rend() const
-  {
-    return const_reverse_iterator(begin());
-  }
-#endif
-
 private:
   using Element = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
