@@ -38,7 +38,6 @@ public:
     }
   }
 
-  // TODO (maybe, unused...)
   StaticVector& operator=(StaticVector&) = delete;
   StaticVector& operator=(StaticVector&&) = delete;
 
@@ -49,7 +48,7 @@ public:
       auto last = std::move(back());
 
       if (!std::is_trivially_destructible<T>::value) {
-        reinterpret_cast<T*>(iter)->~T();
+        iter->~T();
       }
 
       new (iter) T(std::move(last));

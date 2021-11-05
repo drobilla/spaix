@@ -2,12 +2,11 @@ Checks: >
   *,
   -*-avoid-c-arrays,
   -*-magic-numbers,
+  -*-qualified-auto,
   -*-uppercase-literal-suffix,
   -altera-struct-pack-align,
-  -android-cloexec-fopen,
   -bugprone-branch-clone,
   -clang-analyzer-alpha.*,
-  -clang-diagnostic-unneeded-internal-declaration,
   -clang-diagnostic-unused-macros,
   -clang-diagnostic-unused-template,
   -cppcoreguidelines-macro-usage,
@@ -19,7 +18,6 @@ Checks: >
   -cppcoreguidelines-pro-type-vararg,
   -fuchsia-default-arguments*,
   -fuchsia-overloaded-operator,
-  -google-readability-todo,
   -google-runtime-references,
   -hicpp-multiway-paths-covered,
   -hicpp-named-parameter,
@@ -30,11 +28,9 @@ Checks: >
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   -modernize-use-trailing-return-type,
-  -readability-else-after-return,
   -readability-function-cognitive-complexity,
   -readability-implicit-bool-conversion,
   -readability-named-parameter,
-  -readability-static-accessed-through-instance,
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 FormatStyle: file
