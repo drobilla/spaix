@@ -21,8 +21,9 @@ class LinearInsertion
 public:
   /// Choose the best child node to insert/expand by `key`
   template<class Children, class Key>
-  static std::pair<size_t, decltype(std::declval<Key>() | std::declval<Key>())>
-  choose(const Children& children, const Key& key)
+  std::pair<size_t, decltype(std::declval<Key>() | std::declval<Key>())> choose(
+    const Children& children,
+    const Key&      key)
   {
     using Volume = decltype(volume(std::declval<Key>()));
     using DirKey = decltype(std::declval<Key>() | std::declval<Key>());

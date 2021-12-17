@@ -49,7 +49,7 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
 {
   auto& parent = *parent_entry.node;
   if (parent.child_type == NodeType::directory) { // Recursing downwards
-    const auto choice   = Insertion::choose(parent.dir_children, key);
+    const auto choice   = _insertion.choose(parent.dir_children, key);
     const auto index    = choice.first;
     const auto expanded = choice.second;
     auto&      entry    = parent.dir_children[index];
@@ -125,7 +125,7 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
   assert(bounds == parent_key(deposit));
 
   // Pick two nodes to seed the left and right groups
-  const auto seeds = Split::pick_seeds(deposit, bounds);
+  const auto seeds = _split.pick_seeds(deposit, bounds);
   assert(seeds.first < seeds.second);
 
   // Create left and right parent nodes with seeds
@@ -133,7 +133,7 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                     new_parent(deposit, seeds.first, type)};
 
   // Distribute remaining nodes between seeds
-  Split::distribute_children(
+  _split.distribute_children(
     std::move(deposit), sides[0], sides[1], max_fanout);
   assert(sides[0].node->num_children() + sides[1].node->num_children() ==
          fanout + 1);

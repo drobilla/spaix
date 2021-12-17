@@ -28,8 +28,8 @@ class LinearSplit
 public:
   /// Return the indices of the children that should be used for split seeds
   template<class Entries, class DirKey>
-  static std::pair<size_t, size_t> pick_seeds(const Entries& deposit,
-                                              const DirKey&  bounds)
+  std::pair<size_t, size_t> pick_seeds(const Entries& deposit,
+                                       const DirKey&  bounds)
   {
     using Scalar = typename CommonScalarType<typename DirKey::Scalars>::type;
 
@@ -52,10 +52,10 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirNode>
-  static void distribute_children(Deposit&&        deposit,
-                                  DirNode&         lhs,
-                                  DirNode&         rhs,
-                                  const ChildCount max_fanout)
+  void distribute_children(Deposit&&        deposit,
+                           DirNode&         lhs,
+                           DirNode&         rhs,
+                           const ChildCount max_fanout)
   {
     auto lhs_volume = volume(lhs.key);
     auto rhs_volume = volume(rhs.key);

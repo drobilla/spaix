@@ -107,6 +107,13 @@ public:
   using iterator       = Iter<Everything>;
   using const_iterator = ConstIter<Everything>;
 
+  RTree() = default;
+
+  RTree(Insertion insertion, Split split)
+    : _insertion{std::move(insertion)}
+    , _split{std::move(split)}
+  {}
+
   const_iterator begin() const { return const_iterator{_root, Everything{}}; }
 
   const_iterator end() const
@@ -228,10 +235,10 @@ private:
 
   static Box ideal_key(const DirNode& node);
 
-  static DirNodePair insert_rec(DirEntry&   parent_entry,
-                                const Box&  new_parent_key,
-                                const Key&  key,
-                                const Data& data);
+  DirNodePair insert_rec(DirEntry&   parent_entry,
+                         const Box&  new_parent_key,
+                         const Key&  key,
+                         const Data& data);
 
   template<class Predicate, class Visitor>
   void fast_query_rec(const DirNode&   node,
@@ -264,10 +271,10 @@ private:
 
   /// Split `nodes` plus `node` in two and return the resulting sides
   template<class Entry, ChildCount fanout>
-  static DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
-                           Entry                                    entry,
-                           const Box&                               bounds,
-                           NodeType                                 type);
+  DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
+                    Entry                                    entry,
+                    const Box&                               bounds,
+                    NodeType                                 type);
 
   template<typename DirVisitor, typename DatVisitor>
   static VisitStatus visit_rec(const DirEntry& entry,
@@ -275,8 +282,10 @@ private:
                                DatVisitor      visit_dat,
                                NodePath&       path);
 
-  size_t   _size{};               ///< Number of elements
-  DirEntry _root{Box{}, nullptr}; ///< Key and pointer to root node
+  Insertion _insertion{};          ///< Insertion algorithm
+  Split     _split{};              ///< Split algorithm
+  size_t    _size{};               ///< Number of elements
+  DirEntry  _root{Box{}, nullptr}; ///< Key and pointer to root node
 };
 
 } // namespace spaix

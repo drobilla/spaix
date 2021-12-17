@@ -31,7 +31,7 @@ class QuadraticSplit
 public:
   /// Return the indices of the children that should be used for split seeds
   template<class Entry, ChildCount count, class DirKey>
-  static std::pair<ChildIndex, ChildIndex> pick_seeds(
+  std::pair<ChildIndex, ChildIndex> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit,
     const DirKey&)
   {
@@ -68,10 +68,10 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirEntry>
-  static void distribute_children(Deposit&&        deposit,
-                                  DirEntry&        lhs,
-                                  DirEntry&        rhs,
-                                  const ChildCount max_fanout)
+  void distribute_children(Deposit&&        deposit,
+                           DirEntry&        lhs,
+                           DirEntry&        rhs,
+                           const ChildCount max_fanout)
   {
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
