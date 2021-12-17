@@ -58,10 +58,10 @@ public:
   static constexpr auto min_dir_fanout   = dir_fanout / min_fill_divisor;
   static constexpr auto min_dat_fanout   = dat_fanout / min_fill_divisor;
 
-  static_assert(dir_fanout > 1, "");
-  static_assert(dat_fanout > 1, "");
-  static_assert(min_dir_fanout > 1, "");
-  static_assert(min_dat_fanout > 1, "");
+  static_assert(dir_fanout > 1);
+  static_assert(dat_fanout > 1);
+  static_assert(min_dir_fanout > 1);
+  static_assert(min_dat_fanout > 1);
 
   using DatNode = DataNode<Key, Data>;
   using DirNode =

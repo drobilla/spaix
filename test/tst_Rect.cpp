@@ -17,8 +17,7 @@
 #include <tuple>
 #include <utility>
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 static void
 test_rect()
@@ -69,8 +68,7 @@ test_rect()
   CHECK((ss.str() == "[[1, 2], [3, 4]]"));
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 int
 main()

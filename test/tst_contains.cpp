@@ -8,8 +8,7 @@
 
 #include "spaix/contains.hpp"
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 static void
 test_contains()
@@ -32,8 +31,7 @@ test_contains()
   STATIC_CHECK((contains(TestPoint{1, 2.0f}, TestPoint{1, 2.0f})));
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 int
 main()

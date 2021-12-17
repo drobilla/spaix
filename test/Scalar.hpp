@@ -9,8 +9,7 @@
 
 #undef NDEBUG
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 template<class Tag, class Rep>
 struct Scalar {
@@ -53,8 +52,7 @@ operator<<(std::ostream& os, const Scalar<Tag, Rep>& scalar)
   return os << scalar.value();
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 namespace std {
 

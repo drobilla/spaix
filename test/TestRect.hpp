@@ -10,8 +10,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/types.hpp"
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 using XCoord = Scalar<struct X, int>;
 using YCoord = Scalar<struct Y, float>;
@@ -28,7 +27,6 @@ operator*(const XCoord& lhs, const YCoord& rhs)
   return lhs.value() * rhs.value();
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 #endif // TEST_TESTRECT_HPP

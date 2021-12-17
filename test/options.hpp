@@ -12,8 +12,7 @@
 #include <string>
 #include <utility>
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 struct Option {
   const char* help;
@@ -74,7 +73,6 @@ parse_options(const Options& opts, int argc, char** argv)
   return args;
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 #endif // TEST_OPTIONS_HPP

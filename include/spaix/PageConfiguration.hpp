@@ -64,9 +64,9 @@ private:
   using DirEntry = typename DirNode::DirEntry;
   using DatEntry = typename DirNode::DatEntry;
 
-  static_assert(sizeof(DirNode) <= page_size, "");
-  static_assert(sizeof(DirNode) > page_size - sizeof(DirEntry), "");
-  static_assert(sizeof(DirNode) > page_size - sizeof(DatEntry), "");
+  static_assert(sizeof(DirNode) <= page_size);
+  static_assert(sizeof(DirNode) > page_size - sizeof(DirEntry));
+  static_assert(sizeof(DirNode) > page_size - sizeof(DatEntry));
 };
 
 } // namespace spaix

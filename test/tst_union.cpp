@@ -10,8 +10,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/union.hpp"
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 static void
 test_union()
@@ -38,8 +37,7 @@ test_union()
   CHECK((mut == TestRect{{1, 4}, {1.0f, 5.0f}}));
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 int
 main()

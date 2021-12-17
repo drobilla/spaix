@@ -30,8 +30,8 @@ empty_ranges_rec(Index<dim, n_dims> index)
 {
   using T = Nth<dim, Ts...>;
 
-  static_assert(
-    std::numeric_limits<T>::lowest() < std::numeric_limits<T>::max(), "");
+  static_assert(std::numeric_limits<T>::lowest() <
+                std::numeric_limits<T>::max());
 
   return std::tuple_cat(
     std::make_tuple(std::make_pair(std::numeric_limits<T>::max(),

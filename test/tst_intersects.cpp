@@ -8,8 +8,7 @@
 
 #include "spaix/intersects.hpp"
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 static void
 test_intersects()
@@ -38,8 +37,7 @@ test_intersects()
   STATIC_CHECK((!intersects(TestPoint{1, 0.0f}, rect)));
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 int
 main()

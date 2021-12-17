@@ -10,8 +10,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/intersection.hpp"
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 static void
 test_intersection()
@@ -31,8 +30,7 @@ test_intersection()
   STATIC_CHECK(((TestPoint{1, 2.0f} & TestPoint{1, 3.0f}) == TestRect{}));
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
 int
 main()

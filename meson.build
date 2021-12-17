@@ -5,7 +5,7 @@ project('spaix', 'cpp',
         version: '0.0.0',
         default_options: [
           'buildtype=debugoptimized',
-          'cpp_std=c++14',
+          'cpp_std=c++17',
           'warning_level=2',
         ],
         meson_version : '>= 0.45.0',
