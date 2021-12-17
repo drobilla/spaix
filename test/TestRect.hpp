@@ -24,7 +24,7 @@ using TestPoint = Point<XCoord, YCoord>;
 constexpr auto
 operator*(const XCoord& lhs, const YCoord& rhs)
 {
-  return lhs.value() * rhs.value();
+  return lhs.value() * rhs.value(); // NOLINT
 }
 
 } // namespace spaix::test
