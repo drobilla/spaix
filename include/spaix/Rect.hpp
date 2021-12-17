@@ -19,7 +19,8 @@ namespace spaix {
 namespace detail {
 
 template<class... Ts, size_t n_dims>
-constexpr auto empty_ranges_rec(EndIndex<n_dims>)
+constexpr auto
+empty_ranges_rec(EndIndex<n_dims>)
 {
   return std::make_tuple();
 }
