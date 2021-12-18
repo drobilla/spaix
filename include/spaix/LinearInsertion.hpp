@@ -4,6 +4,8 @@
 #ifndef SPAIX_LINEARINSERTION_HPP
 #define SPAIX_LINEARINSERTION_HPP
 
+#include "spaix/volume.hpp"
+
 #include <cstddef>
 #include <limits>
 #include <type_traits>

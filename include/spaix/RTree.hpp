@@ -6,7 +6,8 @@
 
 #include "spaix/DataNode.hpp"
 #include "spaix/Iterator.hpp"
-#include "spaix/detail/DirectoryNode.hpp"
+#include "spaix/StaticVector.hpp"         // IWYU pragma: export
+#include "spaix/detail/DirectoryNode.hpp" // IWYU pragma: export
 #include "spaix/everything.hpp"
 #include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
@@ -27,9 +28,6 @@ using NodePath = std::vector<ChildIndex>;
 
 template<class K>
 using UnionOf = decltype(std::declval<K>() | std::declval<K>());
-
-template<class T, class Size, Size Capacity>
-class StaticVector;
 
 enum class VisitStatus { proceed, finish };
 

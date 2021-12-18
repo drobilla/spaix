@@ -4,23 +4,27 @@
 #include "check.hpp"
 #include "options.hpp"
 
-#include "spaix/LinearInsertion.hpp"
-#include "spaix/LinearSplit.hpp"
+#include "spaix/DataPlacement.hpp"
+#include "spaix/LinearInsertion.hpp" // IWYU pragma: keep
+#include "spaix/LinearSplit.hpp"     // IWYU pragma: keep
 #include "spaix/PageConfiguration.hpp"
 #include "spaix/Point.hpp"
-#include "spaix/QuadraticSplit.hpp"
+#include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/contains.hpp"
 #include "spaix/within.hpp"
 
 #include <algorithm>
 #include <ctime>
+#include <exception>
 #include <iostream>
 #include <iterator>
 #include <map>
 #include <numeric>
 #include <random>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 

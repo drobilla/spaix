@@ -4,7 +4,6 @@
 #ifndef SPAIX_WITHIN_HPP
 #define SPAIX_WITHIN_HPP
 
-#include "spaix/Rect.hpp"
 #include "spaix/contains.hpp"
 #include "spaix/intersects.hpp"
 

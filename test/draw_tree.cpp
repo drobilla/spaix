@@ -4,15 +4,16 @@
 #include "options.hpp"
 
 #include "spaix/DataPlacement.hpp"
-#include "spaix/LinearInsertion.hpp"
-#include "spaix/LinearSplit.hpp"
+#include "spaix/LinearInsertion.hpp" // IWYU pragma: keep
+#include "spaix/LinearSplit.hpp"     // IWYU pragma: keep
 #include "spaix/PageConfiguration.hpp"
 #include "spaix/Point.hpp"
-#include "spaix/QuadraticSplit.hpp"
+#include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/draw_dot.hpp"
 #include "spaix/draw_svg.hpp"
+#include "spaix/union.hpp"
 
 #include <cmath>
 #include <cstdint>

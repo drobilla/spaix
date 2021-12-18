@@ -8,6 +8,7 @@
 #include "spaix/detail/meta.hpp"
 #include "spaix/distribute.hpp"
 #include "spaix/types.hpp"
+#include "spaix/volume.hpp"
 
 #include <algorithm>
 #include <array>
