@@ -15,16 +15,16 @@ import os
 
 def get_dashes():
     "Generator for plot line dash patterns"
-    dash = 2.0
-    space = dot = 0.75
+    dash = 2
+    space = dot = 1
 
-    yield []  # Solid
-    yield [dash, space]  # Dashed
-    yield [dot, space]  # Dotted
+    yield (0, ())  # Solid
+    yield (0, (dash, space))  # Dashed
+    yield (0, (dot, space))  # Dotted
 
     # Dash-dots, with increasing number of dots for each line
     for i in itertools.count(2):
-        yield [dash, space] + [dot, space] * (i - 1)
+        yield (0, (dash, space) + (dot, space) * (i - 1))
 
 
 class DataSource:
@@ -83,7 +83,7 @@ def plot(sources,
             yerr=yerr,
             label=source.label,
             marker=next(markers),
-            dashes=next(dashes),
+            linestyle=next(dashes),
             markersize=3.0,
             linewidth=1.0,
             elinewidth=0.75,
@@ -169,7 +169,7 @@ if __name__ == "__main__":
 
     bench_opts = [
         "--page-size", str(options.page_size),
-        "--policy", "inline" if options.inline else "separate",
+        "--placement", "inline" if options.inline else "separate",
         "--queries", str(options.queries),
         "--seed", str(options.seed),
         "--size", str(options.size),
