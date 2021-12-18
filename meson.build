@@ -178,7 +178,7 @@ if get_option('benchmark')
                                  dependencies: [boost_dep, spaix_dep])
   endif
 
-  if get_option('test')
+  if get_option('tests')
     test('bench', bench_exe, args: ['--size', '16', '--insert', 'linear'])
     test('bench', bench_exe, args: ['--size', '16', '--split', 'linear'])
     test('bench', bench_exe, args: ['--size', '16', '--split', 'quadratic'])

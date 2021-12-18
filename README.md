@@ -41,7 +41,7 @@ Building
 The library, unit tests, and benchmarks can be built and installed using
 [Meson](http://mesonbuild.com/):
 
-    meson build -Dtest=true -Dbenchmark=true
+    meson setup build -Dbenchmark=true
     ninja -C build test
 
 Benchmarking
