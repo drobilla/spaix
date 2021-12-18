@@ -118,8 +118,14 @@ private:
     return _stack.back();
   }
 
-  const DirNode* node() { return back().node; }
-  ChildIndex     index() { return back().index; }
+  const Frame& back() const
+  {
+    assert(!_stack.empty());
+    return _stack.back();
+  }
+
+  const DirNode* node() const { return back().node; }
+  ChildIndex     index() const { return back().index; }
 
   /// Move right until we reach a good leaf or the end of the parent
   bool move_right_leaf()

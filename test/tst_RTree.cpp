@@ -218,10 +218,10 @@ test_tree(const unsigned span, const unsigned n_queries)
   test_visit(tree);
   test_structure(tree);
 
-  CHECK(tree.begin() == tree.begin());
-  CHECK(tree.end() == tree.end());
-  CHECK(tree.begin() != tree.end());
-  CHECK(std::next(tree.begin()) != tree.begin());
+  CHECK(tree.cbegin() == tree.cbegin());
+  CHECK(tree.cend() == tree.cend());
+  CHECK(tree.cbegin() != tree.cend());
+  CHECK(std::next(tree.cbegin()) != tree.cbegin());
 
   size_t n_nodes = 0;
   for (const auto& node : tree) {

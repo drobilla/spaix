@@ -119,6 +119,9 @@ public:
     return const_iterator{{Box{}, nullptr}, Everything{}};
   }
 
+  const_iterator cbegin() const { return begin(); }
+  const_iterator cend() const { return end(); }
+
   iterator begin() { return empty() ? end() : iterator{_root, Everything{}}; }
 
   iterator end() { return iterator{{Box{}, nullptr}, Everything{}}; }
