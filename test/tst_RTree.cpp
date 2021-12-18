@@ -288,33 +288,33 @@ test_page_size(const unsigned span, const unsigned n_queries)
   // Test a small tree where the root has leaf children
   test_tree<spaix::RTree<Key,
                          Data,
-                         spaix::PageConfiguration<Key,
+                         spaix::PageConfiguration<spaix::LinearSplit,
+                                                  spaix::LinearInsertion,
+                                                  Key,
                                                   Data,
                                                   page_size,
                                                   3,
-                                                  placement,
-                                                  spaix::LinearSplit>>>(
-    2, n_queries);
+                                                  placement>>>(2, n_queries);
 
   test_tree<spaix::RTree<Key,
                          Data,
-                         spaix::PageConfiguration<Key,
+                         spaix::PageConfiguration<spaix::LinearSplit,
+                                                  spaix::LinearInsertion,
+                                                  Key,
                                                   Data,
                                                   page_size,
                                                   3,
-                                                  placement,
-                                                  spaix::LinearSplit>>>(
-    span, n_queries);
+                                                  placement>>>(span, n_queries);
 
   test_tree<spaix::RTree<Key,
                          Data,
-                         spaix::PageConfiguration<Key,
+                         spaix::PageConfiguration<spaix::QuadraticSplit,
+                                                  spaix::LinearInsertion,
+                                                  Key,
                                                   Data,
                                                   page_size,
                                                   3,
-                                                  placement,
-                                                  spaix::QuadraticSplit>>>(
-    span, n_queries);
+                                                  placement>>>(span, n_queries);
 }
 
 template<class Key, spaix::DataPlacement placement>

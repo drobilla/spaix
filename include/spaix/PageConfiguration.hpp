@@ -4,9 +4,6 @@
 #ifndef SPAIX_PAGECONFIGURATION_HPP
 #define SPAIX_PAGECONFIGURATION_HPP
 
-// IWYU pragma: no_include "spaix/LinearInsertion.hpp"
-// IWYU pragma: no_include "spaix/QuadraticSplit.hpp"
-
 #include "spaix/DataNode.hpp"
 #include "spaix/DataPlacement.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
@@ -16,9 +13,6 @@
 #include <type_traits>
 
 namespace spaix {
-
-class LinearInsertion;
-class QuadraticSplit;
 
 /**
    Configuration for an RTree based on a page size.
@@ -38,13 +32,13 @@ class QuadraticSplit;
 
    @tparam InsertionAlgorithm Insert position selection algorithm.
 */
-template<class K,
+template<class SplitAlgorithm,
+         class InsertionAlgorithm,
+         class K,
          class D,
          size_t        page_size      = 4096u,
          unsigned      MinFillDivisor = 3u,
-         DataPlacement Placement      = DataPlacement::separate,
-         class SplitAlgorithm         = QuadraticSplit,
-         class InsertionAlgorithm     = LinearInsertion>
+         DataPlacement Placement      = DataPlacement::separate>
 struct PageConfiguration {
   using Box       = decltype(std::declval<K>() | std::declval<K>());
   using Insertion = InsertionAlgorithm;

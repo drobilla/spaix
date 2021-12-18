@@ -9,9 +9,6 @@
 
 namespace spaix {
 
-class LinearInsertion;
-class QuadraticSplit;
-
 /**
    Configuration for an RTree based on internal and leaf fanouts.
 
@@ -32,12 +29,12 @@ class QuadraticSplit;
 
    @tparam InsertionAlgorithm Insert position selection algorithm.
 */
-template<ChildCount    DirFanout,
+template<class SplitAlgorithm,
+         class InsertionAlgorithm,
+         ChildCount    DirFanout,
          ChildCount    DatFanout,
          unsigned      MinFillDivisor = 3u,
-         DataPlacement Placement      = DataPlacement::separate,
-         class SplitAlgorithm         = QuadraticSplit,
-         class InsertionAlgorithm     = LinearInsertion>
+         DataPlacement Placement      = DataPlacement::separate>
 struct FanoutConfiguration {
   static constexpr auto       dir_fanout       = DirFanout;
   static constexpr auto       dat_fanout       = DatFanout;

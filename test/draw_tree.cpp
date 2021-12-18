@@ -77,13 +77,13 @@ template<class Insertion, class Split, size_t page_size>
 int
 run(const Parameters& params)
 {
-  using Config = spaix::PageConfiguration<Point2,
+  using Config = spaix::PageConfiguration<Split,
+                                          Insertion,
+                                          Point2,
                                           Scalar,
                                           page_size,
                                           2,
-                                          spaix::DataPlacement::separate,
-                                          Split,
-                                          Insertion>;
+                                          spaix::DataPlacement::separate>;
 
   return run<spaix::RTree<Point2, Scalar, Config>>(params);
 }

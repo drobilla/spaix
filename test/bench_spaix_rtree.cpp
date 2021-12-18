@@ -227,13 +227,13 @@ template<class Insertion,
 int
 run(const Parameters& params)
 {
-  using Config = spaix::PageConfiguration<Rect2,
+  using Config = spaix::PageConfiguration<Split,
+                                          Insertion,
+                                          Rect2,
                                           Data,
                                           page_size,
                                           min_fill_divisor,
-                                          placement,
-                                          Split,
-                                          Insertion>;
+                                          placement>;
 
   return run<spaix::RTree<Rect2, Data, Config>>(params, std::cout);
 }
