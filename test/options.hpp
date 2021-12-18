@@ -65,9 +65,7 @@ parse_options(const Options& opts, int argc, char** argv)
   }
 
   for (const auto& opt : opts) {
-    if (args.find(opt.first) == args.end()) {
-      args.emplace(opt.first, opt.second.default_value);
-    }
+    args.emplace(opt.first, opt.second.default_value);
   }
 
   return args;
