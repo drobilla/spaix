@@ -29,10 +29,11 @@ public:
     using DirKey = decltype(std::declval<Key>() | std::declval<Key>());
     using Sizes  = std::pair<Volume, Volume>;
 
+    constexpr auto max_volume = std::numeric_limits<Volume>::max();
+
     size_t best_index{0};
     DirKey best_key{children[0].key};
-    Sizes  best_sizes{std::numeric_limits<Volume>::max(),
-                     std::numeric_limits<Volume>::max()};
+    Sizes  best_sizes{max_volume, max_volume};
 
     for (size_t i = 0; i < children.size(); ++i) {
       const auto& child_key    = children[i].key;
