@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DATANODE_HPP
@@ -9,7 +9,7 @@ namespace spaix {
 /// A data record in a tree
 template<class Key, class Data>
 struct DataNode {
-  const Key key;  ///< Point or rectangle key
+  const Key key;  ///< Point or Rect key
   Data      data; ///< Arbitrary user data
 };
 
