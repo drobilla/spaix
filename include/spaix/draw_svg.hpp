@@ -24,7 +24,7 @@ namespace svg {
 
 constexpr double pad = 8;
 
-static std::string
+inline std::string
 color(const NodePath& path, const double alpha)
 {
   constexpr uint32_t fanout = 4;
@@ -50,21 +50,21 @@ color(const NodePath& path, const double alpha)
 }
 
 template<size_t axis, class Key, class DirKey>
-static inline double
+inline double
 coord(const Key& key, const DirKey& bounds, const double scale)
 {
   return (min<axis>(key) - min<axis>(bounds)) * scale + pad;
 }
 
 template<class T>
-static inline void
+inline void
 write_attr(std::ostream& os, const std::string& key, const T& value)
 {
   os << " " << key << "=\"" << value << "\"";
 }
 
 template<class DirKey>
-static bool
+inline bool
 draw_dir(std::ostream&   os,
          const DirKey&   key,
          const NodePath& path,
@@ -91,7 +91,7 @@ draw_dir(std::ostream&   os,
 }
 
 template<class... Values, class Data>
-static inline void
+inline void
 draw_dat(std::ostream&          os,
          const Rect<Values...>& key,
          const Data&,
@@ -103,7 +103,7 @@ draw_dat(std::ostream&          os,
 }
 
 template<class... Values, class Data>
-static void
+inline void
 draw_dat(std::ostream&           os,
          const Point<Values...>& key,
          const Data&,

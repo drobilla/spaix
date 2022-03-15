@@ -10,7 +10,7 @@
 namespace spaix::detail {
 
 template<class DirEntry, class DirKey, class Entry>
-static void
+inline void
 distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
 {
   parent.key = new_parent_key;
@@ -18,7 +18,7 @@ distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
 }
 
 template<class DirEntry, class Deposit>
-static void
+inline void
 distribute_remaining(DirEntry& parent, Deposit&& deposit)
 {
   for (size_t i = 0; i < deposit.size(); ++i) {

@@ -4,6 +4,7 @@
 #ifndef SPAIX_STATICVECTOR_HPP
 #define SPAIX_STATICVECTOR_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <new>
 #include <type_traits>
