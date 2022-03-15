@@ -20,5 +20,6 @@ IndentPPDirectives: AfterHash
 KeepEmptyLinesAtTheStartOfBlocks: false
 SpacesInContainerLiterals: false
 StatementMacros:
+  - _Pragma
   - __pragma
 ...
