@@ -3,8 +3,8 @@
 
 #undef NDEBUG
 
-#include "TestRect.hpp"
-#include "check.hpp"
+#include "spaix_test/TestRect.hpp"
+#include "spaix_test/check.hpp"
 
 #include "spaix/intersects.hpp"
 

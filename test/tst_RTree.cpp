@@ -1,8 +1,8 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "check.hpp"
-#include "options.hpp"
+#include "spaix_test/check.hpp"
+#include "spaix_test/options.hpp"
 
 #include "spaix/DataPlacement.hpp"
 #include "spaix/LinearInsertion.hpp" // IWYU pragma: keep

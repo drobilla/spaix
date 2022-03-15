@@ -112,6 +112,9 @@ pkg.generate(name: 'Spaix',
              version: meson.project_version(),
              description: 'C++ spatial indexing library')
 
+spaix_test_dep = declare_dependency(
+  include_directories: include_directories('test/include'))
+
 if get_option('tests')
   autoship = find_program('autoship', required: false)
   if autoship.found()
@@ -138,14 +141,14 @@ if get_option('tests')
   foreach test : tests
     test(test,
          executable('tst_' + test, 'test/tst_@0@.cpp'.format(test),
-                    dependencies: spaix_dep))
+                    dependencies: [spaix_dep, spaix_test_dep]))
   endforeach
 
 endif
 
 if get_option('tools')
   draw_exe = executable('draw_tree', 'test/draw_tree.cpp',
-                        dependencies:spaix_dep)
+                        dependencies: [spaix_dep, spaix_test_dep])
 
   if get_option('tests')
     test('draw', draw_exe)
@@ -170,12 +173,13 @@ endif
 
 if get_option('benchmark')
   bench_exe = executable('bench_spaix_rtree', 'test/bench_spaix_rtree.cpp',
-                         dependencies: spaix_dep)
+                         dependencies: [spaix_dep, spaix_test_dep])
 
   if have_boost
-    boost_bench_exe = executable('bench_boost_rtree',
-                                 'test/bench_boost_rtree.cpp',
-                                 dependencies: [boost_dep, spaix_dep])
+    boost_bench_exe = executable(
+      'bench_boost_rtree',
+      'test/bench_boost_rtree.cpp',
+      dependencies: [boost_dep, spaix_dep, spaix_test_dep])
   endif
 
   if get_option('tests')

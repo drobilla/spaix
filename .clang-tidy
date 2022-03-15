@@ -24,7 +24,6 @@ Checks: >
   -hicpp-named-parameter,
   -hicpp-no-array-decay,
   -hicpp-vararg,
-  -llvm-header-guard,
   -llvmlibc-*,
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,

@@ -1,13 +1,12 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_WRITE_ROW_HPP
-#define TEST_WRITE_ROW_HPP
+#ifndef SPAIX_TEST_WRITE_ROW_HPP
+#define SPAIX_TEST_WRITE_ROW_HPP
 
 #include <iostream>
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 template<class Last>
 void
@@ -24,7 +23,6 @@ write_row(std::ostream& os, First first, Rest... rest)
   write_row(os, std::forward<Rest>(rest)...);
 }
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
-#endif // TEST_WRITE_ROW_HPP
+#endif // SPAIX_TEST_WRITE_ROW_HPP

@@ -1,10 +1,10 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "BenchParameters.hpp"
-#include "Distribution.hpp"
-#include "options.hpp"
-#include "write_row.hpp"
+#include "spaix_test/BenchParameters.hpp"
+#include "spaix_test/Distribution.hpp"
+#include "spaix_test/options.hpp"
+#include "spaix_test/write_row.hpp"
 
 #include "spaix/sizes.hpp"
 
@@ -204,7 +204,9 @@ run(const Parameters& params, const Args& args)
   const auto split = args.at("split");
   if (split == "linear") {
     return run<bgi::linear<max_fill, min_fill>>(params);
-  } else if (split == "quadratic") {
+  }
+
+  if (split == "quadratic") {
     return run<bgi::quadratic<max_fill, min_fill>>(params);
   }
 

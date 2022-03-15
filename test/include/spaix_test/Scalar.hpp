@@ -1,8 +1,8 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_SCALAR_HPP
-#define TEST_SCALAR_HPP
+#ifndef SPAIX_TEST_SCALAR_HPP
+#define SPAIX_TEST_SCALAR_HPP
 
 #include <iosfwd>
 #include <limits>
@@ -62,4 +62,4 @@ class numeric_limits<spaix::test::Scalar<Tag, Rep>> : public numeric_limits<Rep>
 
 } // namespace std
 
-#endif // TEST_SCALAR_HPP
+#endif // SPAIX_TEST_SCALAR_HPP

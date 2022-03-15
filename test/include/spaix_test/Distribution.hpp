@@ -1,14 +1,13 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_DISTRIBUTION_HPP
-#define TEST_DISTRIBUTION_HPP
+#ifndef SPAIX_TEST_DISTRIBUTION_HPP
+#define SPAIX_TEST_DISTRIBUTION_HPP
 
 #include <algorithm>
 #include <cstddef>
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 /// Distribution of numbers that can be incrementally updated
 template<class T>
@@ -40,7 +39,6 @@ private:
   T      _mean{};
 };
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
-#endif // TEST_DISTRIBUTION_HPP
+#endif // SPAIX_TEST_DISTRIBUTION_HPP

@@ -3,9 +3,9 @@
 
 #undef NDEBUG
 
-#include "Scalar.hpp"
-#include "TestRect.hpp"
-#include "check.hpp"
+#include "spaix_test/Scalar.hpp"
+#include "spaix_test/TestRect.hpp"
+#include "spaix_test/check.hpp"
 
 #include "spaix/Rect.hpp"
 #include "spaix/union.hpp"

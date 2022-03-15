@@ -1,8 +1,8 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_CHECK_HPP
-#define TEST_CHECK_HPP
+#ifndef SPAIX_TEST_CHECK_HPP
+#define SPAIX_TEST_CHECK_HPP
 
 #undef NDEBUG
 
@@ -23,4 +23,4 @@
 
 #define CHECK(condition) assert(condition)
 
-#endif // TEST_CHECK_HPP
+#endif // SPAIX_TEST_CHECK_HPP

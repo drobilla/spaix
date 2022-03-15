@@ -1,8 +1,8 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_OPTIONS_HPP
-#define TEST_OPTIONS_HPP
+#ifndef SPAIX_TEST_OPTIONS_HPP
+#define SPAIX_TEST_OPTIONS_HPP
 
 #include <algorithm>
 #include <cstring>
@@ -73,4 +73,4 @@ parse_options(const Options& opts, int argc, char** argv)
 
 } // namespace spaix::test
 
-#endif // TEST_OPTIONS_HPP
+#endif // SPAIX_TEST_OPTIONS_HPP

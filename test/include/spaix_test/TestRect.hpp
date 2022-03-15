@@ -1,8 +1,8 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_TESTRECT_HPP
-#define TEST_TESTRECT_HPP
+#ifndef SPAIX_TEST_TESTRECT_HPP
+#define SPAIX_TEST_TESTRECT_HPP
 
 #include "Scalar.hpp"
 
@@ -38,4 +38,4 @@ operator*(const XCoord& lhs, const YCoord& rhs)
 
 } // namespace spaix::test
 
-#endif // TEST_TESTRECT_HPP
+#endif // SPAIX_TEST_TESTRECT_HPP

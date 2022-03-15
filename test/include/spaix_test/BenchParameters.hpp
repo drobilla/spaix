@@ -1,16 +1,15 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef TEST_BENCHPARAMETERS_HPP
-#define TEST_BENCHPARAMETERS_HPP
+#ifndef SPAIX_TEST_BENCHPARAMETERS_HPP
+#define SPAIX_TEST_BENCHPARAMETERS_HPP
 
 #include "options.hpp"
 
 #include <cstddef>
 #include <cstdint>
 
-namespace spaix {
-namespace test {
+namespace spaix::test {
 
 struct BenchParameters {
   explicit BenchParameters(const spaix::test::Arguments& args)
@@ -30,7 +29,6 @@ struct BenchParameters {
   size_t   page_size;
 };
 
-} // namespace test
-} // namespace spaix
+} // namespace spaix::test
 
-#endif // TEST_BENCHPARAMETERS_HPP
+#endif // SPAIX_TEST_BENCHPARAMETERS_HPP

@@ -1,10 +1,10 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "BenchParameters.hpp"
-#include "Distribution.hpp"
-#include "options.hpp"
-#include "write_row.hpp"
+#include "spaix_test/BenchParameters.hpp"
+#include "spaix_test/Distribution.hpp"
+#include "spaix_test/options.hpp"
+#include "spaix_test/write_row.hpp"
 
 #include "spaix/DataPlacement.hpp"
 #include "spaix/LinearInsertion.hpp"
@@ -269,7 +269,9 @@ run(const Parameters& params, const Args& args)
   const auto placement = args.at("placement");
   if (placement == "inline") {
     return run<Insertion, Split, spaix::DataPlacement::inlined>(params);
-  } else if (placement == "separate") {
+  }
+
+  if (placement == "separate") {
     return run<Insertion, Split, spaix::DataPlacement::separate>(params);
   }
 
@@ -283,7 +285,9 @@ run(const Parameters& params, const Args& args)
   const auto split = args.at("split");
   if (split == "linear") {
     return run<Insertion, spaix::LinearSplit>(params, args);
-  } else if (split == "quadratic") {
+  }
+
+  if (split == "quadratic") {
     return run<Insertion, spaix::QuadraticSplit>(params, args);
   }
 
