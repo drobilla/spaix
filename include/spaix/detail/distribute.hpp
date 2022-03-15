@@ -7,8 +7,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace spaix {
-namespace detail {
+namespace spaix::detail {
 
 template<class DirEntry, class DirKey, class Entry>
 static void
@@ -28,7 +27,6 @@ distribute_remaining(DirEntry& parent, Deposit&& deposit)
   }
 }
 
-} // namespace detail
-} // namespace spaix
+} // namespace spaix::detail
 
 #endif // SPAIX_DETAIL_DISTRIBUTE_HPP
