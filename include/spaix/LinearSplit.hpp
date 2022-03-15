@@ -5,8 +5,8 @@
 #define SPAIX_LINEARSPLIT_HPP
 
 #include "spaix/Rect.hpp"
+#include "spaix/detail/distribute.hpp"
 #include "spaix/detail/meta.hpp"
-#include "spaix/distribute.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
@@ -84,17 +84,17 @@ public:
       }
 
       if (side == Side::left) {
-        distribute_child(lhs, l_key, std::move(child));
+        detail::distribute_child(lhs, l_key, std::move(child));
         if (lhs.node->num_children() == max_fanout) {
-          distribute_remaining(rhs, std::forward<Deposit>(deposit));
+          detail::distribute_remaining(rhs, std::forward<Deposit>(deposit));
           return;
         }
 
         lhs_volume = l_volume;
       } else {
-        distribute_child(rhs, r_key, std::move(child));
+        detail::distribute_child(rhs, r_key, std::move(child));
         if (rhs.node->num_children() == max_fanout) {
-          distribute_remaining(lhs, std::forward<Deposit>(deposit));
+          detail::distribute_remaining(lhs, std::forward<Deposit>(deposit));
           return;
         }
 

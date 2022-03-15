@@ -5,8 +5,7 @@
 #define SPAIX_QUADRATICSPLIT_HPP
 
 #include "spaix/detail/DirectoryNode.hpp"
-
-#include "spaix/distribute.hpp"
+#include "spaix/detail/distribute.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
@@ -80,11 +79,12 @@ public:
       auto&      parent = best.side == Side::left ? lhs : rhs;
 
       assert(best.child_index < deposit.size());
-      distribute_child(parent, best.new_parent_key, std::move(*iter));
+      detail::distribute_child(parent, best.new_parent_key, std::move(*iter));
       deposit.pop(iter);
 
       if (parent.node->num_children() == max_fanout) {
-        distribute_remaining(best.side == Side::left ? rhs : lhs, deposit);
+        detail::distribute_remaining(best.side == Side::left ? rhs : lhs,
+                                     deposit);
         return;
       }
     }

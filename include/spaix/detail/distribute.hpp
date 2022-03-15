@@ -1,13 +1,14 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_DISTRIBUTE_HPP
-#define SPAIX_DISTRIBUTE_HPP
+#ifndef SPAIX_DETAIL_DISTRIBUTE_HPP
+#define SPAIX_DETAIL_DISTRIBUTE_HPP
 
 #include <cstddef>
 #include <utility>
 
 namespace spaix {
+namespace detail {
 
 template<class DirEntry, class DirKey, class Entry>
 static void
@@ -27,6 +28,7 @@ distribute_remaining(DirEntry& parent, Deposit&& deposit)
   }
 }
 
+} // namespace detail
 } // namespace spaix
 
-#endif // SPAIX_DISTRIBUTE_HPP
+#endif // SPAIX_DETAIL_DISTRIBUTE_HPP
