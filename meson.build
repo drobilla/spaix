@@ -72,8 +72,6 @@ headers = [
   'include/spaix/detail/DirectoryNode.hpp',
   'include/spaix/detail/distribute.hpp',
   'include/spaix/detail/meta.hpp',
-  'include/spaix/draw_dot.hpp',
-  'include/spaix/draw_svg.hpp',
   'include/spaix/everything.hpp',
   'include/spaix/intersection.hpp',
   'include/spaix/intersects.hpp',

@@ -1,5 +1,8 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
+
+#include "draw_dot.hpp"
+#include "draw_svg.hpp"
 
 #include "spaix_test/options.hpp"
 
@@ -11,8 +14,6 @@
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
-#include "spaix/draw_dot.hpp"
-#include "spaix/draw_svg.hpp"
 #include "spaix/union.hpp"
 
 #include <cmath>

@@ -18,8 +18,6 @@
 #include "spaix/detail/DirectoryNode.hpp" // IWYU pragma: keep
 #include "spaix/detail/distribute.hpp"    // IWYU pragma: keep
 #include "spaix/detail/meta.hpp"          // IWYU pragma: keep
-#include "spaix/draw_dot.hpp"             // IWYU pragma: keep
-#include "spaix/draw_svg.hpp"             // IWYU pragma: keep
 #include "spaix/everything.hpp"           // IWYU pragma: keep
 #include "spaix/intersection.hpp"         // IWYU pragma: keep
 #include "spaix/intersects.hpp"           // IWYU pragma: keep
