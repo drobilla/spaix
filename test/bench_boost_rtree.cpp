@@ -239,6 +239,7 @@ main(int argc, char** argv)
   const spaix::test::Options opts{
     {"insert", {"Insert (linear, quadratic)", "ALGORITHM", "linear"}},
     {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
+    {"placement", {"Data placement (ignored)", "PLACEMENT", "inline"}},
     {"queries", {"Number of queries per step", "COUNT", "100"}},
     {"seed", {"Random number generator seed", "SEED", "5489"}},
     {"size", {"Maximum number of elements", "ELEMENTS", "1000000"}},
