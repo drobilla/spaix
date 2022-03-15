@@ -93,13 +93,19 @@ public:
   */
   template<class Predicate>
   struct Range {
-    ConstIter<Predicate>& begin() { return first; }
-    ConstIter<Predicate>& end() { return last; }
+    Range(ConstIter<Predicate> first, ConstIter<Predicate> last)
+      : _first{std::move(first)}
+      , _last{std::move(last)}
+    {}
 
-    bool empty() const { return first == last; }
+    ConstIter<Predicate>& begin() { return _first; }
+    ConstIter<Predicate>& end() { return _last; }
 
-    ConstIter<Predicate> first;
-    ConstIter<Predicate> last;
+    bool empty() const { return _first == _last; }
+
+  private:
+    ConstIter<Predicate> _first;
+    ConstIter<Predicate> _last;
   };
 
   using iterator       = Iter<Everything>;

@@ -19,4 +19,6 @@ IndentCaseLabels: false
 IndentPPDirectives: AfterHash
 KeepEmptyLinesAtTheStartOfBlocks: false
 SpacesInContainerLiterals: false
+StatementMacros:
+  - __pragma
 ...

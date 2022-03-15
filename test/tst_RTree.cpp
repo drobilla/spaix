@@ -260,10 +260,10 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
     const auto verify = [&](const auto& node) {
-      CHECK((spaix::min<0>(node.key) >= x_low));
-      CHECK((spaix::max<0>(node.key) <= x_high));
-      CHECK((spaix::min<1>(node.key) >= y_low));
-      CHECK((spaix::max<1>(node.key) <= y_high));
+      CHECK((spaix::min<0>(node.key) >= float(x_low)));
+      CHECK((spaix::max<0>(node.key) <= float(x_high)));
+      CHECK((spaix::min<1>(node.key) >= float(y_low)));
+      CHECK((spaix::max<1>(node.key) <= float(y_high)));
       CHECK((contains(tree.bounds(), node.key)));
       ++count;
     };
