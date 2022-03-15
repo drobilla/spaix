@@ -1,8 +1,8 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_DIRECTORYNODE_HPP
-#define SPAIX_DIRECTORYNODE_HPP
+#ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
+#define SPAIX_DETAIL_DIRECTORYNODE_HPP
 
 #include "spaix/DataPlacement.hpp"
 #include "spaix/StaticVector.hpp"
@@ -198,4 +198,4 @@ entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry)
 
 } // namespace spaix
 
-#endif // SPAIX_DIRECTORYNODE_HPP
+#endif // SPAIX_DETAIL_DIRECTORYNODE_HPP
