@@ -184,6 +184,10 @@ if get_option('benchmark')
   endif
 
   if get_option('tests')
+    test('build', executable('test_build',
+                             'test/test_build.cpp',
+                             dependencies: [spaix_dep]))
+
     test('bench', bench_exe, args: ['--size', '16', '--insert', 'linear'])
     test('bench', bench_exe, args: ['--size', '16', '--split', 'linear'])
     test('bench', bench_exe, args: ['--size', '16', '--split', 'quadratic'])
