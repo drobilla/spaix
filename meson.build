@@ -140,14 +140,14 @@ if get_option('tests')
 
   foreach test : tests
     test(test,
-         executable('tst_' + test, 'test/tst_@0@.cpp'.format(test),
+         executable('tst_' + test, 'test/unit/tst_@0@.cpp'.format(test),
                     dependencies: [spaix_dep, spaix_test_dep]))
   endforeach
 
 endif
 
 if get_option('tools')
-  draw_exe = executable('draw_tree', 'test/draw_tree.cpp',
+  draw_exe = executable('draw_tree', 'test/tools/draw_tree.cpp',
                         dependencies: [spaix_dep, spaix_test_dep])
 
   if get_option('tests')
@@ -172,13 +172,14 @@ if get_option('tools')
 endif
 
 if get_option('benchmark')
-  bench_exe = executable('bench_spaix_rtree', 'test/bench_spaix_rtree.cpp',
+  bench_exe = executable('bench_spaix_rtree',
+                         'test/benchmark/bench_spaix_rtree.cpp',
                          dependencies: [spaix_dep, spaix_test_dep])
 
   if have_boost
     boost_bench_exe = executable(
       'bench_boost_rtree',
-      'test/bench_boost_rtree.cpp',
+      'test/benchmark/bench_boost_rtree.cpp',
       dependencies: [boost_dep, spaix_dep, spaix_test_dep])
   endif
 
