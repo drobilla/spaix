@@ -30,9 +30,9 @@ struct Touching {
 /// Return a query predicate that matches items that intersect a region
 template<class QueryKey>
 Touching<QueryKey>
-touching(QueryKey key)
+touching(QueryKey&& key)
 {
-  return Touching<QueryKey>{std::move(key)};
+  return Touching<QueryKey>{std::forward<QueryKey>(key)};
 }
 
 } // namespace spaix

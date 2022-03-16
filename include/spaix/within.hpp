@@ -7,6 +7,8 @@
 #include "spaix/contains.hpp"
 #include "spaix/intersects.hpp"
 
+#include <utility>
+
 namespace spaix {
 
 template<typename QueryKey>
@@ -29,9 +31,9 @@ struct Within {
 /// Return a query predicate that matches items contained within a region
 template<class QueryKey>
 Within<QueryKey>
-within(QueryKey key)
+within(QueryKey&& key)
 {
-  return Within<QueryKey>{std::move(key)};
+  return Within<QueryKey>{std::forward<QueryKey>(key)};
 }
 
 } // namespace spaix
