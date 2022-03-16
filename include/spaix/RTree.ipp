@@ -143,13 +143,14 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
   return sides;
 }
 
-template<class K, class D, class C>
-template<typename DirVisitor, typename DatVisitor>
+namespace detail {
+
+template<class Key, class Node, typename DirVisitor, typename DatVisitor>
 VisitStatus
-RTree<K, D, C>::visit_dir_entry(const DirEntry& entry,
-                                DirVisitor      visit_dir,
-                                DatVisitor      visit_dat,
-                                NodePath&       path)
+visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
+                DirVisitor                         visit_dir,
+                DatVisitor                         visit_dat,
+                NodePath&                          path)
 {
   const auto& node   = *entry.node;
   VisitStatus status = visit_dir(path, entry.key, node.num_children());
@@ -171,6 +172,33 @@ RTree<K, D, C>::visit_dir_entry(const DirEntry& entry,
   }
 
   return status;
+}
+
+} // namespace detail
+
+template<class K, class D, class C>
+template<typename DirVisitor, typename DatVisitor>
+void
+RTree<K, D, C>::visit(DirVisitor visit_dir, DatVisitor visit_dat) const
+{
+  NodePath path{0};
+  detail::visit_dir_entry(_root,
+                          std::forward<DirVisitor>(visit_dir),
+                          std::forward<DatVisitor>(visit_dat),
+                          path);
+}
+
+template<class K, class D, class C>
+template<typename DirVisitor>
+void
+RTree<K, D, C>::visit(DirVisitor visit_dir) const
+{
+  NodePath path{0};
+  detail::visit_dir_entry(
+    _root,
+    std::forward<DirVisitor>(visit_dir),
+    [](auto, auto, auto) { return VisitStatus::proceed; },
+    path);
 }
 
 } // namespace spaix

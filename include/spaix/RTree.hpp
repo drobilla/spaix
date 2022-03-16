@@ -219,22 +219,10 @@ public:
      prototype VisitStatus(const NodePath&, const Key&, const Data&)>.
   */
   template<typename DirVisitor, typename DatVisitor>
-  void visit(DirVisitor visit_dir, DatVisitor visit_dat) const
-  {
-    NodePath path{0};
-    visit_dir_entry(_root, std::move(visit_dir), std::move(visit_dat), path);
-  }
+  void visit(DirVisitor visit_dir, DatVisitor visit_dat) const;
 
   template<typename DirVisitor>
-  void visit(DirVisitor visit_dir) const
-  {
-    NodePath path{0};
-    visit_dir_entry(
-      _root,
-      std::move(visit_dir),
-      [](auto, auto, auto) { return VisitStatus::proceed; },
-      path);
-  }
+  void visit(DirVisitor visit_dir) const;
 
 private:
   template<class Children>
@@ -282,12 +270,6 @@ private:
                     Entry                                    entry,
                     const Box&                               bounds,
                     NodeType                                 type);
-
-  template<typename DirVisitor, typename DatVisitor>
-  static VisitStatus visit_dir_entry(const DirEntry& entry,
-                                     DirVisitor      visit_dir,
-                                     DatVisitor      visit_dat,
-                                     NodePath&       path);
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm
