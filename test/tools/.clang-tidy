@@ -1,0 +1,7 @@
+Checks: >
+  -*-vararg,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -fuchsia-default-arguments-declarations,
+  -llvm-header-guard,
+  -readability-implicit-bool-conversion,
+InheritParentConfig: true

@@ -1,0 +1,6 @@
+Checks: >
+  -bugprone-easily-swappable-parameters,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -readability-function-cognitive-complexity,
+  -readability-implicit-bool-conversion,
+InheritParentConfig: true

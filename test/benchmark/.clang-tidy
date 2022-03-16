@@ -1,0 +1,4 @@
+Checks: >
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -readability-implicit-bool-conversion,
+InheritParentConfig: true
