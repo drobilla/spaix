@@ -8,9 +8,9 @@
 #include "spaix/DataPlacement.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/sizes.hpp"
+#include "spaix/union.hpp"
 
 #include <cstddef>
-#include <type_traits>
 
 namespace spaix {
 
@@ -40,7 +40,7 @@ template<class SplitAlgorithm,
          unsigned      MinFillDivisor = 3u,
          DataPlacement Placement      = DataPlacement::separate>
 struct PageConfiguration {
-  using Box       = decltype(std::declval<K>() | std::declval<K>());
+  using Box       = UnionOf<K>;
   using Insertion = InsertionAlgorithm;
   using Split     = SplitAlgorithm;
 

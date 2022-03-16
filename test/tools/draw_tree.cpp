@@ -14,7 +14,6 @@
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
-#include "spaix/union.hpp"
 
 #include <cmath>
 #include <cstdint>

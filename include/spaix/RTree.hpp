@@ -11,14 +11,13 @@
 #include "spaix/sizes.hpp"
 #include "spaix/traverse/everything.hpp"
 #include "spaix/types.hpp"
-#include "spaix/union.hpp" // IWYU pragma: keep
+#include "spaix/union.hpp"
 
 #include <array>
 #include <cassert>
 #include <cstddef>
 #include <limits>
 #include <memory>
-#include <type_traits>
 #include <utility> // IWYU pragma: keep
 #include <vector>
 
@@ -27,9 +26,6 @@
 namespace spaix {
 
 using NodePath = std::vector<ChildIndex>;
-
-template<class K>
-using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
 enum class VisitStatus { proceed, finish };
 
