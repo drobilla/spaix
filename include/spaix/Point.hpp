@@ -67,7 +67,7 @@ get(const Point<Ts...>& point)
 }
 
 template<size_t dim, class... Ts>
-constexpr Range<Nth<dim, Ts...>>
+constexpr DimRange<Nth<dim, Ts...>>
 range(const Point<Ts...>& point)
 {
   return std::make_pair(get<dim>(point), get<dim>(point));

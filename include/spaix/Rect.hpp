@@ -62,7 +62,7 @@ template<class T0, class... Ts>
 class Rect
 {
 public:
-  using Tuple   = std::tuple<Range<T0>, Range<Ts>...>;
+  using Tuple   = std::tuple<DimRange<T0>, DimRange<Ts>...>;
   using Scalars = std::tuple<T0, Ts...>;
 
   Rect(const Rect& rect)     = default;
@@ -83,9 +83,9 @@ public:
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
-  constexpr explicit Rect(Range<T0>&& first, Range<Ts>&&... rest)
-    : Rect{std::make_tuple(std::forward<Range<T0>>(first),
-                           std::forward<Range<Ts>>(rest)...)}
+  constexpr explicit Rect(DimRange<T0>&& first, DimRange<Ts>&&... rest)
+    : Rect{std::make_tuple(std::forward<DimRange<T0>>(first),
+                           std::forward<DimRange<Ts>>(rest)...)}
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
@@ -113,9 +113,9 @@ private:
 
 template<class... Ts>
 constexpr Rect<Ts...>
-make_rect(Range<Ts>&&... ranges)
+make_rect(DimRange<Ts>&&... ranges)
 {
-  return Rect<Ts...>{std::forward<Range<Ts>>(ranges)...};
+  return Rect<Ts...>{std::forward<DimRange<Ts>>(ranges)...};
 }
 
 template<class... Ts>
@@ -133,21 +133,21 @@ operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 }
 
 template<size_t dim, class... Ts>
-constexpr const Range<Nth<dim, Ts...>>&
+constexpr const DimRange<Nth<dim, Ts...>>&
 get(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<size_t dim, class... Ts>
-constexpr const Range<Nth<dim, Ts...>>&
+constexpr const DimRange<Nth<dim, Ts...>>&
 range(const Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<size_t dim, class... Ts>
-Range<Nth<dim, Ts...>>&
+DimRange<Nth<dim, Ts...>>&
 range(Rect<Ts...>& rect)
 {
   return std::get<dim>(rect.tuple());

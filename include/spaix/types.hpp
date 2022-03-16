@@ -12,8 +12,9 @@ namespace spaix {
 using ChildIndex = size_t;
 using ChildCount = size_t;
 
+/// A range in a dimension from a low value (first) to a high value (second)
 template<class T>
-using Range = std::pair<T, T>;
+using DimRange = std::pair<T, T>;
 
 enum class NodeType : size_t {
   directory, ///< Internal directory node

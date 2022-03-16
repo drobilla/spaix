@@ -15,8 +15,8 @@ namespace spaix::test {
 using XCoord = Scalar<struct X, int>;
 using YCoord = Scalar<struct Y, float>;
 
-using XRange = Range<XCoord>;
-using YRange = Range<YCoord>;
+using XRange = DimRange<XCoord>;
+using YRange = DimRange<YCoord>;
 
 using TestRect  = Rect<XCoord, YCoord>;
 using TestPoint = Point<XCoord, YCoord>;
