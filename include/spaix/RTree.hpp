@@ -74,16 +74,14 @@ public:
   using DirNodePair = std::array<DirEntry, 2>;
 
   template<class Predicate>
-  using Iter = Iterator<Predicate,
-                        DirNode,
-                        DatNode,
-                        max_height(sizeof(DatNode), min_dir_fanout)>;
+  using Iter =
+    Iterator<Predicate, DirNode, DatNode, max_height<DatNode>(min_dir_fanout)>;
 
   template<class Predicate>
   using ConstIter = Iterator<Predicate,
                              const DirNode,
                              const DatNode,
-                             max_height(sizeof(DatNode), min_dir_fanout)>;
+                             max_height<DatNode>(min_dir_fanout)>;
 
   /**
      A range in an RTree that matches a predicate.
@@ -177,7 +175,7 @@ public:
   /// Return the maximum height of a tree
   static constexpr size_t max_height()
   {
-    return spaix::max_height(sizeof(DatNode), min_dir_fanout);
+    return spaix::max_height<DatNode>(min_dir_fanout);
   }
 
   /// Return a key that encompasses all items in the tree

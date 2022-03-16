@@ -8,6 +8,7 @@
 #include "spaix/types.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 
 namespace spaix {
@@ -59,11 +60,12 @@ log_b(const T n, const T b)
    64-bit, storing hundreds of millions or hundreds of quadrillions of
    elements, respectively.
 */
+template<class DataNodeType>
 constexpr size_t
-max_height(const size_t data_node_size, const ChildCount min_fanout)
+max_height(const ChildCount min_fanout)
 {
-  const auto max_n_elements =
-    std::numeric_limits<size_t>::max() / data_node_size;
+  constexpr auto max_address    = std::numeric_limits<uintptr_t>::max();
+  constexpr auto max_n_elements = max_address / sizeof(DataNodeType);
 
   return log_b(max_n_elements, size_t{min_fanout});
 }
