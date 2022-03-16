@@ -219,10 +219,10 @@ public:
      prototype VisitStatus(const NodePath&, const Key&, const Data&)>.
   */
   template<typename DirVisitor, typename DatVisitor>
-  void visit(DirVisitor visit_dir, DatVisitor visit_dat) const;
+  void visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const;
 
   template<typename DirVisitor>
-  void visit(DirVisitor visit_dir) const;
+  void visit(DirVisitor&& visit_dir) const;
 
 private:
   template<class Children>

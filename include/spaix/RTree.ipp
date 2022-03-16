@@ -145,33 +145,45 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 
 namespace detail {
 
-template<class Key, class Node, typename DirVisitor, typename DatVisitor>
+template<typename Children, typename ChildFunc>
 VisitStatus
-visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
-                DirVisitor                         visit_dir,
-                DatVisitor                         visit_dat,
-                NodePath&                          path)
+visit_children(const Children& children, NodePath& path, ChildFunc&& child_func)
 {
-  const auto& node   = *entry.node;
-  VisitStatus status = visit_dir(path, entry.key, node.num_children());
+  VisitStatus status = VisitStatus::proceed;
 
-  for (ChildIndex i = 0u;
-       i < node.num_children() && status == VisitStatus::proceed;
+  for (ChildIndex i = 0u; i < children.size() && status == VisitStatus::proceed;
        ++i) {
     path.push_back(i);
-
-    if (node.child_type == NodeType::data) {
-      const auto& child = node.dat_children[i];
-      status            = visit_dat(path, entry_key(child), entry_data(child));
-    } else {
-      const auto& child = node.dir_children[i];
-      status            = visit_dir_entry(child, visit_dir, visit_dat, path);
-    }
-
+    status = child_func(children[i]);
     path.pop_back();
   }
 
   return status;
+}
+
+template<class Key, class Node, typename DirVisitor, typename DatVisitor>
+VisitStatus
+visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
+                DirVisitor&&                       visit_dir,
+                DatVisitor&&                       visit_dat,
+                NodePath&                          path)
+{
+  const auto& node = *entry.node;
+
+  if (visit_dir(path, entry.key, node.num_children()) == VisitStatus::finish) {
+    return VisitStatus::finish;
+  }
+
+  return node.child_type == NodeType::directory
+           ? visit_children(node.dir_children,
+                            path,
+                            [&](const auto& child) {
+                              return visit_dir_entry(
+                                child, visit_dir, visit_dat, path);
+                            })
+           : visit_children(node.dat_children, path, [&](const auto& child) {
+               return visit_dat(path, entry_key(child), entry_data(child));
+             });
 }
 
 } // namespace detail
@@ -179,7 +191,7 @@ visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
 template<class K, class D, class C>
 template<typename DirVisitor, typename DatVisitor>
 void
-RTree<K, D, C>::visit(DirVisitor visit_dir, DatVisitor visit_dat) const
+RTree<K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
 {
   NodePath path{0};
   detail::visit_dir_entry(_root,
@@ -191,7 +203,7 @@ RTree<K, D, C>::visit(DirVisitor visit_dir, DatVisitor visit_dat) const
 template<class K, class D, class C>
 template<typename DirVisitor>
 void
-RTree<K, D, C>::visit(DirVisitor visit_dir) const
+RTree<K, D, C>::visit(DirVisitor&& visit_dir) const
 {
   NodePath path{0};
   detail::visit_dir_entry(
