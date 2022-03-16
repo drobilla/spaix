@@ -89,6 +89,31 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
   return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
 }
 
+template<class K, class D, class C>
+template<class Predicate, class Visitor>
+void
+RTree<K, D, C>::fast_query_rec(const DirNode&   node,
+                               const Predicate& predicate,
+                               const Visitor&   visitor) const
+{
+  switch (node.child_type()) {
+  case NodeType::directory:
+    for (const auto& entry : node.dir_children()) {
+      if (predicate.directory(entry.key)) {
+        fast_query_rec(*entry.node, predicate, visitor);
+      }
+    }
+    break;
+
+  case NodeType::data:
+    for (const auto& entry : node.dat_children()) {
+      if (predicate.leaf(entry_key(entry))) {
+        visitor(entry_ref(entry));
+      }
+    }
+  }
+}
+
 /// Create a new parent seeded with a child
 template<class K, class D, class C>
 template<class Entry, ChildCount count>
