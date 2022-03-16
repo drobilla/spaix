@@ -52,18 +52,20 @@ log_b(const T n, const T b)
   return log_2(n) / log_2(b);
 }
 
-/// Return an upper bound on the maximum number of elements in a tree
-constexpr size_t
-max_size(const size_t dat_size)
-{
-  return std::numeric_limits<size_t>::max() / dat_size;
-}
+/**
+   Return the maximum possible height of a tree on this system.
 
-/// Return the maximum height of a tree
+   For typical configurations, this is something like 7 on 32-bit and 20 on
+   64-bit, storing hundreds of millions or hundreds of quadrillions of
+   elements, respectively.
+*/
 constexpr size_t
-max_height(const size_t dat_size, const ChildCount min_fanout)
+max_height(const size_t data_node_size, const ChildCount min_fanout)
 {
-  return log_b(max_size(dat_size), size_t{min_fanout});
+  const auto max_n_elements =
+    std::numeric_limits<size_t>::max() / data_node_size;
+
+  return log_b(max_n_elements, size_t{min_fanout});
 }
 
 } // namespace spaix
