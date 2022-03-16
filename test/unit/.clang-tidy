@@ -1,6 +1,7 @@
 Checks: >
   -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -fuchsia-default-arguments-calls,
   -readability-function-cognitive-complexity,
   -readability-implicit-bool-conversion,
 InheritParentConfig: true

@@ -1,7 +1,7 @@
 Checks: >
   -*-vararg,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-  -fuchsia-default-arguments-declarations,
+  -fuchsia-default-arguments-*,
   -llvm-header-guard,
   -misc-non-private-member-variables-in-classes,
   -readability-implicit-bool-conversion,

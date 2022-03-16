@@ -194,7 +194,7 @@ template<typename DirVisitor, typename DatVisitor>
 void
 RTree<K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
 {
-  NodePath path{0};
+  NodePath path({0}, NodePath::allocator_type{});
   detail::visit_dir_entry(_root,
                           std::forward<DirVisitor>(visit_dir),
                           std::forward<DatVisitor>(visit_dat),
@@ -206,7 +206,7 @@ template<typename DirVisitor>
 void
 RTree<K, D, C>::visit(DirVisitor&& visit_dir) const
 {
-  NodePath path{0};
+  NodePath path({0}, NodePath::allocator_type{});
   detail::visit_dir_entry(
     _root,
     std::forward<DirVisitor>(visit_dir),

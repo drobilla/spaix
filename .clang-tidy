@@ -12,7 +12,6 @@ Checks: >
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-type-union-access,
-  -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
   -hicpp-no-array-decay,
   -llvmlibc-*,
