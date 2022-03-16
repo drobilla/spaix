@@ -16,7 +16,6 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
-#include <limits>
 #include <memory>
 #include <utility> // IWYU pragma: keep
 #include <vector>
@@ -71,13 +70,17 @@ public:
 
   template<class Predicate>
   using Iter =
-    Iterator<Predicate, DirNode, DatNode, max_height<DatNode>(min_dir_fanout)>;
+    Iterator<Predicate,
+             DirNode,
+             DatNode,
+             max_height<DirNode, DatNode, Config::placement>(min_dir_fanout)>;
 
   template<class Predicate>
-  using ConstIter = Iterator<Predicate,
-                             const DirNode,
-                             const DatNode,
-                             max_height<DatNode>(min_dir_fanout)>;
+  using ConstIter =
+    Iterator<Predicate,
+             const DirNode,
+             const DatNode,
+             max_height<DirNode, DatNode, Config::placement>(min_dir_fanout)>;
 
   /**
      A range in an RTree that matches a predicate.
@@ -163,15 +166,16 @@ public:
   static constexpr ChildCount leaf_fanout() { return Config::dat_fanout; }
 
   /// Return an upper bound on the maximum number of elements in a tree
-  static constexpr size_t max_size()
+  static constexpr size_t max_size() noexcept
   {
-    return std::numeric_limits<size_t>::max() / sizeof(DatNode);
+    return Config::dat_fanout * power(Config::dir_fanout, max_height() - 1);
   }
 
   /// Return the maximum height of a tree
-  static constexpr size_t max_height()
+  static constexpr size_t max_height() noexcept
   {
-    return spaix::max_height<DatNode>(min_dir_fanout);
+    return spaix::max_height<DirNode, DatNode, Config::placement>(
+      min_dir_fanout);
   }
 
   /// Return a key that encompasses all items in the tree

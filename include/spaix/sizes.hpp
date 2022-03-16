@@ -8,7 +8,6 @@
 #include "spaix/types.hpp"
 
 #include <cstddef>
-#include <cstdint>
 #include <limits>
 
 namespace spaix {
@@ -53,6 +52,14 @@ log_b(const T n, const T b)
   return log_2(n) / log_2(b);
 }
 
+/// Return b^e (b raised to the power e)
+template<class T>
+constexpr T
+power(const T b, const T e)
+{
+  return !e ? 1 : b * power(b, e - 1);
+}
+
 /**
    Return the maximum possible height of a tree on this system.
 
@@ -60,14 +67,31 @@ log_b(const T n, const T b)
    64-bit, storing hundreds of millions or hundreds of quadrillions of
    elements, respectively.
 */
-template<class DataNodeType>
+template<class DirectoryNodeType, class DataNodeType, DataPlacement placement>
 constexpr size_t
 max_height(const ChildCount min_fanout)
 {
-  constexpr auto max_address    = std::numeric_limits<uintptr_t>::max();
-  constexpr auto max_n_elements = max_address / sizeof(DataNodeType);
+  constexpr auto total_space = std::numeric_limits<size_t>::max();
+  constexpr auto dir_size    = sizeof(DirectoryNodeType);
+  constexpr auto dat_size    = sizeof(DataNodeType);
 
-  return log_b(max_n_elements, size_t{min_fanout});
+  switch (placement) {
+  case DataPlacement::inlined: {
+    const auto n_most_dirs = total_space / dir_size;
+
+    return log_b(n_most_dirs, size_t{min_fanout});
+  }
+
+  case DataPlacement::separate: {
+    const auto n_most_dats         = total_space / dat_size;
+    const auto n_most_dirs         = log_b(n_most_dats, size_t{min_fanout});
+    const auto needed_dir_space    = n_most_dirs * dir_size;
+    const auto available_dat_space = total_space - needed_dir_space;
+    const auto max_n_dats          = available_dat_space / dat_size;
+
+    return log_b(max_n_dats, size_t{min_fanout});
+  }
+  }
 }
 
 } // namespace spaix
