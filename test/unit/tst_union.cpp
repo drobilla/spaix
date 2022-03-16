@@ -32,9 +32,9 @@ test_union()
 
   STATIC_CHECK(((TestPoint{1, 2.0f} | TestPoint{3, 5.0f}) == rect));
 
-  auto mut = TestRect{{1, 3}, {2.0f, 5.0f}};
-  mut |= TestRect{{2, 4}, {1.0f, 5.0f}};
-  CHECK((mut == TestRect{{1, 4}, {1.0f, 5.0f}}));
+  auto mut = TestRect{{1, 3}, {1.0f, 5.0f}};
+  mut |= TestRect{{2, 4}, {2.0f, 6.0f}};
+  CHECK((mut == TestRect{{1, 4}, {1.0f, 6.0f}}));
 }
 
 } // namespace spaix::test
