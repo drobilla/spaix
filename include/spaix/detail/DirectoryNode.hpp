@@ -13,7 +13,7 @@
 #include <memory>
 #include <new>
 #include <type_traits>
-#include <utility>
+#include <utility> // IWYU pragma: keep
 
 namespace spaix {
 

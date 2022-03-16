@@ -5,6 +5,7 @@
 #define SPAIX_TEST_WRITE_ROW_HPP
 
 #include <iostream>
+#include <utility>
 
 namespace spaix::test {
 

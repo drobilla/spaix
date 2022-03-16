@@ -4,7 +4,7 @@
 #ifndef SPAIX_STATICVECTOR_HPP
 #define SPAIX_STATICVECTOR_HPP
 
-#include <algorithm>
+#include <algorithm> // IWYU pragma: keep
 #include <cassert>
 #include <new>
 #include <type_traits>

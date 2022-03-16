@@ -11,7 +11,7 @@
 #include "spaix/everything.hpp"
 #include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
-#include "spaix/union.hpp"
+#include "spaix/union.hpp" // IWYU pragma: keep
 
 #include <array>
 #include <cassert>
@@ -19,8 +19,10 @@
 #include <limits>
 #include <memory>
 #include <type_traits>
-#include <utility>
+#include <utility> // IWYU pragma: keep
 #include <vector>
+
+// IWYU pragma: no_include <algorithm>
 
 namespace spaix {
 
@@ -279,6 +281,6 @@ private:
 
 } // namespace spaix
 
-#include "spaix/RTree.ipp" // IWYU pragma: keep
+#include "spaix/RTree.ipp" // IWYU pragma: export
 
 #endif // SPAIX_RTREE_HPP

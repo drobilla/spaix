@@ -7,7 +7,7 @@
 #include "spaix/StaticVector.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/types.hpp"
-#include "spaix/union.hpp"
+#include "spaix/union.hpp" // IWYU pragma: keep
 
 #include <cassert>
 #include <memory>

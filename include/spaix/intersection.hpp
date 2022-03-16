@@ -8,7 +8,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
 
-#include <algorithm>
+#include <algorithm> // IWYU pragma: keep
 #include <cstddef>
 #include <tuple>
 #include <utility>

@@ -25,11 +25,14 @@ _Pragma("clang diagnostic pop")
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <random>
 #include <stdexcept>
 #include <string>
 #include <utility>
+
+// IWYU pragma: no_include <map>
 
 namespace {
 namespace bg  = boost::geometry;

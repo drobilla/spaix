@@ -8,11 +8,12 @@
 
 #include "spaix/DataPlacement.hpp"
 #include "spaix/LinearInsertion.hpp"
-#include "spaix/LinearSplit.hpp"
+#include "spaix/LinearSplit.hpp" // IWYU pragma: keep
 #include "spaix/PageConfiguration.hpp"
-#include "spaix/QuadraticSplit.hpp"
+#include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/union.hpp"
 #include "spaix/within.hpp"
 
 #include <algorithm>
@@ -23,6 +24,7 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace {
 

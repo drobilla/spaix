@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+// IWYU pragma: no_include <algorithm>
+
 namespace spaix {
 
 using NodePath = std::vector<ChildIndex>;

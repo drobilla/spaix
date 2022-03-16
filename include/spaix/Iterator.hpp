@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <utility> // IWYU pragma: keep
 
 namespace spaix {
 

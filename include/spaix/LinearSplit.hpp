@@ -4,13 +4,13 @@
 #ifndef SPAIX_LINEARSPLIT_HPP
 #define SPAIX_LINEARSPLIT_HPP
 
-#include "spaix/Rect.hpp"
+#include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
 #include "spaix/detail/meta.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
-#include <algorithm>
+#include <algorithm> // IWYU pragma: keep
 #include <array>
 #include <cassert>
 #include <cstddef>
