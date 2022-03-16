@@ -146,10 +146,10 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 template<class K, class D, class C>
 template<typename DirVisitor, typename DatVisitor>
 VisitStatus
-RTree<K, D, C>::visit_rec(const DirEntry& entry,
-                          DirVisitor      visit_dir,
-                          DatVisitor      visit_dat,
-                          NodePath&       path)
+RTree<K, D, C>::visit_dir_entry(const DirEntry& entry,
+                                DirVisitor      visit_dir,
+                                DatVisitor      visit_dat,
+                                NodePath&       path)
 {
   const auto& node   = *entry.node;
   VisitStatus status = visit_dir(path, entry.key, node.num_children());
@@ -164,7 +164,7 @@ RTree<K, D, C>::visit_rec(const DirEntry& entry,
       status            = visit_dat(path, entry_key(child), entry_data(child));
     } else {
       const auto& child = node.dir_children[i];
-      status            = visit_rec(child, visit_dir, visit_dat, path);
+      status            = visit_dir_entry(child, visit_dir, visit_dat, path);
     }
 
     path.pop_back();

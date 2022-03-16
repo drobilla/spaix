@@ -21,7 +21,7 @@ template<class Key, class Data>
 struct DataNode;
 
 template<class ChildKey, class ChildNode>
-struct NodeEntry {
+struct NodePointerEntry {
   using Key  = ChildKey;
   using Node = ChildNode;
 
@@ -72,7 +72,7 @@ public:
   using DirNodePtr = std::unique_ptr<DirNode>;
   using DatNodePtr = std::unique_ptr<DatNode>;
 
-  using DirEntry = NodeEntry<DirKey, DirNode>;
+  using DirEntry = NodePointerEntry<DirKey, DirNode>;
   using DatEntry = typename DatEntryType<DatNode, Placement>::Type;
 
   using DirChildren = StaticVector<DirEntry, ChildCount, DirFanout>;
@@ -135,7 +135,7 @@ public:
 
 template<class Key, class Node>
 const auto&
-entry_key(const NodeEntry<Key, Node>& entry)
+entry_key(const NodePointerEntry<Key, Node>& entry)
 {
   return entry.key;
 }

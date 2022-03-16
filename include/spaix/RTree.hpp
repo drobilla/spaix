@@ -222,14 +222,14 @@ public:
   void visit(DirVisitor visit_dir, DatVisitor visit_dat) const
   {
     NodePath path{0};
-    visit_rec(_root, std::move(visit_dir), std::move(visit_dat), path);
+    visit_dir_entry(_root, std::move(visit_dir), std::move(visit_dat), path);
   }
 
   template<typename DirVisitor>
   void visit(DirVisitor visit_dir) const
   {
     NodePath path{0};
-    visit_rec(
+    visit_dir_entry(
       _root,
       std::move(visit_dir),
       [](auto, auto, auto) { return VisitStatus::proceed; },
@@ -284,10 +284,10 @@ private:
                     NodeType                                 type);
 
   template<typename DirVisitor, typename DatVisitor>
-  static VisitStatus visit_rec(const DirEntry& entry,
-                               DirVisitor      visit_dir,
-                               DatVisitor      visit_dat,
-                               NodePath&       path);
+  static VisitStatus visit_dir_entry(const DirEntry& entry,
+                                     DirVisitor      visit_dir,
+                                     DatVisitor      visit_dat,
+                                     NodePath&       path);
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm
