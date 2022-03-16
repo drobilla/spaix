@@ -43,23 +43,30 @@ struct Counts {
 };
 
 template<class QueryKey>
-struct BenchmarkWithin {
+struct BenchmarkWithin : public spaix::Within<QueryKey> {
+  using Super = spaix::Within<QueryKey>;
+
+  BenchmarkWithin(QueryKey&& query_key, Counts* const counts)
+    : Super{std::forward<QueryKey>(query_key)}
+    , _counts{counts}
+  {}
+
   template<class DirKey>
   constexpr bool directory(const DirKey& k) const
   {
-    ++counts->n_checked_dirs;
-    return spaix::intersects(key, k);
+    ++_counts->n_checked_dirs;
+    return Super::directory(k);
   }
 
   template<class DatKey>
   constexpr bool leaf(const DatKey& k) const
   {
-    ++counts->n_checked_dats;
-    return spaix::contains(key, k);
+    ++_counts->n_checked_dats;
+    return Super::leaf(k);
   }
 
-  const QueryKey key;
-  Counts*        counts{};
+private:
+  Counts* const _counts;
 };
 
 struct QueryMetrics {
