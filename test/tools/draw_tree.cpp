@@ -6,10 +6,10 @@
 
 #include "spaix_test/options.hpp"
 
+#include "spaix/Config.hpp"
 #include "spaix/DataPlacement.hpp"
 #include "spaix/LinearInsertion.hpp" // IWYU pragma: keep
 #include "spaix/LinearSplit.hpp"     // IWYU pragma: keep
-#include "spaix/PageConfiguration.hpp"
 #include "spaix/Point.hpp"
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
@@ -78,13 +78,10 @@ template<class Insertion, class Split, size_t page_size>
 int
 run(const Parameters& params)
 {
-  using Config = spaix::PageConfiguration<Split,
-                                          Insertion,
-                                          Point2,
-                                          Scalar,
-                                          page_size,
-                                          2,
-                                          spaix::DataPlacement::separate>;
+  using Structure = spaix::
+    PageStructure<Point2, Scalar, page_size, spaix::DataPlacement::separate>;
+
+  using Config = spaix::Config<Structure, Split, Insertion>;
 
   return run<spaix::RTree<Point2, Scalar, Config>>(params);
 }

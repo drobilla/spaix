@@ -62,6 +62,9 @@ public:
                                 Config::dir_fanout,
                                 Config::dat_fanout>;
 
+  static_assert(sizeof(DirNode) <= Config::Structure::max_dir_node_size);
+  static_assert(sizeof(DirNode) >= Config::Structure::min_dir_node_size);
+
   using DatNodePtr  = std::unique_ptr<DatNode>;
   using DirNodePtr  = std::unique_ptr<DirNode>;
   using DirEntry    = typename DirNode::DirEntry;
