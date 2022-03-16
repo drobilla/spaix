@@ -44,9 +44,9 @@ struct PageConfiguration {
   using Insertion = InsertionAlgorithm;
   using Split     = SplitAlgorithm;
 
-  static constexpr auto dir_fanout = page_internal_fanout<Box>(page_size);
+  static constexpr auto dir_fanout = page_dir_fanout<Box>(page_size);
   static constexpr auto dat_fanout =
-    page_leaf_fanout<K, D, Placement>(page_size);
+    page_dat_fanout<K, D, Placement>(page_size);
 
   static constexpr auto min_fill_divisor = MinFillDivisor;
   static constexpr auto placement        = Placement;

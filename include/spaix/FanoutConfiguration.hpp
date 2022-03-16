@@ -36,13 +36,13 @@ template<class SplitAlgorithm,
          unsigned      MinFillDivisor = 3u,
          DataPlacement Placement      = DataPlacement::separate>
 struct FanoutConfiguration {
+  using Insertion = InsertionAlgorithm;
+  using Split     = SplitAlgorithm;
+
   static constexpr auto       dir_fanout       = DirFanout;
   static constexpr auto       dat_fanout       = DatFanout;
   static constexpr const auto min_fill_divisor = MinFillDivisor;
   static constexpr const auto placement        = Placement;
-
-  using Insertion = InsertionAlgorithm;
-  using Split     = SplitAlgorithm;
 };
 
 } // namespace spaix

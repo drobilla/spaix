@@ -15,7 +15,7 @@ namespace spaix {
 /// Return a directory fanout where nodes fit within `page_size` bytes
 template<class DirKey>
 constexpr ChildCount
-page_internal_fanout(const size_t page_size)
+page_dir_fanout(const size_t page_size)
 {
   return (page_size - sizeof(NodeType) - sizeof(ChildCount)) /
          (sizeof(DirKey) + sizeof(void*));
@@ -24,7 +24,7 @@ page_internal_fanout(const size_t page_size)
 /// Return a leaf fanout where nodes nodes fit within `page_size` bytes
 template<class DatKey, class Data, DataPlacement placement>
 constexpr ChildCount
-page_leaf_fanout(const size_t page_size)
+page_dat_fanout(const size_t page_size)
 {
   switch (placement) {
   case DataPlacement::inlined:
