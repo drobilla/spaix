@@ -33,11 +33,11 @@ template<class K, class D, class C>
 typename RTree<K, D, C>::Box
 RTree<K, D, C>::ideal_key(const DirNode& node)
 {
-  if (node.child_type == NodeType::directory) {
-    return parent_key(node.dir_children);
+  if (node.child_type() == NodeType::directory) {
+    return parent_key(node.dir_children());
   }
 
-  return parent_key(node.dat_children);
+  return parent_key(node.dat_children());
 }
 
 template<class K, class D, class C>
@@ -48,40 +48,41 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
                            const Data& data)
 {
   auto& parent = *parent_entry.node;
-  if (parent.child_type == NodeType::directory) { // Recursing downwards
-    const auto choice   = _insertion.choose(parent.dir_children, key);
+  if (parent.child_type() == NodeType::directory) { // Recursing downwards
+    auto&      children = parent.dir_children();
+    const auto choice   = _insertion.choose(children, key);
     const auto index    = choice.first;
     const auto expanded = choice.second;
-    auto&      entry    = parent.dir_children[index];
+    auto&      entry    = children[index];
 
     auto sides = insert_rec(entry, expanded, key, data);
 
     if (sides[0].node) { // Child was split, replace it
-      parent.dir_children[index] = std::move(sides[0]);
-      if (parent.dir_children.size() == dir_fanout) {
-        return split(parent.dir_children,
+      children[index] = std::move(sides[0]);
+      if (children.size() == dir_fanout) {
+        return split(children,
                      std::move(sides[1]),
                      parent_entry.key | key,
-                     parent.child_type);
+                     parent.child_type());
       }
 
       parent.append_child(std::move(sides[1]));
-      parent_entry.key = parent_key(parent.dir_children);
+      parent_entry.key = parent_key(children);
     } else {
       parent_entry.key = new_parent_key;
       assert(parent_entry.key == ideal_key(parent));
     }
 
-  } else if (parent.dat_children.size() < dat_fanout) { // Simple leaf insert
+  } else if (parent.dat_children().size() < dat_fanout) { // Simple leaf insert
     parent.append_child(DirNode::make_dat_entry(key, data));
     parent_entry.key = new_parent_key;
     assert(parent_entry.key == ideal_key(parent));
 
   } else { // Split leaf insert
-    return split(parent.dat_children,
+    return split(parent.dat_children(),
                  DirNode::make_dat_entry(key, data),
                  parent_entry.key | key,
-                 parent.child_type);
+                 parent.child_type());
   }
 
   return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
@@ -174,14 +175,14 @@ visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
     return VisitStatus::finish;
   }
 
-  return node.child_type == NodeType::directory
-           ? visit_children(node.dir_children,
+  return node.child_type() == NodeType::directory
+           ? visit_children(node.dir_children(),
                             path,
                             [&](const auto& child) {
                               return visit_dir_entry(
                                 child, visit_dir, visit_dat, path);
                             })
-           : visit_children(node.dat_children, path, [&](const auto& child) {
+           : visit_children(node.dat_children(), path, [&](const auto& child) {
                return visit_dat(path, entry_key(child), entry_data(child));
              });
 }

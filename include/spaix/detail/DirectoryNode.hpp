@@ -79,21 +79,27 @@ public:
   using DatChildren = StaticVector<DatEntry, ChildCount, DatFanout>;
 
   explicit DirectoryNode(const NodeType t)
-    : child_type{t}
+    : _child_type{t}
   {
-    if (child_type == NodeType::data) {
-      new (&dat_children) DatChildren();
-    } else {
-      new (&dir_children) DirChildren();
+    switch (_child_type) {
+    case NodeType::directory:
+      new (&_dir_children) DirChildren();
+      break;
+    case NodeType::data:
+      new (&_dat_children) DatChildren();
+      break;
     }
   }
 
   ~DirectoryNode()
   {
-    if (child_type == NodeType::data) {
-      dat_children.~DatChildren();
-    } else {
-      dir_children.~DirChildren();
+    switch (_child_type) {
+    case NodeType::directory:
+      _dir_children.~DirChildren();
+      break;
+    case NodeType::data:
+      _dat_children.~DatChildren();
+      break;
     }
   }
 
@@ -110,26 +116,53 @@ public:
 
   void append_child(DatEntry child)
   {
-    assert(child_type == NodeType::data);
-    dat_children.emplace_back(std::move(child));
+    assert(_child_type == NodeType::data);
+    _dat_children.emplace_back(std::move(child));
   }
 
   void append_child(DirEntry entry)
   {
-    assert(child_type == NodeType::directory);
-    dir_children.emplace_back(std::move(entry));
+    assert(_child_type == NodeType::directory);
+    _dir_children.emplace_back(std::move(entry));
   }
 
   size_t num_children() const
   {
-    return child_type == NodeType::directory ? dir_children.size()
-                                             : dat_children.size();
+    return _child_type == NodeType::directory ? _dir_children.size()
+                                              : _dat_children.size();
   }
 
-  const NodeType child_type; ///< Type of children nodes
+  NodeType child_type() const { return _child_type; }
+
+  const DirChildren& dir_children() const
+  {
+    assert(_child_type == NodeType::directory);
+    return _dir_children;
+  }
+
+  const DatChildren& dat_children() const
+  {
+    assert(_child_type == NodeType::data);
+    return _dat_children;
+  }
+
+  DirChildren& dir_children()
+  {
+    assert(_child_type == NodeType::directory);
+    return _dir_children;
+  }
+
+  DatChildren& dat_children()
+  {
+    assert(_child_type == NodeType::data);
+    return _dat_children;
+  }
+
+private:
+  const NodeType _child_type; ///< Type of children nodes
   union {
-    DirChildren dir_children; ///< Directory node children
-    DatChildren dat_children; ///< Data node children
+    DirChildren _dir_children; ///< Directory node children
+    DatChildren _dat_children; ///< Data node children
   };
 };
 
