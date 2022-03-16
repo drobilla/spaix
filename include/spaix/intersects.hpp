@@ -14,14 +14,14 @@ namespace spaix {
 namespace detail {
 
 template<class Lhs, class Rhs, size_t num_dims>
-constexpr bool
+SPAIX_ALWAYS_INLINE constexpr bool
 intersects_rec(const Lhs&, const Rhs&, EndIndex<num_dims>)
 {
   return true;
 }
 
 template<class Lhs, class Rhs, size_t dim, size_t num_dims>
-constexpr bool
+SPAIX_ALWAYS_INLINE constexpr bool
 intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 {
   const auto& l = range<dim>(lhs);
@@ -36,15 +36,15 @@ intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
 template<class... Ts>
 constexpr bool
-intersects(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+intersects(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 {
-  return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
+  return lhs == rhs;
 }
 
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
 template<class... Ts>
 constexpr bool
-intersects(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+intersects(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
 }
@@ -55,6 +55,14 @@ constexpr bool
 intersects(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return detail::intersects_rec(rhs, lhs, ibegin<Ts...>());
+}
+
+/// Return true iff `lhs` has a non-empty intersection with `rhs`
+template<class... Ts>
+constexpr bool
+intersects(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+{
+  return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
 }
 
 } // namespace spaix

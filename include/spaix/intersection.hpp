@@ -17,36 +17,36 @@ namespace spaix {
 namespace detail {
 
 template<class Lhs, class Rhs, size_t num_dims>
-constexpr auto
+SPAIX_ALWAYS_INLINE constexpr auto
 intersection_rec(const Lhs&, const Rhs&, EndIndex<num_dims>)
 {
   return std::make_tuple();
 }
 
 template<class Lhs, class Rhs, size_t dim, size_t num_dims>
-constexpr auto
+SPAIX_ALWAYS_INLINE constexpr auto
 intersection_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 {
-  const auto l = range<dim>(lhs);
-  const auto r = range<dim>(rhs);
+  const auto l  = range<dim>(lhs);
+  const auto r  = range<dim>(rhs);
+  const auto lo = std::max(l.first, r.first);
+  const auto hi = std::min(l.second, r.second);
 
-  return std::tuple_cat(
-    std::make_tuple(
-      std::make_pair(std::max(l.first, r.first), std::min(l.second, r.second))),
-    intersection_rec(lhs, rhs, ++index));
+  return std::tuple_cat(std::make_tuple(std::make_pair(lo, hi)),
+                        intersection_rec(lhs, rhs, ++index));
 }
 
 } // namespace detail
 
-/// Return the geometric intersection of `lhs` and `rhs`
+/// Return the geometric intersection of two points
 template<class... Ts>
 constexpr Rect<Ts...>
 operator&(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 {
-  return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
+  return lhs == rhs ? Rect<Ts...>{lhs} : Rect<Ts...>{};
 }
 
-/// Return the geometric intersection of `lhs` and `rhs`
+/// Return the geometric intersection of two rectangles
 template<class... Ts>
 constexpr Rect<Ts...>
 operator&(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
@@ -54,18 +54,18 @@ operator&(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
   return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
 }
 
-/// Return the geometric intersection of `lhs` and `rhs`
+/// Return the geometric intersection of a point and a rectangle
 template<class... Ts>
 constexpr Rect<Ts...>
-operator&(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+operator&(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
 }
 
-/// Return the geometric intersection of `lhs` and `rhs`
+/// Return the geometric intersection of a rectangle and a point
 template<class... Ts>
 constexpr Rect<Ts...>
-operator&(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
+operator&(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 {
   return Rect<Ts...>{detail::intersection_rec(lhs, rhs, ibegin<Ts...>())};
 }

@@ -14,14 +14,14 @@ namespace spaix {
 namespace detail {
 
 template<class Parent, class Child, size_t n_dims>
-constexpr bool
+SPAIX_ALWAYS_INLINE constexpr bool
 contains_rec(const Parent&, const Child&, EndIndex<n_dims>)
 {
   return true;
 }
 
 template<class Parent, class Child, size_t dim, size_t n_dims>
-constexpr bool
+SPAIX_ALWAYS_INLINE constexpr bool
 contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
 {
   const auto& p = range<dim>(parent);
@@ -36,15 +36,15 @@ contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Rect<Ts...>& parent, const Rect<Ts...>& child)
+contains(const Point<Ts...>& parent, const Point<Ts...>& child)
 {
-  return detail::contains_rec(parent, child, ibegin<Ts...>());
+  return parent == child;
 }
 
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Rect<Ts...>& parent, const Point<Ts...>& child)
+contains(const Rect<Ts...>& parent, const Rect<Ts...>& child)
 {
   return detail::contains_rec(parent, child, ibegin<Ts...>());
 }
@@ -60,9 +60,9 @@ contains(const Point<Ts...>& parent, const Rect<Ts...>& child)
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Point<Ts...>& parent, const Point<Ts...>& child)
+contains(const Rect<Ts...>& parent, const Point<Ts...>& child)
 {
-  return parent == child;
+  return detail::contains_rec(parent, child, ibegin<Ts...>());
 }
 
 } // namespace spaix
