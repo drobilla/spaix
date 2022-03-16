@@ -1,10 +1,10 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_EVERYTHING_HPP
-#define SPAIX_EVERYTHING_HPP
+#ifndef SPAIX_TRAVERSE_EVERYTHING_HPP
+#define SPAIX_TRAVERSE_EVERYTHING_HPP
 
-namespace spaix {
+namespace spaix::traverse {
 
 struct Everything {
   template<class DirKey>
@@ -27,6 +27,6 @@ everything()
   return Everything{};
 }
 
-} // namespace spaix
+} // namespace spaix::traverse
 
-#endif // SPAIX_EVERYTHING_HPP
+#endif // SPAIX_TRAVERSE_EVERYTHING_HPP

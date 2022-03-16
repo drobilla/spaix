@@ -8,8 +8,8 @@
 #include "spaix/Iterator.hpp"
 #include "spaix/StaticVector.hpp"         // IWYU pragma: export
 #include "spaix/detail/DirectoryNode.hpp" // IWYU pragma: export
-#include "spaix/everything.hpp"
 #include "spaix/sizes.hpp"
+#include "spaix/traverse/everything.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp" // IWYU pragma: keep
 
@@ -109,6 +109,8 @@ public:
     ConstIter<Predicate> _first;
     ConstIter<Predicate> _last;
   };
+
+  using Everything = traverse::Everything;
 
   using iterator       = Iter<Everything>;
   using const_iterator = ConstIter<Everything>;

@@ -13,7 +13,7 @@
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/contains.hpp"
-#include "spaix/within.hpp"
+#include "spaix/traverse/within.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -64,7 +64,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
 
   CHECK(tree.empty());
   CHECK(tree.begin() == tree.end());
-  CHECK(tree.query(spaix::within(everything)).empty());
+  CHECK(tree.query(spaix::traverse::within(everything)).empty());
 }
 
 template<class Tree>
@@ -236,7 +236,8 @@ test_tree(const unsigned span, const unsigned n_queries)
   const auto mid = float(span) / 2.0f;
   const auto no_matches_query =
     Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
-  for (const auto& node : tree.query(spaix::within(no_matches_query))) {
+  for (const auto& node :
+       tree.query(spaix::traverse::within(no_matches_query))) {
     ++count;
     (void)node;
   }
@@ -270,12 +271,12 @@ test_tree(const unsigned span, const unsigned n_queries)
 
     // Fast visitor query
     count = 0;
-    tree.fast_query(spaix::within(query), verify);
+    tree.fast_query(spaix::traverse::within(query), verify);
     CHECK((count == expected_count));
 
     // Incremental query
     count = 0;
-    for (const auto& node : tree.query(spaix::within(query))) {
+    for (const auto& node : tree.query(spaix::traverse::within(query))) {
       verify(node);
     }
     CHECK((count == expected_count));

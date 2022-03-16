@@ -1,15 +1,15 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_WITHIN_HPP
-#define SPAIX_WITHIN_HPP
+#ifndef SPAIX_TRAVERSE_WITHIN_HPP
+#define SPAIX_TRAVERSE_WITHIN_HPP
 
 #include "spaix/contains.hpp"
 #include "spaix/intersects.hpp"
 
 #include <utility>
 
-namespace spaix {
+namespace spaix::traverse {
 
 template<typename QueryKey>
 struct Within {
@@ -36,6 +36,6 @@ within(QueryKey&& key)
   return Within<QueryKey>{std::forward<QueryKey>(key)};
 }
 
-} // namespace spaix
+} // namespace spaix::traverse
 
-#endif // SPAIX_WITHIN_HPP
+#endif // SPAIX_TRAVERSE_WITHIN_HPP

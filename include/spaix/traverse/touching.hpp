@@ -1,14 +1,14 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_TOUCHING_HPP
-#define SPAIX_TOUCHING_HPP
+#ifndef SPAIX_TRAVERSE_TOUCHING_HPP
+#define SPAIX_TRAVERSE_TOUCHING_HPP
 
 #include "spaix/intersects.hpp"
 
 #include <utility>
 
-namespace spaix {
+namespace spaix::traverse {
 
 template<class QueryKey>
 struct Touching {
@@ -35,6 +35,6 @@ touching(QueryKey&& key)
   return Touching<QueryKey>{std::forward<QueryKey>(key)};
 }
 
-} // namespace spaix
+} // namespace spaix::traverse
 
-#endif // SPAIX_TOUCHING_HPP
+#endif // SPAIX_TRAVERSE_TOUCHING_HPP

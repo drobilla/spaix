@@ -72,15 +72,15 @@ headers = [
   'include/spaix/detail/DirectoryNode.hpp',
   'include/spaix/detail/distribute.hpp',
   'include/spaix/detail/meta.hpp',
-  'include/spaix/everything.hpp',
   'include/spaix/intersection.hpp',
   'include/spaix/intersects.hpp',
   'include/spaix/sizes.hpp',
-  'include/spaix/touching.hpp',
+  'include/spaix/traverse/everything.hpp',
+  'include/spaix/traverse/touching.hpp',
+  'include/spaix/traverse/within.hpp',
   'include/spaix/types.hpp',
   'include/spaix/union.hpp',
   'include/spaix/volume.hpp',
-  'include/spaix/within.hpp',
 ]
 
 # Boost for comparison benchmark program
