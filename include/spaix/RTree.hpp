@@ -52,20 +52,20 @@ public:
   using Split     = typename Config::Split;
 
   static constexpr auto min_fill_divisor = Config::min_fill_divisor;
-  static constexpr auto placement        = Config::placement;
-  static constexpr auto dir_fanout       = Config::dir_fanout;
-  static constexpr auto dat_fanout       = Config::dat_fanout;
-  static constexpr auto min_dir_fanout   = dir_fanout / min_fill_divisor;
-  static constexpr auto min_dat_fanout   = dat_fanout / min_fill_divisor;
+  static constexpr auto min_dir_fanout = Config::dir_fanout / min_fill_divisor;
+  static constexpr auto min_dat_fanout = Config::dat_fanout / min_fill_divisor;
 
-  static_assert(dir_fanout > 1);
-  static_assert(dat_fanout > 1);
+  static_assert(Config::dir_fanout > 1);
+  static_assert(Config::dat_fanout > 1);
   static_assert(min_dir_fanout > 1);
   static_assert(min_dat_fanout > 1);
 
   using DatNode = DataNode<Key, Data>;
-  using DirNode =
-    DirectoryNode<Box, DatNode, placement, dir_fanout, dat_fanout>;
+  using DirNode = DirectoryNode<Box,
+                                DatNode,
+                                Config::placement,
+                                Config::dir_fanout,
+                                Config::dat_fanout>;
 
   using DatNodePtr  = std::unique_ptr<DatNode>;
   using DirNodePtr  = std::unique_ptr<DirNode>;
@@ -122,19 +122,12 @@ public:
     , _split{std::move(split)}
   {}
 
-  const_iterator begin() const { return const_iterator{_root, Everything{}}; }
-
-  const_iterator end() const
-  {
-    return const_iterator{{Box{}, nullptr}, Everything{}};
-  }
-
+  const_iterator begin() const { return const_iterator{_root, {}}; }
+  const_iterator end() const { return const_iterator{{Box{}, nullptr}, {}}; }
   const_iterator cbegin() const { return begin(); }
   const_iterator cend() const { return end(); }
-
-  iterator begin() { return empty() ? end() : iterator{_root, Everything{}}; }
-
-  iterator end() { return iterator{{Box{}, nullptr}, Everything{}}; }
+  iterator       begin() { return empty() ? end() : iterator{_root, {}}; }
+  iterator       end() { return iterator{{Box{}, nullptr}, {}}; }
 
   template<class Predicate>
   Range<Predicate> query(Predicate predicate) const
@@ -170,10 +163,10 @@ public:
   bool empty() const { return !_root.node; }
 
   /// Return the maximum number of children of an internal node
-  static constexpr ChildCount internal_fanout() { return dir_fanout; }
+  static constexpr ChildCount internal_fanout() { return Config::dir_fanout; }
 
   /// Return the maximum number of children of a leaf node
-  static constexpr ChildCount leaf_fanout() { return dat_fanout; }
+  static constexpr ChildCount leaf_fanout() { return Config::dat_fanout; }
 
   /// Return an upper bound on the maximum number of elements in a tree
   static constexpr size_t max_size()

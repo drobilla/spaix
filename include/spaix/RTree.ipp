@@ -59,7 +59,7 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
 
     if (sides[0].node) { // Child was split, replace it
       children[index] = std::move(sides[0]);
-      if (children.size() == dir_fanout) {
+      if (children.size() == Config::dir_fanout) {
         return split(children,
                      std::move(sides[1]),
                      parent_entry.key | key,
@@ -73,7 +73,8 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
       assert(parent_entry.key == ideal_key(parent));
     }
 
-  } else if (parent.dat_children().size() < dat_fanout) { // Simple leaf insert
+  } else if (parent.dat_children().size() <
+             Config::dat_fanout) { // Simple leaf insert
     parent.append_child(DirNode::make_dat_entry(key, data));
     parent_entry.key = new_parent_key;
     assert(parent_entry.key == ideal_key(parent));
