@@ -137,7 +137,7 @@ if get_option('tests')
 
   foreach test : tests
     test(test,
-         executable('tst_' + test, 'test/unit/tst_@0@.cpp'.format(test),
+         executable('test_' + test, 'test/unit/test_@0@.cpp'.format(test),
                     dependencies: [spaix_dep, spaix_test_dep]))
   endforeach
 
