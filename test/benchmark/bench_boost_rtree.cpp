@@ -6,7 +6,7 @@
 #include "spaix_test/options.hpp"
 #include "spaix_test/write_row.hpp"
 
-#include "spaix/sizes.hpp"
+#include "spaix/types.hpp"
 
 #ifdef __APPLE__
 _Pragma("clang diagnostic push")
@@ -201,7 +201,14 @@ template<size_t page_size>
 int
 run(const Parameters& params, const Args& args)
 {
-  constexpr auto max_fill = spaix::page_internal_fanout<Box>(page_size);
+  static constexpr auto overhead =
+    sizeof(spaix::NodeType) + sizeof(spaix::ChildCount);
+
+  static constexpr auto entry_space    = page_size - overhead;
+  static constexpr auto dir_entry_size = sizeof(Box) + sizeof(void*);
+  static constexpr auto dir_fanout     = entry_space / dir_entry_size;
+
+  constexpr auto max_fill = dir_fanout;
   constexpr auto min_fill = std::max(size_t(1), max_fill / min_fill_divisor);
 
   const auto split = args.at("split");
