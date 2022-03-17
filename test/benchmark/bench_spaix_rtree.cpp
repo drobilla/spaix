@@ -6,15 +6,15 @@
 #include "spaix_test/options.hpp"
 #include "spaix_test/write_row.hpp"
 
+#include "spaix/Config.hpp"
 #include "spaix/DataPlacement.hpp"
 #include "spaix/LinearInsertion.hpp"
-#include "spaix/LinearSplit.hpp" // IWYU pragma: keep
-#include "spaix/PageConfiguration.hpp"
+#include "spaix/LinearSplit.hpp"    // IWYU pragma: keep
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/search/within.hpp"
 #include "spaix/union.hpp"
-#include "spaix/within.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -45,8 +45,8 @@ struct Counts {
 };
 
 template<class QueryKey>
-struct BenchmarkWithin : public spaix::Within<QueryKey> {
-  using Super = spaix::Within<QueryKey>;
+struct BenchmarkWithin : public spaix::search::Within<QueryKey> {
+  using Super = spaix::search::Within<QueryKey>;
 
   BenchmarkWithin(QueryKey&& query_key, Counts* const counts)
     : Super{std::forward<QueryKey>(query_key)}
@@ -236,15 +236,13 @@ template<class Insertion,
 int
 run(const Parameters& params)
 {
-  using Config = spaix::PageConfiguration<Split,
-                                          Insertion,
-                                          Rect2,
-                                          Data,
-                                          page_size,
-                                          min_fill_divisor,
-                                          placement>;
+  using Conf =
+    spaix::Config<spaix::PageStructure<Rect2, Data, page_size, placement>,
+                  Split,
+                  Insertion,
+                  min_fill_divisor>;
 
-  return run<spaix::RTree<Rect2, Data, Config>>(params, std::cout);
+  return run<spaix::RTree<Rect2, Data, Conf>>(params, std::cout);
 }
 
 template<class Insertion, class Split, spaix::DataPlacement placement>
