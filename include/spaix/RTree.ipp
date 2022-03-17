@@ -91,13 +91,10 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
 {
   auto& parent = *parent_entry.node;
   if (parent.child_type() == NodeType::directory) { // Recursing downwards
-    auto&      children = parent.dir_children();
-    const auto choice   = _insertion.choose(children, key);
-    const auto index    = choice.first;
-    const auto expanded = choice.second;
-    auto&      entry    = children[index];
-
-    auto sides = insert_rec(entry, expanded, key, data);
+    auto& children               = parent.dir_children();
+    const auto [index, expanded] = _insertion.choose(children, key);
+    auto& entry                  = children[index];
+    auto  sides                  = insert_rec(entry, expanded, key, data);
 
     if (sides[0].node) { // Child was split, replace it
       children[index] = std::move(sides[0]);
