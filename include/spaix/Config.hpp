@@ -55,7 +55,8 @@ struct FanoutStructure {
 */
 template<class K, class D, size_t page_size, DataPlacement data_placement>
 struct PageStructure {
-  static constexpr auto placement      = data_placement;
+  static constexpr auto placement = data_placement;
+
   static constexpr auto dir_entry_size = sizeof(UnionOf<K>) + sizeof(void*);
   static constexpr auto dat_entry_size = placement == DataPlacement::inlined
                                            ? sizeof(DataNode<K, D>)
@@ -100,10 +101,16 @@ struct Config {
   using Split     = SplitAlgorithm;
   using Insertion = InsertionAlgorithm;
 
+  static constexpr const auto placement        = Structure::placement;
   static constexpr auto       dir_fanout       = Structure::dir_fanout;
   static constexpr auto       dat_fanout       = Structure::dat_fanout;
   static constexpr const auto min_fill_divisor = minimum_fill_divisor;
-  static constexpr const auto placement        = Structure::placement;
+  static constexpr auto       min_dir_fanout   = dir_fanout / min_fill_divisor;
+  static constexpr auto       min_dat_fanout   = dat_fanout / min_fill_divisor;
+
+  static_assert(dir_fanout > 1);
+  static_assert(dat_fanout > 1);
+  static_assert(min_fill_divisor > 0);
 };
 
 } // namespace spaix

@@ -204,7 +204,7 @@ run(const Parameters& params, std::ostream& os)
         os,
         total_times.n(),
         params.page_size,
-        t.internal_fanout(),
+        Tree::Conf::dir_fanout,
         std::chrono::duration<double>(t_end - t_bench_start).count(),
         times.mean(),
         times.min(),

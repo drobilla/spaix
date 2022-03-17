@@ -6,15 +6,15 @@
 
 #include "spaix/DataNode.hpp"
 #include "spaix/Iterator.hpp"
-#include "spaix/StaticVector.hpp"         // IWYU pragma: export
+#include "spaix/StaticVector.hpp" // IWYU pragma: export
+#include "spaix/TreeRange.hpp"
 #include "spaix/detail/DirectoryNode.hpp" // IWYU pragma: export
-#include "spaix/search/everything.hpp"
+#include "spaix/search/everything.hpp"    // IWYU pragma: keep
 #include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
 
 #include <array>
-#include <cassert>
 #include <cstddef>
 #include <memory>
 #include <utility> // IWYU pragma: keep
@@ -33,85 +33,54 @@ enum class VisitStatus { proceed, finish };
 
    @tparam K Geometric key type for elements.
    @tparam D Data type for elements.
-   @tparam C Tree configuration (an instantiation of spaix::Configuration).
+   @tparam C Tree configuration (an instantiation of spaix::Config).
 */
 template<class K, class D, class C>
 class RTree
 {
 public:
-  using Key       = K;
-  using Data      = D;
-  using Box       = UnionOf<Key>;
-  using Config    = C;
-  using Insertion = typename Config::Insertion;
-  using Split     = typename Config::Split;
+  using Key  = K;            ///< Key for a single data element
+  using Data = D;            ///< Single data element
+  using Box  = UnionOf<Key>; ///< Aggregate key in a directory node
 
-  static constexpr auto min_fill_divisor = Config::min_fill_divisor;
-  static constexpr auto min_dir_fanout = Config::dir_fanout / min_fill_divisor;
-  static constexpr auto min_dat_fanout = Config::dat_fanout / min_fill_divisor;
+  using Conf      = C;                        ///< Tree configuration
+  using Structure = typename Conf::Structure; ///< Tree structure configuration
+  using Insertion = typename Conf::Insertion; ///< Insertion algorithm
+  using Split     = typename Conf::Split;     ///< Split algorithm
 
-  static_assert(Config::dir_fanout > 1);
-  static_assert(Config::dat_fanout > 1);
-  static_assert(min_dir_fanout > 1);
-  static_assert(min_dat_fanout > 1);
+  using DatNode = DataNode<Key, Data>;                    ///< Leaf node
+  using DirNode = DirectoryNode<Box, DatNode, Structure>; ///< Internal node
 
-  using DatNode = DataNode<Key, Data>;
-  using DirNode = DirectoryNode<Box,
-                                DatNode,
-                                Config::placement,
-                                Config::dir_fanout,
-                                Config::dat_fanout>;
+  /// Return the maximum height of a tree
+  static constexpr size_t max_height() noexcept
+  {
+    return max_tree_height<DirNode, DatNode, Conf::placement>(
+      Conf::min_dir_fanout);
+  }
 
-  static_assert(sizeof(DirNode) <= Config::Structure::max_dir_node_size);
-  static_assert(sizeof(DirNode) >= Config::Structure::min_dir_node_size);
+  /// Return an upper bound on the maximum number of elements in a tree
+  static constexpr size_t max_size() noexcept
+  {
+    return Conf::dat_fanout * power(Conf::dir_fanout, max_height() - 1);
+  }
 
-  using DatNodePtr  = std::unique_ptr<DatNode>;
-  using DirNodePtr  = std::unique_ptr<DirNode>;
-  using DirEntry    = typename DirNode::DirEntry;
-  using DatEntry    = typename DirNode::DatEntry;
-  using DirNodePair = std::array<DirEntry, 2>;
+  /// An iterator over a search area
+  template<class S>
+  using Searcher = Iterator<S, const DirNode, DatNode, max_height()>;
 
-  template<class Predicate>
-  using Iter =
-    Iterator<Predicate,
-             DirNode,
-             DatNode,
-             max_height<DirNode, DatNode, Config::placement>(min_dir_fanout)>;
+  /// A constant iterator over a search area
+  template<class S>
+  using ConstSearcher = Iterator<S, const DirNode, const DatNode, max_height()>;
 
-  template<class Predicate>
-  using ConstIter =
-    Iterator<Predicate,
-             const DirNode,
-             const DatNode,
-             max_height<DirNode, DatNode, Config::placement>(min_dir_fanout)>;
+  // STL Container member types
+  using iterator       = Searcher<search::Everything>;
+  using const_iterator = ConstSearcher<search::Everything>;
 
-  /**
-     A range in an RTree that matches a predicate.
-
-     This acts like a collection of nodes that match a query predicate,
-     particularly for use with range-based for loops.  Note, however, that the
-     nodes are not actually contiguous internally as the underlying iterators
-     automatically skip nodes that do not match.
-  */
-  template<class Predicate>
-  struct Range {
-    Range(ConstIter<Predicate> first, ConstIter<Predicate> last)
-      : _first{std::move(first)}
-      , _last{std::move(last)}
-    {}
-
-    ConstIter<Predicate>& begin() { return _first; }
-    ConstIter<Predicate>& end() { return _last; }
-
-    bool empty() const { return _first == _last; }
-
-  private:
-    ConstIter<Predicate> _first;
-    ConstIter<Predicate> _last;
-  };
-
-  using iterator       = Iter<search::Everything>;
-  using const_iterator = ConstIter<search::Everything>;
+  // STL AssociativeContainer member types
+  using key_type    = K;
+  using mapped_type = D;
+  using value_type  = DataNode<K, D>;
+  using node_type   = DatNode;
 
   RTree() = default;
 
@@ -120,28 +89,33 @@ public:
     , _split{std::move(split)}
   {}
 
-  const_iterator begin() const { return const_iterator{_root, {}}; }
-  const_iterator end() const { return const_iterator{{Box{}, nullptr}, {}}; }
-  const_iterator cbegin() const { return begin(); }
-  const_iterator cend() const { return end(); }
-  iterator       begin() { return empty() ? end() : iterator{_root, {}}; }
-  iterator       end() { return iterator{{Box{}, nullptr}, {}}; }
+  RTree(const RTree&) = delete;
+  RTree& operator=(const RTree&) = delete;
 
-  template<class Predicate>
-  Range<Predicate> query(Predicate predicate) const
-  {
-    if (empty()) {
-      return {{{Box{}, nullptr}, predicate}, {{Box{}, nullptr}, predicate}};
-    }
+  RTree(RTree&&) noexcept = default;
+  RTree& operator=(RTree&&) noexcept = default;
 
-    ConstIter<Predicate> first{_root, predicate};
-    ConstIter<Predicate> last{{Box{}, nullptr}, predicate};
-    if (first != last && !predicate.leaf(first->key)) {
-      ++first;
-    }
+  ~RTree() = default;
 
-    return {std::move(first), std::move(last)};
-  }
+  /// Insert a new item with the given `key` and `data`
+  void insert(const Key& key, const Data& data);
+
+  /**
+     Return a range over all items covered by the given search.
+
+     This returns a facade of a collection that is suitable for use with
+     range-based for loops, for example, everything in the tree can be queried
+     like:
+
+     @code{.cpp}
+     for (const auto& data_node : tree.query(spaix::search::everything())) {
+       std::cout << "Key:  " << data_node.key << std::endl;
+       std::cout << "Data: " << data_node.data << std::endl;
+     }
+     @endcode
+  */
+  template<class S>
+  TreeRange<ConstSearcher<S>> query(S search) const;
 
   template<class Predicate, class Visitor>
   void fast_query(const Predicate& predicate, const Visitor& visitor) const
@@ -160,47 +134,8 @@ public:
   /// Return true iff there are no items in the tree
   bool empty() const { return !_root.node; }
 
-  /// Return the maximum number of children of an internal node
-  static constexpr ChildCount internal_fanout() { return Config::dir_fanout; }
-
-  /// Return the maximum number of children of a leaf node
-  static constexpr ChildCount leaf_fanout() { return Config::dat_fanout; }
-
-  /// Return an upper bound on the maximum number of elements in a tree
-  static constexpr size_t max_size() noexcept
-  {
-    return Config::dat_fanout * power(Config::dir_fanout, max_height() - 1);
-  }
-
-  /// Return the maximum height of a tree
-  static constexpr size_t max_height() noexcept
-  {
-    return spaix::max_height<DirNode, DatNode, Config::placement>(
-      min_dir_fanout);
-  }
-
   /// Return a key that encompasses all items in the tree
   Box bounds() const { return _root.node ? _root.key : Box{}; }
-
-  /// Insert a new item at `key` with `data`
-  void insert(const Key& key, const Data& data)
-  {
-    if (empty()) {
-      _root = {Box{key}, std::make_unique<DirNode>(NodeType::data)};
-    }
-
-    auto sides = insert_rec(_root, _root.key | key, key, data);
-    if (sides[0].node) {
-      _root = {sides[0].key | sides[1].key,
-               std::make_unique<DirNode>(NodeType::directory)};
-
-      _root.node->append_child(std::move(sides[0]));
-      _root.node->append_child(std::move(sides[1]));
-      assert(_root.key == ideal_key(*_root.node));
-    }
-
-    ++_size;
-  }
 
   /**
      Visit every node in the tree.
@@ -220,7 +155,32 @@ public:
   template<typename DirVisitor>
   void visit(DirVisitor&& visit_dir) const;
 
+  const_iterator begin() const { return const_iterator{_root, {}}; }
+  const_iterator end() const { return const_iterator{{Box{}, nullptr}, {}}; }
+  const_iterator cbegin() const { return begin(); }
+  const_iterator cend() const { return end(); }
+  iterator       begin() { return empty() ? end() : iterator{_root, {}}; }
+  iterator       end() { return iterator{{Box{}, nullptr}, {}}; }
+
 private:
+  using DatNodePtr  = std::unique_ptr<DatNode>;
+  using DirNodePtr  = std::unique_ptr<DirNode>;
+  using DirEntry    = typename DirNode::DirEntry;
+  using DatEntry    = typename DirNode::DatEntry;
+  using DirNodePair = std::array<DirEntry, 2>;
+
+  static constexpr auto placement      = Conf::placement;
+  static constexpr auto dir_fanout     = Conf::dir_fanout;
+  static constexpr auto dat_fanout     = Conf::dat_fanout;
+  static constexpr auto min_dir_fanout = dir_fanout / Conf::min_fill_divisor;
+  static constexpr auto min_dat_fanout = dat_fanout / Conf::min_fill_divisor;
+
+  static_assert(min_dir_fanout > 1);
+  static_assert(min_dat_fanout > 1);
+
+  static_assert(sizeof(DirNode) <= Structure::max_dir_node_size);
+  static_assert(sizeof(DirNode) >= Structure::min_dir_node_size);
+
   template<class Children>
   static Box parent_key(const Children& children);
 

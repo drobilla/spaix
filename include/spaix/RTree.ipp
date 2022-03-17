@@ -5,6 +5,7 @@
 #define SPAIX_RTREE_IPP
 
 #include "spaix/StaticVector.hpp"
+#include "spaix/TreeRange.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/types.hpp"
 #include "spaix/union.hpp"
@@ -14,6 +15,47 @@
 #include <utility>
 
 namespace spaix {
+
+template<class K, class D, class C>
+void
+RTree<K, D, C>::insert(const Key& key, const Data& data)
+{
+  if (empty()) {
+    _root = {Box{key}, std::make_unique<DirNode>(NodeType::data)};
+  }
+
+  auto sides = insert_rec(_root, _root.key | key, key, data);
+  if (sides[0].node) {
+    const auto root_key  = sides[0].key | sides[1].key;
+    auto       root_node = std::make_unique<DirNode>(NodeType::directory);
+
+    root_node->append_child(std::move(sides[0]));
+    root_node->append_child(std::move(sides[1]));
+
+    assert(root_key == ideal_key(*root_node));
+    _root = {root_key, std::move(root_node)};
+  }
+
+  ++_size;
+}
+
+template<class K, class D, class C>
+template<class S>
+TreeRange<typename RTree<K, D, C>::template ConstSearcher<S>>
+RTree<K, D, C>::query(S search) const
+{
+  if (empty()) {
+    return {{{Box{}, nullptr}, search}, {{Box{}, nullptr}, search}};
+  }
+
+  ConstSearcher<S> first{_root, search};
+  ConstSearcher<S> last{{Box{}, nullptr}, search};
+  if (first != last && !search.leaf(first->key)) {
+    ++first;
+  }
+
+  return {std::move(first), std::move(last)};
+}
 
 template<class K, class D, class C>
 template<class Children>
@@ -59,7 +101,7 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
 
     if (sides[0].node) { // Child was split, replace it
       children[index] = std::move(sides[0]);
-      if (children.size() == Config::dir_fanout) {
+      if (children.size() == Conf::dir_fanout) {
         return split(children,
                      std::move(sides[1]),
                      parent_entry.key | key,
@@ -74,7 +116,7 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
     }
 
   } else if (parent.dat_children().size() <
-             Config::dat_fanout) { // Simple leaf insert
+             Conf::dat_fanout) { // Simple leaf insert
     parent.append_child(DirNode::make_dat_entry(key, data));
     parent_entry.key = new_parent_key;
     assert(parent_entry.key == ideal_key(parent));
@@ -141,7 +183,7 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                       const Box&                               bounds,
                       const NodeType                           type)
 {
-  constexpr auto max_fanout = fanout - (fanout / min_fill_divisor);
+  constexpr auto max_fanout = fanout - (fanout / Conf::min_fill_divisor);
 
   // Make an array of all nodes to deposit
   StaticVector<Entry, ChildCount, fanout + 1> deposit;

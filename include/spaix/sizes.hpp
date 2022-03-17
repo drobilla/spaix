@@ -45,7 +45,7 @@ power(const T b, const T e)
 */
 template<class DirectoryNodeType, class DataNodeType, DataPlacement placement>
 constexpr size_t
-max_height(const ChildCount min_fanout)
+max_tree_height(const ChildCount min_fanout)
 {
   constexpr auto total_space = std::numeric_limits<size_t>::max();
   constexpr auto dir_size    = sizeof(DirectoryNodeType);

@@ -55,15 +55,14 @@ struct DatEntryType<DatNode, DataPlacement::separate> {
   }
 };
 
-template<class DirKey,
-         class DatNode,
-         DataPlacement Placement,
-         ChildCount    DirFanout,
-         ChildCount    DatFanout>
+template<class DirKey, class DatNode, class Structure>
 struct DirectoryNode {
 public:
-  using DirNode =
-    DirectoryNode<DirKey, DatNode, Placement, DirFanout, DatFanout>;
+  static constexpr auto placement  = Structure::placement;
+  static constexpr auto dir_fanout = Structure::dir_fanout;
+  static constexpr auto dat_fanout = Structure::dat_fanout;
+
+  using DirNode = DirectoryNode<DirKey, DatNode, Structure>;
 
   using Key     = decltype(std::declval<DatNode>().key);
   using Data    = decltype(std::declval<DatNode>().data);
@@ -73,10 +72,10 @@ public:
   using DatNodePtr = std::unique_ptr<DatNode>;
 
   using DirEntry = NodePointerEntry<DirKey, DirNode>;
-  using DatEntry = typename DatEntryType<DatNode, Placement>::Type;
+  using DatEntry = typename DatEntryType<DatNode, placement>::Type;
 
-  using DirChildren = StaticVector<DirEntry, ChildCount, DirFanout>;
-  using DatChildren = StaticVector<DatEntry, ChildCount, DatFanout>;
+  using DirChildren = StaticVector<DirEntry, ChildCount, dir_fanout>;
+  using DatChildren = StaticVector<DatEntry, ChildCount, dat_fanout>;
 
   explicit DirectoryNode(const NodeType t)
     : _child_type{t}
@@ -111,7 +110,7 @@ public:
 
   static DatEntry make_dat_entry(Key key, Data data)
   {
-    return DatEntryType<DatNode, Placement>::make(key, data);
+    return DatEntryType<DatNode, placement>::make(key, data);
   }
 
   void append_child(DatEntry child)

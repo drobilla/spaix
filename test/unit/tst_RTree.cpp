@@ -12,6 +12,7 @@
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/TreeRange.hpp"
 #include "spaix/contains.hpp"
 #include "spaix/search/within.hpp"
 
@@ -184,8 +185,7 @@ test_structure(const Tree& tree)
 
   size_t n_leaves = 0;
   tree.visit(
-    [&](const NodePath& path, const DirKey& key, const size_t n_children) {
-      CHECK(n_children <= std::max(Tree::internal_fanout(), Tree::leaf_fanout()));
+    [&](const NodePath& path, const DirKey& key, const size_t) {
       check_node(dir_keys, key, path);
       dir_keys.emplace(path, key);
       return spaix::VisitStatus::proceed;
