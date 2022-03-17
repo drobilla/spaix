@@ -4,6 +4,7 @@
 #ifndef SPAIX_LINEARINSERTION_HPP
 #define SPAIX_LINEARINSERTION_HPP
 
+#include "spaix/union.hpp"
 #include "spaix/volume.hpp"
 
 #include <cstddef>
@@ -23,12 +24,11 @@ class LinearInsertion
 public:
   /// Choose the best child node to insert/expand by `key`
   template<class Children, class Key>
-  std::pair<size_t, decltype(std::declval<Key>() | std::declval<Key>())> choose(
-    const Children& children,
-    const Key&      key)
+  std::pair<size_t, UnionOf<Key>> choose(const Children& children,
+                                         const Key&      key)
   {
     using Volume = decltype(volume(std::declval<Key>()));
-    using DirKey = decltype(std::declval<Key>() | std::declval<Key>());
+    using DirKey = UnionOf<Key>;
     using Sizes  = std::pair<Volume, Volume>;
 
     constexpr auto max_volume = std::numeric_limits<Volume>::max();

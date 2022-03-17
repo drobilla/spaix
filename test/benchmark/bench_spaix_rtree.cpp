@@ -14,7 +14,6 @@
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/search/within.hpp"
-#include "spaix/union.hpp"
 
 #include <algorithm>
 #include <chrono>

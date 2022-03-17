@@ -15,10 +15,6 @@
 #include <utility>
 
 namespace spaix {
-
-template<class K>
-using UnionOf = decltype(std::declval<K>() | std::declval<K>());
-
 namespace detail {
 
 template<class Lhs, class Rhs, size_t n_dims>
@@ -110,6 +106,9 @@ operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs)
   detail::union_rec(lhs, rhs, ibegin<Ts...>());
   return lhs;
 }
+
+template<class K>
+using UnionOf = decltype(std::declval<K>() | std::declval<K>());
 
 } // namespace spaix
 
