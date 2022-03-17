@@ -10,16 +10,13 @@
 #include <cstddef>
 #include <sstream>
 #include <string>
-#include <vector>
 
 // IWYU pragma: no_include <algorithm>
 
 namespace spaix {
-
-using NodePath = std::vector<ChildIndex>;
-
 namespace detail {
 
+template<class NodePath>
 static inline std::string
 to_string(const NodePath& path)
 {
@@ -31,7 +28,7 @@ to_string(const NodePath& path)
   return s;
 }
 
-template<class DirKey>
+template<class DirKey, class NodePath>
 static inline bool
 draw_dir_dot(std::ostream&   os,
              const DirKey&   key,
@@ -43,7 +40,7 @@ draw_dir_dot(std::ostream&   os,
 
   auto child_path{path};
   for (ChildCount i = 0; i < n_children; ++i) {
-    child_path.push_back(i);
+    child_path.emplace_back(i);
     os << "  " << id << " -- " << to_string(child_path) << ";\n";
     child_path.pop_back();
   }
@@ -51,7 +48,7 @@ draw_dir_dot(std::ostream&   os,
   return true;
 }
 
-template<class Key, class Data>
+template<class Key, class Data, class NodePath>
 static inline void
 draw_dat_dot(std::ostream& os,
              const Key&    key,
@@ -67,9 +64,10 @@ template<class Tree>
 void
 draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
 {
-  using Key    = typename Tree::Key;
-  using Data   = typename Tree::Data;
-  using DirKey = typename Tree::Box;
+  using Key      = typename Tree::Key;
+  using Data     = typename Tree::Data;
+  using DirKey   = typename Tree::Box;
+  using NodePath = typename Tree::NodePath;
 
   using spaix::VisitStatus;
 

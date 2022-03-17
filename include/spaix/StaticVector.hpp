@@ -4,7 +4,7 @@
 #ifndef SPAIX_STATICVECTOR_HPP
 #define SPAIX_STATICVECTOR_HPP
 
-#include <algorithm> // IWYU pragma: keep
+#include <algorithm>
 #include <cassert>
 #include <new>
 #include <type_traits>
@@ -100,11 +100,6 @@ public:
     return *reinterpret_cast<T*>(&_array[index]);
   }
 
-  bool operator==(const StaticVector& rhs) const
-  {
-    return _size == rhs._size && std::equal(begin(), end(), rhs.begin());
-  }
-
   void clear()
   {
     if (!std::is_trivially_destructible<T>::value) {
@@ -132,6 +127,24 @@ private:
   Size    _size{};
   Element _array[Capacity]{};
 };
+
+template<class T, class Size, Size capacity>
+bool
+operator==(const spaix::StaticVector<T, Size, capacity>& lhs,
+           const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
+{
+  return lhs.size() == rhs.size() &&
+         std::equal(lhs.begin(), rhs.end(), rhs.begin());
+}
+
+template<class T, class Size, Size capacity>
+bool
+operator<(const spaix::StaticVector<T, Size, capacity>& lhs,
+          const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
+{
+  return std::lexicographical_compare(
+    lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
 
 } // namespace spaix
 

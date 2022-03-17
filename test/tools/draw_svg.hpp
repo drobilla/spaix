@@ -14,18 +14,15 @@
 #include <limits>
 #include <ostream>
 #include <string>
-#include <vector>
 
 // IWYU pragma: no_include <algorithm>
 
 namespace spaix {
-
-using NodePath = std::vector<ChildIndex>;
-
 namespace svg {
 
 constexpr double pad = 8;
 
+template<class NodePath>
 inline std::string
 color(const NodePath& path, const double alpha)
 {
@@ -65,7 +62,7 @@ write_attr(std::ostream& os, const std::string& key, const T& value)
   os << " " << key << "=\"" << value << "\"";
 }
 
-template<class DirKey>
+template<class DirKey, class NodePath>
 inline bool
 draw_dir(std::ostream&   os,
          const DirKey&   key,
@@ -92,7 +89,7 @@ draw_dir(std::ostream&   os,
   return true;
 }
 
-template<class... Values, class Data>
+template<class... Values, class Data, class NodePath>
 inline void
 draw_dat(std::ostream&          os,
          const Rect<Values...>& key,
@@ -104,7 +101,7 @@ draw_dat(std::ostream&          os,
   draw_dir(os, key, path, bounds, scale);
 }
 
-template<class... Values, class Data>
+template<class... Values, class Data, class NodePath>
 inline void
 draw_dat(std::ostream&           os,
          const Point<Values...>& key,
@@ -132,9 +129,10 @@ draw_svg(std::ostream&  os,
          const double   scale     = 1.0,
          const unsigned max_depth = 0)
 {
-  using Key    = typename Tree::Key;
-  using Data   = typename Tree::Data;
-  using DirKey = typename Tree::Box;
+  using Key      = typename Tree::Key;
+  using Data     = typename Tree::Data;
+  using DirKey   = typename Tree::Box;
+  using NodePath = typename Tree::NodePath;
 
   const auto bounds = tree.bounds();
 

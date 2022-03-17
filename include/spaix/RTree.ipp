@@ -211,7 +211,7 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 
 namespace detail {
 
-template<typename Children, typename ChildFunc>
+template<typename Children, typename NodePath, typename ChildFunc>
 VisitStatus
 visit_children(const Children& children, NodePath& path, ChildFunc&& child_func)
 {
@@ -219,7 +219,7 @@ visit_children(const Children& children, NodePath& path, ChildFunc&& child_func)
 
   for (ChildIndex i = 0u; i < children.size() && status == VisitStatus::proceed;
        ++i) {
-    path.push_back(i);
+    path.emplace_back(i);
     status = child_func(children[i]);
     path.pop_back();
   }
@@ -227,7 +227,11 @@ visit_children(const Children& children, NodePath& path, ChildFunc&& child_func)
   return status;
 }
 
-template<class Key, class Node, typename DirVisitor, typename DatVisitor>
+template<class Key,
+         class Node,
+         typename DirVisitor,
+         typename DatVisitor,
+         typename NodePath>
 VisitStatus
 visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
                 DirVisitor&&                       visit_dir,
@@ -259,7 +263,8 @@ template<typename DirVisitor, typename DatVisitor>
 void
 RTree<K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
 {
-  NodePath path({0}, NodePath::allocator_type{});
+  NodePath path;
+  path.emplace_back(0u);
   detail::visit_dir_entry(_root,
                           std::forward<DirVisitor>(visit_dir),
                           std::forward<DatVisitor>(visit_dat),
@@ -271,7 +276,8 @@ template<typename DirVisitor>
 void
 RTree<K, D, C>::visit(DirVisitor&& visit_dir) const
 {
-  NodePath path({0}, NodePath::allocator_type{});
+  NodePath path;
+  path.emplace_back(0u);
   detail::visit_dir_entry(
     _root,
     std::forward<DirVisitor>(visit_dir),

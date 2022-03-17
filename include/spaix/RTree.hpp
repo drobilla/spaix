@@ -18,13 +18,10 @@
 #include <cstddef>
 #include <memory>
 #include <utility> // IWYU pragma: keep
-#include <vector>
 
 // IWYU pragma: no_include <algorithm>
 
 namespace spaix {
-
-using NodePath = std::vector<ChildIndex>;
 
 enum class VisitStatus { proceed, finish };
 
@@ -81,6 +78,8 @@ public:
   using mapped_type = D;
   using value_type  = DataNode<K, D>;
   using node_type   = DatNode;
+
+  using NodePath = StaticVector<ChildIndex, ChildCount, max_height()>;
 
   RTree() = default;
 

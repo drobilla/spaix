@@ -12,9 +12,11 @@
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
+#include "spaix/StaticVector.hpp"
 #include "spaix/TreeRange.hpp"
 #include "spaix/contains.hpp"
 #include "spaix/search/within.hpp"
+#include "spaix/types.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -31,13 +33,10 @@
 
 namespace {
 
-using Scalar   = float;
-using Rect     = spaix::Rect<float, float>;
-using Point    = spaix::Point<float, float>;
-using Data     = size_t;
-using NodePath = spaix::NodePath;
-
-/* constexpr size_t page_size = 512u; */
+using Scalar = float;
+using Rect   = spaix::Rect<float, float>;
+using Point  = spaix::Point<float, float>;
+using Data   = size_t;
 
 template<class Key>
 Key
@@ -114,14 +113,15 @@ num_items_in_area<Rect>(const unsigned x_span, const unsigned y_span)
   return x_span * y_span;
 }
 
-template<class NodeKey>
+template<class NodePath, class NodeKey>
 void
 check_node(const std::map<NodePath, Rect>& dir_keys,
            const NodeKey&                  key,
            const NodePath&                 path)
 {
   // Check that all parent keys are present and contain us
-  NodePath parent_path(path.begin(), std::prev(path.end()));
+  NodePath parent_path = path;
+  parent_path.pop_back();
   while (!parent_path.empty()) {
     const auto p = dir_keys.find(parent_path);
     CHECK(p != dir_keys.end());
@@ -134,7 +134,8 @@ template<class Tree>
 void
 test_visit(const Tree& tree)
 {
-  using DirKey = typename Tree::Box;
+  using DirKey   = typename Tree::Box;
+  using NodePath = typename Tree::NodePath;
 
   std::vector<NodePath> top_paths;
 
@@ -177,8 +178,9 @@ template<class Tree>
 void
 test_structure(const Tree& tree)
 {
-  using DirKey = typename Tree::Box;
-  using Key    = typename Tree::Key;
+  using DirKey   = typename Tree::Box;
+  using Key      = typename Tree::Key;
+  using NodePath = typename Tree::NodePath;
 
   std::map<NodePath, DirKey> dir_keys;
   std::set<NodePath>         dat_paths;
