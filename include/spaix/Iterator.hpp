@@ -4,14 +4,12 @@
 #ifndef SPAIX_ITERATOR_HPP
 #define SPAIX_ITERATOR_HPP
 
-#include "spaix/StaticVector.hpp"
+#include "spaix/DataIterator.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/types.hpp"
 
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
-#include <iterator>
 #include <utility> // IWYU pragma: keep
 
 namespace spaix {
@@ -22,25 +20,23 @@ namespace spaix {
    This iterates over data items in the tree which match the given predicate.
 */
 template<class Predicate, class DirNode, class DatNode, size_t max_height>
-struct Iterator {
-  using iterator_category = std::forward_iterator_tag;
-  using value_type        = DatNode;
-  using difference_type   = intptr_t;
-  using pointer           = const DatNode*;
-  using reference         = const DatNode&;
-
+class Iterator : public DataIterator<DirNode, DatNode, max_height>
+{
+public:
+  using Base     = DataIterator<DirNode, DatNode, max_height>;
   using DirEntry = typename DirNode::DirEntry;
   using DirKey   = typename DirNode::NodeKey;
+  using Frame    = typename Base::Frame;
 
   Iterator(const DirEntry& root_entry, Predicate predicate)
-    : _stack{}
+    : Base{}
     , _predicate{std::move(predicate)}
   {
     const auto& root = root_entry.node;
-    if (root && predicate.directory(root_entry.key)) {
-      const ChildIndex root_child_index = leftmost_child(*root, predicate);
+    if (root && _predicate.directory(root_entry.key)) {
+      const ChildIndex root_child_index = leftmost_child(*root, _predicate);
       if (root_child_index < root->num_children()) {
-        _stack.emplace_back(Frame{root.get(), root_child_index});
+        Base::stack().emplace_back(Frame{root.get(), root_child_index});
         move_down_left();
       }
     }
@@ -52,37 +48,11 @@ struct Iterator {
     return *this;
   }
 
-  const DatNode& operator*() const { return *operator->(); }
-
-  const DatNode* operator->() const
-  {
-    assert(!_stack.empty());
-    assert(_stack.back().index < _stack.back().node->num_children());
-    assert(_stack.back().node->child_type() == NodeType::data);
-
-    return entry_ptr(_stack.back().node->dat_children()[_stack.back().index]);
-  }
-
-  bool operator==(const Iterator& rhs) const
-  {
-    return _stack.size() == rhs._stack.size() &&
-           (_stack.empty() || _stack.back() == rhs._stack.back());
-  }
-
-  bool operator!=(const Iterator& rhs) const { return !operator==(rhs); }
-
 private:
-  struct Frame {
-    const DirNode* node;  ///< Pointer to directory node
-    ChildIndex     index; ///< Index of child
-
-    inline friend bool operator==(const Frame& lhs, const Frame& rhs)
-    {
-      return lhs.node == rhs.node && lhs.index == rhs.index;
-    }
-  };
-
-  using Stack = StaticVector<Frame, size_t, max_height>;
+  using Base::back;
+  using Base::index;
+  using Base::node;
+  using Base::stack;
 
   /**
      Return the index of the leftmost child of `dir` that matches `predicate`.
@@ -113,21 +83,6 @@ private:
     return 0; // Unreached
   }
 
-  Frame& back()
-  {
-    assert(!_stack.empty());
-    return _stack.back();
-  }
-
-  const Frame& back() const
-  {
-    assert(!_stack.empty());
-    return _stack.back();
-  }
-
-  const DirNode* node() const { return back().node; }
-  ChildIndex     index() const { return back().index; }
-
   /// Move right until we reach a good leaf or the end of the parent
   bool move_right_leaf()
   {
@@ -153,9 +108,9 @@ private:
   /// Move up/right until we reach a node we are not at the end of yet
   bool move_up_right()
   {
-    while (!_stack.empty() && index() >= node()->num_children()) {
-      _stack.pop_back(); // Move up
-      if (_stack.empty()) {
+    while (!stack().empty() && index() >= node()->num_children()) {
+      stack().pop_back(); // Move up
+      if (stack().empty()) {
         return false; // Reached end of tree
       }
 
@@ -171,10 +126,10 @@ private:
     while (node()->child_type() == NodeType::directory) {
       auto* const dir = node()->dir_children()[index()].node.get();
       if (dir->child_type() == NodeType::data) {
-        _stack.emplace_back(Frame{dir, 0});
+        stack().emplace_back(Frame{dir, 0});
       } else {
         const ChildIndex first_index = leftmost_child(*dir, _predicate);
-        _stack.emplace_back(Frame{dir, first_index});
+        stack().emplace_back(Frame{dir, first_index});
 
         if (first_index >= dir->dir_children().size()) {
           // Reached a non-matching directory, skip this subtree
@@ -215,7 +170,6 @@ private:
     } while (!_predicate.leaf(entry_key(node()->dat_children()[index()])));
   }
 
-  Stack     _stack;
   Predicate _predicate;
 };
 

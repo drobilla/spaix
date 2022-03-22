@@ -56,6 +56,7 @@ endif
 
 headers = [
   'include/spaix/Config.hpp',
+  'include/spaix/DataIterator.hpp',
   'include/spaix/DataNode.hpp',
   'include/spaix/DataPlacement.hpp',
   'include/spaix/Iterator.hpp',
