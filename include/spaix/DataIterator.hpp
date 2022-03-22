@@ -26,6 +26,8 @@ public:
   using pointer           = const DatNode*;
   using reference         = const DatNode&;
 
+  static DataIterator make_end() { return DataIterator{}; }
+
   const DatNode& operator*() const { return *operator->(); }
 
   const DatNode* operator->() const
@@ -37,13 +39,20 @@ public:
     return entry_ptr(_stack.back().node->dat_children()[_stack.back().index]);
   }
 
-  bool operator==(const DataIterator& rhs) const
+  template<class RhsDir, class RhsDat>
+  bool operator==(const DataIterator<RhsDir, RhsDat, max_height>& rhs) const
   {
-    return _stack.size() == rhs._stack.size() &&
-           (_stack.empty() || _stack.back() == rhs._stack.back());
+    return (empty() || rhs.empty()) ? (empty() && rhs.empty())
+                                    : (operator->() == rhs.operator->());
   }
 
-  bool operator!=(const DataIterator& rhs) const { return !operator==(rhs); }
+  template<class RhsDir, class RhsDat>
+  bool operator!=(const DataIterator<RhsDir, RhsDat, max_height>& rhs) const
+  {
+    return !operator==(rhs);
+  }
+
+  bool empty() const { return _stack.empty(); }
 
 protected:
   struct Frame {

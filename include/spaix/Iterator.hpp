@@ -28,6 +28,12 @@ public:
   using DirKey   = typename DirNode::NodeKey;
   using Frame    = typename Base::Frame;
 
+  Iterator(const DataIterator<DirNode, DatNode, max_height>& base,
+           Predicate                                         predicate)
+    : Base{base}
+    , _predicate{predicate}
+  {}
+
   Iterator(const DirEntry& root_entry, Predicate predicate)
     : Base{}
     , _predicate{std::move(predicate)}

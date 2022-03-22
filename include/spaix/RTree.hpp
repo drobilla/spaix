@@ -4,6 +4,7 @@
 #ifndef SPAIX_RTREE_HPP
 #define SPAIX_RTREE_HPP
 
+#include "spaix/DataIterator.hpp"
 #include "spaix/DataNode.hpp"
 #include "spaix/Iterator.hpp"
 #include "spaix/StaticVector.hpp" // IWYU pragma: export
@@ -154,12 +155,13 @@ public:
   template<typename DirVisitor>
   void visit(DirVisitor&& visit_dir) const;
 
+  using EndIterator = DataIterator<const DirNode, const DatNode, max_height()>;
+
   const_iterator begin() const { return const_iterator{_root, {}}; }
-  const_iterator end() const { return const_iterator{{Box{}, nullptr}, {}}; }
+  EndIterator    end() const { return EndIterator::make_end(); }
   const_iterator cbegin() const { return begin(); }
-  const_iterator cend() const { return end(); }
-  iterator       begin() { return empty() ? end() : iterator{_root, {}}; }
-  iterator       end() { return iterator{{Box{}, nullptr}, {}}; }
+  EndIterator    cend() const { return EndIterator::make_end(); }
+  iterator       begin() { return iterator{_root, {}}; }
 
 private:
   using DatNodePtr  = std::unique_ptr<DatNode>;

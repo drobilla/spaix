@@ -12,11 +12,9 @@
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
-#include "spaix/StaticVector.hpp"
 #include "spaix/TreeRange.hpp"
 #include "spaix/contains.hpp"
 #include "spaix/search/within.hpp"
-#include "spaix/types.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -28,7 +26,6 @@
 #include <random>
 #include <set>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace {
