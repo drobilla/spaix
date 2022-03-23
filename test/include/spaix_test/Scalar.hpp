@@ -29,12 +29,12 @@ struct Scalar {
     return _value < rhs._value;
   }
 
-  constexpr Scalar operator*(const Scalar& rhs) const
+  constexpr auto operator*(const Scalar& rhs) const
   {
     return _value * rhs._value;
   }
 
-  constexpr Scalar operator-(const Scalar& rhs) const
+  constexpr auto operator-(const Scalar& rhs) const
   {
     return _value - rhs._value;
   }

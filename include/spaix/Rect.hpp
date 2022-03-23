@@ -175,7 +175,7 @@ max(const Rect<Ts...>& rect)
 }
 
 template<size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
+constexpr DifferenceOf<Nth<dim, Ts...>, Nth<dim, Ts...>>
 span(const Rect<Ts...>& rect)
 {
   const auto& dim_range = get<dim>(rect);

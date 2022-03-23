@@ -79,6 +79,9 @@ using ProductOf =
   decltype(tuple_product<Ts...>(std::declval<std::tuple<Ts...>>(),
                                 ibegin_inclusive<Ts...>()));
 
+template<class L, class R>
+using DifferenceOf = decltype(std::declval<L>() - std::declval<R>());
+
 } // namespace spaix
 
 #endif // SPAIX_DETAIL_META_HPP
