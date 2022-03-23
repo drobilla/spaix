@@ -74,9 +74,9 @@ public:
   {
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
-      const auto best   = pick_next(deposit, lhs, rhs);
-      const auto iter   = deposit.begin() + best.child_index;
-      auto&      parent = best.side == Side::left ? lhs : rhs;
+      const auto  best   = pick_next(deposit, lhs, rhs);
+      auto* const iter   = deposit.begin() + best.child_index;
+      auto&       parent = best.side == Side::left ? lhs : rhs;
 
       assert(best.child_index < deposit.size());
       detail::distribute_child(parent, best.new_parent_key, std::move(*iter));

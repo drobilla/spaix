@@ -3,7 +3,6 @@ Checks: >
   -*-c-arrays,
   -*-magic-numbers,
   -*-named-parameter,
-  -*-qualified-auto,
   -*-uppercase-literal-suffix,
   -altera-*,
   -bugprone-branch-clone,

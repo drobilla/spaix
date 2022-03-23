@@ -160,9 +160,9 @@ RTree<K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                            ChildIndex                              index,
                            NodeType                                child_type)
 {
-  const auto iter{deposit.begin() + index};
-  Box        key{entry_key(*iter)};
-  DirNodePtr node{std::make_unique<DirNode>(child_type)};
+  auto* const iter{deposit.begin() + index};
+  Box         key{entry_key(*iter)};
+  DirNodePtr  node{std::make_unique<DirNode>(child_type)};
 
   node->append_child(std::move(*iter));
   deposit.pop(iter);
