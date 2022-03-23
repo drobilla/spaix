@@ -6,6 +6,7 @@ tests = [
   'test_RTree',
   'test_Rect',
   'test_contains',
+  'test_expansion',
   'test_intersection',
   'test_intersects',
   'test_union',
