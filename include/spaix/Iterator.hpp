@@ -43,7 +43,9 @@ public:
       const ChildIndex root_child_index = leftmost_child(*root, _predicate);
       if (root_child_index < root->num_children()) {
         Base::stack().emplace_back(Frame{root.get(), root_child_index});
-        move_down_left();
+        if (move_down_left() == Status::reached_end) {
+          Base::stack().clear();
+        }
       }
     }
   }
@@ -59,6 +61,11 @@ private:
   using Base::index;
   using Base::node;
   using Base::stack;
+
+  enum class Status {
+    success,
+    reached_end,
+  };
 
   /**
      Return the index of the leftmost child of `dir` that matches `predicate`.
@@ -90,7 +97,7 @@ private:
   }
 
   /// Move right until we reach a good leaf or the end of the parent
-  bool move_right_leaf()
+  [[nodiscard]] Status move_right_leaf()
   {
     assert(node()->child_type() == NodeType::data);
     do {
@@ -98,7 +105,8 @@ private:
     } while (index() < node()->dat_children().size() &&
              !_predicate.leaf(entry_key(node()->dat_children()[index()])));
 
-    return index() < node()->dat_children().size();
+    return index() < node()->dat_children().size() ? Status::success
+                                                   : Status::reached_end;
   }
 
   /// Move right until we reach a good directory or the end of the parent
@@ -112,22 +120,22 @@ private:
   }
 
   /// Move up/right until we reach a node we are not at the end of yet
-  bool move_up_right()
+  [[nodiscard]] Status move_up_right()
   {
     while (!stack().empty() && index() >= node()->num_children()) {
       stack().pop_back(); // Move up
       if (stack().empty()) {
-        return false; // Reached end of tree
+        return Status::reached_end;
       }
 
       move_right_dir(); // Move to the next child of this node
     }
 
-    return true;
+    return Status::success;
   }
 
   /// Move down/left until we reach a potentially matching leaf
-  bool move_down_left()
+  [[nodiscard]] Status move_down_left()
   {
     while (node()->child_type() == NodeType::directory) {
       auto* const dir = node()->dir_children()[index()].node.get();
@@ -139,24 +147,24 @@ private:
 
         if (first_index >= dir->dir_children().size()) {
           // Reached a non-matching directory, skip this subtree
-          if (!move_up_right()) {
-            return false; // Reached end of tree
+          if (move_up_right() == Status::reached_end) {
+            return Status::reached_end; // Reached end of tree
           }
         }
       }
     }
 
-    return true;
+    return Status::success;
   }
 
-  bool increment()
+  [[nodiscard]] Status increment()
   {
-    if (move_right_leaf()) {
-      return true; // Moved to next leaf child
+    if (move_right_leaf() == Status::success) {
+      return Status::success; // Moved to next leaf child
     }
 
-    if (!move_up_right()) {
-      return false; // Reached end of tree
+    if (move_up_right() == Status::reached_end) {
+      return Status::reached_end; // Reached end of tree
     }
 
     // Now at a matching directory, and a matching child of that directory
@@ -170,7 +178,7 @@ private:
   void scan_next()
   {
     do {
-      if (!increment()) {
+      if (increment() == Status::reached_end) {
         return;
       }
     } while (!_predicate.leaf(entry_key(node()->dat_children()[index()])));
