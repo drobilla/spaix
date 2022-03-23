@@ -1,4 +1,4 @@
-# Copyright 2019-2020 David Robillard <d@drobilla.net>
+# Copyright 2019-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: CC0-1.0 OR GPL-3.0-only
 
 project('spaix', 'cpp',
@@ -10,6 +10,8 @@ project('spaix', 'cpp',
         ],
         meson_version : '>= 0.45.0',
         license: 'GPLv3+')
+
+spaix_src_root = meson.current_source_dir()
 
 cxx = meson.get_compiler('cpp')
 versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
@@ -114,34 +116,7 @@ spaix_test_dep = declare_dependency(
   include_directories: include_directories('test/include'))
 
 if get_option('tests')
-  autoship = find_program('autoship', required: false)
-  if autoship.found()
-    test('autoship', autoship, args: ['test', meson.current_source_dir()])
-  endif
-
-  reuse = find_program('reuse', required: false)
-  if reuse.found()
-    test('REUSE', reuse,
-         args: ['--root', meson.current_source_dir(), 'lint'],
-         suite: 'data')
-  endif
-
-  tests = [
-    'Point',
-    'RTree',
-    'Rect',
-    'contains',
-    'intersection',
-    'intersects',
-    'union'
-  ]
-
-  foreach test : tests
-    test(test,
-         executable('test_' + test, 'test/unit/test_@0@.cpp'.format(test),
-                    dependencies: [spaix_dep, spaix_test_dep]))
-  endforeach
-
+  subdir('test')
 endif
 
 if get_option('tools')
@@ -149,59 +124,24 @@ if get_option('tools')
                         dependencies: [spaix_dep, spaix_test_dep])
 
   if get_option('tests')
-    test('draw', draw_exe)
-    test('draw', draw_exe, args: ['--insert', 'linear'])
-    test('draw', draw_exe, args: ['--split', 'linear'])
-    test('draw', draw_exe, args: ['--split', 'quadratic'])
-    # test('draw', draw_exe, args: ['--page-size', '64'])
-    # test('draw', draw_exe, args: ['--page-size', '128'])
-    test('draw', draw_exe, args: ['--page-size', '256'])
-    test('draw', draw_exe, args: ['--page-size', '512'])
-    test('draw', draw_exe, args: ['--page-size', '1024'])
-    test('draw', draw_exe, args: ['--page-size', '2048'])
-    test('draw', draw_exe, args: ['--page-size', '4096'])
+    test('default', draw_exe, suite: 'draw')
+    test('linear_insert', draw_exe, args: ['--insert', 'linear'], suite: 'draw')
+    test('linear_split', draw_exe, args: ['--split', 'linear'], suite: 'draw')
+    test('quadratic_split', draw_exe, args: ['--split', 'quadratic'], suite: 'draw')
+    test('page_256', draw_exe, args: ['--page-size', '256'], suite: 'draw')
+    test('page_512', draw_exe, args: ['--page-size', '512'], suite: 'draw')
+    test('page_1024', draw_exe, args: ['--page-size', '1024'], suite: 'draw')
+    test('page_2048', draw_exe, args: ['--page-size', '2048'], suite: 'draw')
+    test('page_4096', draw_exe, args: ['--page-size', '4096'], suite: 'draw')
 
-    test('draw', draw_exe, args: ['--insert', 'unknown'], should_fail: true)
-    test('draw', draw_exe, args: ['--split', 'unknown'], should_fail: true)
-    test('draw', draw_exe, args: ['--page-size', '16'], should_fail: true)
-    test('draw', draw_exe, args: ['--page-size', '8192'], should_fail: true)
-    test('draw', draw_exe, args: ['--bad-arg'], should_fail: true)
+    test('bad_insert', draw_exe, args: ['--insert', 'unknown'], should_fail: true, suite: 'draw')
+    test('bad_split', draw_exe, args: ['--split', 'unknown'], should_fail: true, suite: 'draw')
+    test('bad_small_page', draw_exe, args: ['--page-size', '128'], should_fail: true, suite: 'draw')
+    test('bad_large_page', draw_exe, args: ['--page-size', '8192'], should_fail: true, suite: 'draw')
+    test('bad_option', draw_exe, args: ['--bad-arg'], should_fail: true, suite: 'draw')
   endif
 endif
 
 if get_option('benchmark')
-  bench_exe = executable('bench_spaix_rtree',
-                         'test/benchmark/bench_spaix_rtree.cpp',
-                         dependencies: [spaix_dep, spaix_test_dep])
-
-  if have_boost
-    boost_bench_exe = executable(
-      'bench_boost_rtree',
-      'test/benchmark/bench_boost_rtree.cpp',
-      dependencies: [boost_dep, spaix_dep, spaix_test_dep])
-  endif
-
-  if get_option('tests')
-    test('build', executable('test_build',
-                             'test/test_build.cpp',
-                             dependencies: [spaix_dep]))
-
-    test('bench', bench_exe, args: ['--size', '16', '--insert', 'linear'])
-    test('bench', bench_exe, args: ['--size', '16', '--split', 'linear'])
-    test('bench', bench_exe, args: ['--size', '16', '--split', 'quadratic'])
-    # test('bench', bench_exe, args: ['--size', '16', '--page-size', '64'])
-    # test('bench', bench_exe, args: ['--size', '16', '--page-size', '128'])
-    test('bench', bench_exe, args: ['--size', '16', '--page-size', '256'])
-    test('bench', bench_exe, args: ['--size', '16', '--page-size', '512'])
-    test('bench', bench_exe, args: ['--size', '16', '--page-size', '1024'])
-    test('bench', bench_exe, args: ['--size', '16', '--page-size', '2048'])
-    test('bench', bench_exe, args: ['--size', '16', '--page-size', '4096'])
-    test('bench', bench_exe, args: ['--size', '16', '--page-size', '8192'])
-
-    test('bench', bench_exe, args: ['--insert', 'unknown'], should_fail: true)
-    test('bench', bench_exe, args: ['--split', 'unknown'], should_fail: true)
-    test('bench', bench_exe, args: ['--page-size', '64'], should_fail: true)
-    test('bench', bench_exe, args: ['--page-size', '16384'], should_fail: true)
-    test('bench', bench_exe, args: ['--bad-arg'], should_fail: true)
-  endif
+  subdir('test/benchmark')
 endif
