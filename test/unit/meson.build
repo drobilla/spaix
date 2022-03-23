@@ -9,6 +9,7 @@ tests = [
   'test_intersection',
   'test_intersects',
   'test_union',
+  'test_volume',
 ]
 
 foreach test : tests
