@@ -50,9 +50,8 @@ RTree<K, D, C>::query(S search) const
 
   ConstSearcher<S> first{_root, search};
   ConstSearcher<S> last{{Box{}, nullptr}, search};
-  if (first != last && !search.leaf(first->key)) {
-    ++first;
-  }
+
+  assert(first == last || search.leaf(first->key));
 
   return {std::move(first), std::move(last)};
 }

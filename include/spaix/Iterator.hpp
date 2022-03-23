@@ -48,11 +48,16 @@ public:
         }
       }
     }
+
+    assert(this->empty() || _predicate.leaf(entry_key(this->operator*())));
   }
 
   Iterator& operator++()
   {
-    scan_next();
+    if (increment() == Status::reached_end) {
+      assert(this->empty());
+    }
+
     return *this;
   }
 
@@ -138,18 +143,15 @@ private:
   [[nodiscard]] Status move_down_left()
   {
     while (node()->child_type() == NodeType::directory) {
-      auto* const dir = node()->dir_children()[index()].node.get();
-      if (dir->child_type() == NodeType::data) {
-        stack().emplace_back(Frame{dir, 0});
-      } else {
-        const ChildIndex first_index = leftmost_child(*dir, _predicate);
-        stack().emplace_back(Frame{dir, first_index});
+      auto* const      dir         = node()->dir_children()[index()].node.get();
+      const ChildIndex first_index = leftmost_child(*dir, _predicate);
 
-        if (first_index >= dir->dir_children().size()) {
-          // Reached a non-matching directory, skip this subtree
-          if (move_up_right() == Status::reached_end) {
-            return Status::reached_end; // Reached end of tree
-          }
+      stack().emplace_back(Frame{dir, first_index});
+
+      if (first_index >= dir->num_children()) {
+        // No matches in this directory node, skip to the next
+        if (move_up_right() == Status::reached_end) {
+          return Status::reached_end;
         }
       }
     }
@@ -157,7 +159,7 @@ private:
     return Status::success;
   }
 
-  [[nodiscard]] Status increment()
+  Status increment()
   {
     if (move_right_leaf() == Status::success) {
       return Status::success; // Moved to next leaf child
@@ -173,15 +175,6 @@ private:
            (_predicate.leaf(entry_key(node()->dat_children()[index()]))));
 
     return move_down_left();
-  }
-
-  void scan_next()
-  {
-    do {
-      if (increment() == Status::reached_end) {
-        return;
-      }
-    } while (!_predicate.leaf(entry_key(node()->dat_children()[index()])));
   }
 
   Predicate _predicate;
