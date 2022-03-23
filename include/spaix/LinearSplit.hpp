@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_LINEARSPLIT_HPP
@@ -10,7 +10,7 @@
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
-#include <algorithm> // IWYU pragma: keep
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -32,6 +32,9 @@ public:
   std::pair<size_t, size_t> pick_seeds(const Entries& deposit,
                                        const DirKey&  bounds)
   {
+    using std::max;
+    using std::min;
+
     using Scalar = typename CommonScalarType<typename DirKey::Scalars>::type;
 
     std::array<ExtremeIndices, DirKey::size()> indices{};
@@ -47,8 +50,8 @@ public:
     const auto min_max_index = indices[max_separation.dimension].min_max;
     assert(max_min_index != min_max_index);
 
-    return {std::min(max_min_index, min_max_index),
-            std::max(max_min_index, min_max_index)};
+    return {min(max_min_index, min_max_index),
+            max(max_min_index, min_max_index)};
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`

@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_INTERSECTION_HPP
@@ -8,7 +8,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
 
-#include <algorithm> // IWYU pragma: keep
+#include <algorithm>
 #include <cstddef>
 #include <tuple>
 #include <utility>
@@ -27,10 +27,13 @@ template<class Lhs, class Rhs, size_t dim, size_t num_dims>
 SPAIX_ALWAYS_INLINE constexpr auto
 intersection_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 {
+  using std::max;
+  using std::min;
+
   const auto l  = range<dim>(lhs);
   const auto r  = range<dim>(rhs);
-  const auto lo = std::max(l.first, r.first);
-  const auto hi = std::min(l.second, r.second);
+  const auto lo = max(l.first, r.first);
+  const auto hi = min(l.second, r.second);
 
   return std::tuple_cat(std::make_tuple(std::make_pair(lo, hi)),
                         intersection_rec(lhs, rhs, ++index));

@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_UNION_HPP
@@ -8,7 +8,7 @@
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
 
-#include <algorithm> // IWYU pragma: keep
+#include <algorithm>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
@@ -16,6 +16,9 @@
 
 namespace spaix {
 namespace detail {
+
+using std::max;
+using std::min;
 
 template<class Lhs, class Rhs, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr auto
@@ -30,8 +33,8 @@ union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 {
   const auto l  = range<dim>(lhs);
   const auto r  = range<dim>(rhs);
-  const auto lo = std::min(l.first, r.first);
-  const auto hi = std::max(l.second, r.second);
+  const auto lo = min(l.first, r.first);
+  const auto hi = max(l.second, r.second);
 
   return std::tuple_cat(std::make_tuple(std::make_pair(lo, hi)),
                         union_rec(lhs, rhs, ++index));
@@ -49,8 +52,8 @@ union_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
   auto&      l = range<dim>(lhs);
   const auto r = range<dim>(rhs);
 
-  l.first  = std::min(l.first, r.first);
-  l.second = std::max(l.second, r.second);
+  l.first  = min(l.first, r.first);
+  l.second = max(l.second, r.second);
 
   union_rec(lhs, rhs, ++index);
 }

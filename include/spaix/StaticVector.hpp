@@ -1,10 +1,10 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_STATICVECTOR_HPP
 #define SPAIX_STATICVECTOR_HPP
 
-#include <algorithm> // IWYU pragma: keep
+#include <algorithm>
 #include <cassert>
 #include <new>
 #include <type_traits>
@@ -133,8 +133,9 @@ bool
 operator==(const spaix::StaticVector<T, Size, capacity>& lhs,
            const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
 {
-  return lhs.size() == rhs.size() &&
-         std::equal(lhs.begin(), rhs.end(), rhs.begin());
+  using std::equal;
+
+  return lhs.size() == rhs.size() && equal(lhs.begin(), rhs.end(), rhs.begin());
 }
 
 template<class T, class Size, Size capacity>
@@ -142,7 +143,9 @@ bool
 operator<(const spaix::StaticVector<T, Size, capacity>& lhs,
           const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
 {
-  return std::lexicographical_compare(
+  using std::lexicographical_compare;
+
+  return lexicographical_compare(
     lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 

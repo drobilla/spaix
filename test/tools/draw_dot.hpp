@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DRAW_DOT_HPP
@@ -10,8 +10,6 @@
 #include <cstddef>
 #include <sstream>
 #include <string>
-
-// IWYU pragma: no_include <algorithm>
 
 namespace spaix {
 namespace detail {

@@ -16,11 +16,14 @@ class Distribution
 public:
   void update(T x)
   {
+    using std::max;
+    using std::min;
+
     if (_n == 0) {
       _min = _max = _mean = x;
     } else {
-      _min  = std::min(_min, x);
-      _max  = std::max(_max, x);
+      _min  = min(_min, x);
+      _max  = max(_max, x);
       _mean = _mean + (x - _mean) / T(_n + 1);
     }
 
