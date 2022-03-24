@@ -37,10 +37,6 @@ test_point()
   STATIC_CHECK((get<1>(point) == 2.0f));
   STATIC_CHECK((range<0>(point) == XRange{1, 1}));
   STATIC_CHECK((range<1>(point) == YRange{2.0f, 2.0f}));
-  STATIC_CHECK((min<0>(point) == 1));
-  STATIC_CHECK((min<1>(point) == 2.0f));
-  STATIC_CHECK((max<0>(point) == 1));
-  STATIC_CHECK((max<1>(point) == 2.0f));
   STATIC_CHECK((span<0>(point) == 0));
   STATIC_CHECK((span<1>(point) == 0.0f));
 

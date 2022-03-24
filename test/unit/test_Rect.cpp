@@ -53,10 +53,6 @@ test_rect()
   STATIC_CHECK((get<1>(rect) == YRange{2.0f, 5.0f}));
   STATIC_CHECK((range<0>(rect) == XRange{1, 3}));
   STATIC_CHECK((range<1>(rect) == YRange{2.0f, 5.0f}));
-  STATIC_CHECK((min<0>(rect) == 1));
-  STATIC_CHECK((min<1>(rect) == 2.0f));
-  STATIC_CHECK((max<0>(rect) == 3));
-  STATIC_CHECK((max<1>(rect) == 5.0f));
   STATIC_CHECK((span<0>(rect) == 2));
   STATIC_CHECK((span<1>(rect) == 3.0f));
 

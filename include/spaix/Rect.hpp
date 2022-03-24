@@ -139,20 +139,6 @@ ranges(const Rect<Ts...>& rect)
 }
 
 template<size_t dim, class... Ts>
-constexpr const Nth<dim, Ts...>&
-min(const Rect<Ts...>& rect)
-{
-  return std::get<dim>(rect.tuple()).lower;
-}
-
-template<size_t dim, class... Ts>
-constexpr const Nth<dim, Ts...>&
-max(const Rect<Ts...>& rect)
-{
-  return std::get<dim>(rect.tuple()).upper;
-}
-
-template<size_t dim, class... Ts>
 constexpr DifferenceOf<Nth<dim, Ts...>, Nth<dim, Ts...>>
 span(const Rect<Ts...>& rect)
 {
@@ -173,8 +159,9 @@ template<class... Ts, size_t dim, size_t n_dims>
 void
 print_rec(std::ostream& os, const Rect<Ts...>& rect, Index<dim, n_dims> index)
 {
-  os << ((dim > 0) ? ", " : "") << "[" << min<dim>(rect) << ", "
-     << max<dim>(rect) << ']';
+  const auto [lower, upper] = range<dim>(rect);
+
+  os << ((dim > 0) ? ", " : "") << "[" << lower << ", " << upper << ']';
 
   print_rec(os, rect, ++index);
 }

@@ -110,20 +110,6 @@ ranges(const Point<Ts...>& point)
 
 template<size_t dim, class... Ts>
 constexpr Nth<dim, Ts...>
-min(const Point<Ts...>& point)
-{
-  return std::get<dim>(point.tuple());
-}
-
-template<size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
-max(const Point<Ts...>& point)
-{
-  return std::get<dim>(point.tuple());
-}
-
-template<size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
 span(const Point<Ts...>&)
 {
   return 0;

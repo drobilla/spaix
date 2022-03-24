@@ -139,24 +139,24 @@ private:
                              std::array<ExtremeIndices, n_dims>& indices,
                              Index<dim, n_dims>                  index)
   {
-    const auto& child = deposit[child_index];
-    const auto  low   = min<dim>(entry_key(child));
-    const auto  high  = max<dim>(entry_key(child));
+    const auto& child      = deposit[child_index];
+    const auto& child_key  = entry_key(child);
+    const auto [low, high] = range<dim>(child_key);
 
-    if (low <= min<dim>(entry_key(deposit[indices[dim].min_min]))) {
+    if (low <= range<dim>(entry_key(deposit[indices[dim].min_min])).lower) {
       indices[dim].min_min = child_index;
     }
 
-    if (low >= min<dim>(entry_key(deposit[indices[dim].max_min]))) {
+    if (low >= range<dim>(entry_key(deposit[indices[dim].max_min])).lower) {
       indices[dim].max_min = child_index;
     }
 
-    if (high <= max<dim>(entry_key(deposit[indices[dim].min_max])) &&
+    if (high <= range<dim>(entry_key(deposit[indices[dim].min_max])).upper &&
         child_index != indices[dim].max_min) {
       indices[dim].min_max = child_index;
     }
 
-    if (high >= max<dim>(entry_key(deposit[indices[dim].max_max]))) {
+    if (high >= range<dim>(entry_key(deposit[indices[dim].max_max])).upper) {
       indices[dim].max_max = child_index;
     }
 
@@ -177,13 +177,13 @@ private:
     MaxSeparation<T>&                         max_separation,
     Index<dim, n_dims>                        index)
   {
-    const auto width =
-      static_cast<T>(max<dim>(entry_key(deposit[indices[dim].max_max])) -
-                     min<dim>(entry_key(deposit[indices[dim].min_min])));
+    const auto width = static_cast<T>(
+      range<dim>(entry_key(deposit[indices[dim].max_max])).upper -
+      range<dim>(entry_key(deposit[indices[dim].min_min])).lower);
 
-    const auto separation =
-      static_cast<T>(max<dim>(entry_key(deposit[indices[dim].min_max])) -
-                     min<dim>(entry_key(deposit[indices[dim].max_min])));
+    const auto separation = static_cast<T>(
+      range<dim>(entry_key(deposit[indices[dim].min_max])).upper -
+      range<dim>(entry_key(deposit[indices[dim].max_min])).lower);
 
     const auto normalized_separation =
       separation / (width > std::numeric_limits<T>::epsilon() ? width : T{1});
