@@ -191,11 +191,12 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 
   // Pick two nodes to seed the left and right groups
   const auto seeds = _split.pick_seeds(deposit, bounds);
-  assert(seeds.first < seeds.second);
+  assert(seeds.lhs_index < seeds.rhs_index);
 
-  // Create left and right parent nodes with seeds
-  DirNodePair sides{new_parent(deposit, seeds.second, type),
-                    new_parent(deposit, seeds.first, type)};
+  // Create left/right parent nodes with right/left seeds
+  // The largest index is popped first to avoid invalidating the other
+  DirNodePair sides{new_parent(deposit, seeds.rhs_index, type),
+                    new_parent(deposit, seeds.lhs_index, type)};
 
   // Distribute remaining nodes between seeds
   _split.distribute_children(

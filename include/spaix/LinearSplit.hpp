@@ -4,6 +4,7 @@
 #ifndef SPAIX_LINEARSPLIT_HPP
 #define SPAIX_LINEARSPLIT_HPP
 
+#include "spaix/SplitSeeds.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
 #include "spaix/detail/meta.hpp"
@@ -29,8 +30,7 @@ class LinearSplit
 public:
   /// Return the indices of the children that should be used for split seeds
   template<class Entries, class DirKey>
-  std::pair<size_t, size_t> pick_seeds(const Entries& deposit,
-                                       const DirKey&  bounds)
+  SplitSeeds<DirKey> pick_seeds(const Entries& deposit, const DirKey& bounds)
   {
     using std::max;
     using std::min;

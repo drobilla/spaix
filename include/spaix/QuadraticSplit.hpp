@@ -4,6 +4,7 @@
 #ifndef SPAIX_QUADRATICSPLIT_HPP
 #define SPAIX_QUADRATICSPLIT_HPP
 
+#include "spaix/SplitSeeds.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
 #include "spaix/types.hpp"
@@ -13,7 +14,7 @@
 #include <cstddef>
 #include <limits>
 #include <type_traits>
-#include <utility>
+#include <utility> // IWYU pragma: keep
 
 namespace spaix {
 
@@ -30,7 +31,7 @@ class QuadraticSplit
 public:
   /// Return the indices of the children that should be used for split seeds
   template<class Entry, ChildCount count, class DirKey>
-  std::pair<ChildIndex, ChildIndex> pick_seeds(
+  SplitSeeds<DirKey> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit,
     const DirKey&)
   {
@@ -43,8 +44,8 @@ public:
       volumes[i] = volume(entry_key(deposit[i]));
     }
 
-    SeedWaste                 max_waste{std::numeric_limits<Volume>::lowest()};
-    std::pair<size_t, size_t> seeds{deposit.size(), deposit.size()};
+    SeedWaste          max_waste{std::numeric_limits<Volume>::lowest()};
+    SplitSeeds<DirKey> seeds{deposit.size(), deposit.size()};
     for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
         const auto& k = entry_key(deposit[i]);
@@ -54,14 +55,14 @@ public:
 
         if (waste >= max_waste) {
           max_waste = waste;
-          seeds     = std::make_pair(i, j);
+          seeds     = SplitSeeds<DirKey>{i, j};
         }
       }
     }
 
-    assert(seeds.first < deposit.size());
-    assert(seeds.second < deposit.size());
-    assert(seeds.first != seeds.second);
+    assert(seeds.lhs_index < deposit.size());
+    assert(seeds.rhs_index < deposit.size());
+    assert(seeds.lhs_index < seeds.rhs_index);
     return seeds;
   }
 
