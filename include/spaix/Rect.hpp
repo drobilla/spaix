@@ -20,14 +20,14 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 constexpr auto
-empty_ranges_rec(EndIndex<n_dims>)
+empty_ranges_rec(EndIndex<n_dims>) noexcept
 {
   return std::make_tuple();
 }
 
 template<class... Ts, size_t dim, size_t n_dims>
 constexpr auto
-empty_ranges_rec(Index<dim, n_dims> index)
+empty_ranges_rec(Index<dim, n_dims> index) noexcept
 {
   using T = Nth<dim, Ts...>;
 
@@ -40,23 +40,6 @@ empty_ranges_rec(Index<dim, n_dims> index)
     empty_ranges_rec<Ts...>(++index));
 }
 
-template<class Tuple, size_t n_dims>
-constexpr bool
-ranges_are_empty(const Tuple&, EndIndex<n_dims>)
-{
-  return false;
-}
-
-template<class Tuple, size_t dim, size_t n_dims>
-constexpr bool
-ranges_are_empty(const Tuple& tuple, Index<dim, n_dims> index)
-{
-  const auto& dim_range = std::get<dim>(tuple);
-
-  return (dim_range.upper < dim_range.lower) ||
-         ranges_are_empty(tuple, ++index);
-}
-
 } // namespace detail
 
 /// A multi-dimensional rectangle which suports heterogeneous types
@@ -67,41 +50,34 @@ public:
   using Tuple   = std::tuple<DimRange<T0>, DimRange<Ts>...>;
   using Scalars = std::tuple<T0, Ts...>;
 
-  Rect(const Rect& rect)     = default;
-  Rect(Rect&& rect) noexcept = default;
-  Rect& operator=(const Rect& rect) = default;
-  Rect& operator=(Rect&& rect) noexcept = default;
-
-  ~Rect() = default;
-
   /// Construct an empty rectangle
-  constexpr explicit Rect()
+  constexpr explicit Rect() noexcept
     : _ranges{detail::empty_ranges_rec<T0, Ts...>(ibegin())}
   {}
 
   /// Construct a rectangle from a single point
-  constexpr explicit Rect(const Point<T0, Ts...>& point)
+  constexpr explicit Rect(const Point<T0, Ts...>& point) noexcept
     : _ranges{ranges(point)}
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
-  constexpr explicit Rect(DimRange<T0>&& first, DimRange<Ts>&&... rest)
+  constexpr explicit Rect(DimRange<T0>&& first, DimRange<Ts>&&... rest) noexcept
     : Rect{std::make_tuple(std::forward<DimRange<T0>>(first),
                            std::forward<DimRange<Ts>>(rest)...)}
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
-#if 1
-  constexpr explicit Rect(Tuple ranges)
-    : _ranges{detail::ranges_are_empty(ranges, ibegin())
-                ? detail::empty_ranges_rec<T0, Ts...>(ibegin())
-                : std::move(ranges)}
-  {}
-#else
-  constexpr explicit Rect(Tuple ranges)
+  constexpr explicit Rect(Tuple ranges) noexcept
     : _ranges{std::move(ranges)}
   {}
-#endif
+
+  Rect(const Rect& rect) noexcept = default;
+  Rect& operator=(const Rect& rect) noexcept = default;
+
+  Rect(Rect&& rect) noexcept = default;
+  Rect& operator=(Rect&& rect) noexcept = default;
+
+  ~Rect() noexcept = default;
 
   static constexpr auto   ibegin() { return spaix::ibegin<T0, Ts...>(); }
   static constexpr size_t size() { return 1 + sizeof...(Ts); }

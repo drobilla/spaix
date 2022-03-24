@@ -17,6 +17,8 @@ test_union()
 {
   constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
 
+  STATIC_CHECK(((rect | TestRect{}) == rect));
+
   STATIC_CHECK(((rect | TestRect{{2, 4}, {1.0f, 5.0f}}) ==
                 TestRect{{1, 4}, {1.0f, 5.0f}}));
 

@@ -8,6 +8,7 @@
 #include "spaix_test/check.hpp"
 
 #include "spaix/Rect.hpp"
+#include "spaix/empty.hpp"
 #include "spaix/intersection.hpp"
 
 namespace spaix::test {
@@ -19,7 +20,7 @@ test_intersection()
 
   STATIC_CHECK(((rect & TestRect{{2, 4}, {1.0f, 4.0f}}) ==
                 TestRect{{2, 3}, {2.0f, 4.0f}}));
-  STATIC_CHECK(((rect & TestRect{{5, 6}, {1.0f, 4.0f}}) == TestRect{}));
+  STATIC_CHECK(empty(rect & TestRect{{5, 6}, {1.0f, 4.0f}}));
 
   STATIC_CHECK(((rect & TestPoint{1, 2.0f}) == TestRect{{1, 1}, {2.0f, 2.0f}}));
   STATIC_CHECK(((TestPoint{1, 2.0f} & rect) == TestRect{{1, 1}, {2.0f, 2.0f}}));

@@ -22,13 +22,21 @@ class Point
 public:
   using Tuple = std::tuple<Ts...>;
 
-  constexpr explicit Point(Ts... values)
+  constexpr explicit Point(Ts... values) noexcept
     : _values{std::move(values)...}
   {}
 
-  constexpr explicit Point(Tuple values)
+  constexpr explicit Point(Tuple values) noexcept
     : _values{std::move(values)}
   {}
+
+  constexpr Point(const Point&) noexcept = default;
+  constexpr Point& operator=(const Point&) noexcept = default;
+
+  constexpr Point(Point&&) noexcept = default;
+  constexpr Point& operator=(Point&&) noexcept = default;
+
+  ~Point() noexcept = default;
 
   constexpr auto         ibegin() const { return spaix::ibegin<Ts...>(); }
   constexpr size_t       size() const { return sizeof...(Ts); }
