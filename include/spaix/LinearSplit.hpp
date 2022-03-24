@@ -35,7 +35,7 @@ public:
     using std::max;
     using std::min;
 
-    using Scalar = typename CommonScalarType<typename DirKey::Scalars>::type;
+    using Scalar = typename CommonElementType<typename DirKey::Scalars>::type;
 
     std::array<ExtremeIndices, DirKey::size()> indices{};
 
