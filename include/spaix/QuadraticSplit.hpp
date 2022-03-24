@@ -7,6 +7,7 @@
 #include "spaix/SplitSeeds.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
+#include "spaix/expansion.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
@@ -143,23 +144,24 @@ private:
     Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
 
     for (size_t i = 0; i < deposit.size(); ++i) {
-      const auto& child       = deposit[i];
-      const auto& child_key   = entry_key(child);
-      const auto  l_key       = lhs.key | child_key;
-      const auto  r_key       = rhs.key | child_key;
-      const auto  l_volume    = volume(l_key);
-      const auto  r_volume    = volume(r_key);
-      const auto  l_expansion = l_volume - seeds.lhs_volume;
-      const auto  r_expansion = r_volume - seeds.rhs_volume;
+      const auto& child      = deposit[i];
+      const auto& child_key  = entry_key(child);
+      const auto  l_key      = lhs.key | child_key;
+      const auto  r_key      = rhs.key | child_key;
+      const auto  l_volume   = volume(l_key);
+      const auto  r_volume   = volume(r_key);
+      const auto  l_d_volume = l_volume - seeds.lhs_volume;
+      const auto  r_d_volume = r_volume - seeds.rhs_volume;
 
-      const Preference preference = abs_diff(l_expansion, r_expansion);
+      const Preference preference = abs_diff(l_d_volume, r_d_volume);
       if (preference >= best_preference) {
-        const Side best_side =
-          (l_expansion < r_expansion)             ? Side::left
-          : (r_expansion < l_expansion)           ? Side::right
-          : (seeds.lhs_volume < seeds.rhs_volume) ? Side::left
-          : (seeds.rhs_volume < seeds.lhs_volume) ? Side::right
-                                                  : arbitrary_side();
+        const Side best_side = (l_d_volume < r_d_volume)   ? Side::left
+                               : (r_d_volume < l_d_volume) ? Side::right
+                               : (seeds.lhs_volume < seeds.rhs_volume)
+                                 ? Side::left
+                               : (seeds.rhs_volume < seeds.lhs_volume)
+                                 ? Side::right
+                                 : tie_side(lhs.key, rhs.key, child_key);
 
         best_preference = preference;
         best            = (best_side == Side::left)
@@ -169,6 +171,20 @@ private:
     }
 
     return best;
+  }
+
+  /// Choose a side to break a tie when the volume comparisons fail
+  template<class DirKey, class ChildKey>
+  Side tie_side(const DirKey&   lhs_key,
+                const DirKey&   rhs_key,
+                const ChildKey& child_key)
+  {
+    const auto l_expansion = spaix::expansion(lhs_key, child_key);
+    const auto r_expansion = spaix::expansion(rhs_key, child_key);
+
+    return (l_expansion < r_expansion)   ? Side::left
+           : (r_expansion < l_expansion) ? Side::right
+                                         : arbitrary_side();
   }
 
   /// Choose an arbitrary fallback side (which flip-flops to avoid bias)

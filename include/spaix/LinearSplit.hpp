@@ -8,6 +8,7 @@
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
 #include "spaix/detail/meta.hpp"
+#include "spaix/expansion.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
@@ -86,8 +87,9 @@ public:
       const Side side = (d_l_volume < d_r_volume)   ? Side::left
                         : (d_r_volume < d_l_volume) ? Side::right
                         : (l_volume < r_volume)     ? Side::left
-                        : (r_volume < l_volume)     ? Side::right
-                                                    : arbitrary_side();
+                        : (r_volume < l_volume)
+                          ? Side::right
+                          : tie_side(lhs.key, rhs.key, child_key);
 
       // Distribute the child to the chosen side and update its volume
       if (side == Side::left) {
@@ -192,6 +194,20 @@ private:
     }
 
     update_max_separation(deposit, indices, max_separation, ++index);
+  }
+
+  /// Choose a side to break a tie when the volume comparisons fail
+  template<class DirKey, class ChildKey>
+  Side tie_side(const DirKey&   lhs_key,
+                const DirKey&   rhs_key,
+                const ChildKey& child_key)
+  {
+    const auto l_expansion = spaix::expansion(lhs_key, child_key);
+    const auto r_expansion = spaix::expansion(rhs_key, child_key);
+
+    return (l_expansion < r_expansion)   ? Side::left
+           : (r_expansion < l_expansion) ? Side::right
+                                         : arbitrary_side();
   }
 
   /// Choose an arbitrary fallback side (which flip-flops to avoid bias)
