@@ -61,27 +61,33 @@ public:
                            DirNode&         rhs,
                            const ChildCount max_fanout)
   {
+    // Calculate the initial side volumes, which will be updated as we go
     auto lhs_volume = volume(lhs.key);
     auto rhs_volume = volume(rhs.key);
 
+    // Scan the deposit entries once, sending each left or right immediately
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
       auto child = std::move(deposit.back());
       deposit.pop_back();
 
-      // Insert into parent which causes the least expansion
-      const auto l_key       = lhs.key | entry_key(child);
-      const auto r_key       = rhs.key | entry_key(child);
-      const auto l_volume    = volume(l_key);
-      const auto r_volume    = volume(r_key);
-      const auto l_expansion = l_volume - lhs_volume;
-      const auto r_expansion = r_volume - rhs_volume;
+      // Calculate the change in volume from inserting left or right
+      const auto& child_key  = entry_key(child);
+      const auto  l_key      = lhs.key | child_key;
+      const auto  r_key      = rhs.key | child_key;
+      const auto  l_volume   = volume(l_key);
+      const auto  r_volume   = volume(r_key);
+      const auto  d_l_volume = l_volume - lhs_volume;
+      const auto  d_r_volume = r_volume - rhs_volume;
 
-      const Side side = (l_expansion < r_expansion)   ? Side::left
-                        : (r_expansion < l_expansion) ? Side::right
-                        : (l_volume < r_volume)       ? Side::left
-                                                      : Side::right;
+      // Choose the side with the least volume increase, then least volume
+      const Side side = (d_l_volume < d_r_volume)   ? Side::left
+                        : (d_r_volume < d_l_volume) ? Side::right
+                        : (l_volume < r_volume)     ? Side::left
+                        : (r_volume < l_volume)     ? Side::right
+                                                    : arbitrary_side();
 
+      // Distribute the child to the chosen side and update its volume
       if (side == Side::left) {
         const auto n = detail::distribute_child(lhs, l_key, std::move(child));
         if (n == max_fanout) {
@@ -185,6 +191,14 @@ private:
 
     update_max_separation(deposit, indices, max_separation, ++index);
   }
+
+  /// Choose an arbitrary fallback side (which flip-flops to avoid bias)
+  Side arbitrary_side()
+  {
+    return (_bias = (_bias == Side::left ? Side::right : Side::left));
+  }
+
+  Side _bias = Side::left;
 };
 
 } // namespace spaix

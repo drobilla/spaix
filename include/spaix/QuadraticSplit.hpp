@@ -111,8 +111,9 @@ private:
 
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
-  static ChildAssignment<typename DirEntry::Key>
-  pick_next(const Deposit& deposit, const DirEntry& lhs, const DirEntry& rhs)
+  ChildAssignment<typename DirEntry::Key> pick_next(const Deposit&  deposit,
+                                                    const DirEntry& lhs,
+                                                    const DirEntry& rhs)
   {
     using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::NodeKey;
@@ -128,8 +129,9 @@ private:
 
     for (size_t i = 0; i < deposit.size(); ++i) {
       const auto& child       = deposit[i];
-      const auto  l_key       = lhs.key | entry_key(child);
-      const auto  r_key       = rhs.key | entry_key(child);
+      const auto& child_key   = entry_key(child);
+      const auto  l_key       = lhs.key | child_key;
+      const auto  r_key       = rhs.key | child_key;
       const auto  l_volume    = volume(l_key);
       const auto  r_volume    = volume(r_key);
       const auto  l_expansion = l_volume - lhs_volume;
@@ -141,12 +143,22 @@ private:
         best = (l_expansion < r_expansion)   ? Result{i, l_key, Side::left}
                : (r_expansion < l_expansion) ? Result{i, r_key, Side::right}
                : (lhs_volume < rhs_volume)   ? Result{i, l_key, Side::left}
-                                             : Result{i, r_key, Side::right};
+               : (rhs_volume < lhs_volume || arbitrary_side() == Side::right)
+                 ? Result{i, r_key, Side::right}
+                 : Result{i, l_key, Side::left};
       }
     }
 
     return best;
   }
+
+  /// Choose an arbitrary fallback side (which flip-flops to avoid bias)
+  Side arbitrary_side()
+  {
+    return (_bias = (_bias == Side::left ? Side::right : Side::left));
+  }
+
+  Side _bias = Side::left;
 };
 
 } // namespace spaix
