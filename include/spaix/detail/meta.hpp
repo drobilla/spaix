@@ -17,10 +17,10 @@
 namespace spaix {
 
 template<size_t n, typename... Ts>
-using Nth = typename std::tuple_element<n, std::tuple<Ts...>>::type;
+using Nth = typename std::tuple_element_t<n, std::tuple<Ts...>>;
 
 template<class... Ts>
-using CommonType = typename std::common_type<Ts...>::type;
+using CommonType = typename std::common_type_t<Ts...>;
 
 template<class Tuple>
 struct CommonScalarType {};

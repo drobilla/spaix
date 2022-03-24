@@ -15,5 +15,6 @@
   { "symbol": [ "std::min",                     "private", "<algorithm>", "public" ] },
   { "symbol": [ "std::move",                    "private", "<utility>",   "public" ] },
   { "symbol": [ "std::ofstream",                "private", "<fstream>",   "public" ] },
-  { "symbol": [ "std::tuple_element",           "private", "<tuple>",     "public" ] }
+  { "symbol": [ "std::tuple_element",           "private", "<tuple>",     "public" ] },
+  { "symbol": [ "std::tuple_element_t",         "private", "<tuple>",     "public" ] }
 ]

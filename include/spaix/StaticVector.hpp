@@ -48,7 +48,7 @@ public:
     if (iter != cend() - 1) {
       auto last = std::move(back());
 
-      if (!std::is_trivially_destructible<T>::value) {
+      if (!std::is_trivially_destructible_v<T>) {
         iter->~T();
       }
 
@@ -63,7 +63,7 @@ public:
     assert(!empty());
     --_size;
 
-    if (!std::is_trivially_destructible<T>::value) {
+    if (!std::is_trivially_destructible_v<T>) {
       reinterpret_cast<T*>(&_array[_size])->~T();
     }
   }
@@ -102,7 +102,7 @@ public:
 
   void clear()
   {
-    if (!std::is_trivially_destructible<T>::value) {
+    if (!std::is_trivially_destructible_v<T>) {
       for (Size i = 0; i < _size; ++i) {
         reinterpret_cast<T*>(&_array[i])->~T();
       }
@@ -122,7 +122,7 @@ public:
   const_iterator cend() const { return begin() + _size; }
 
 private:
-  using Element = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+  using Element = typename std::aligned_storage_t<sizeof(T), alignof(T)>;
 
   Size    _size{};
   Element _array[Capacity]{};
