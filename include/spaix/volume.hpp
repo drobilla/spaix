@@ -26,8 +26,8 @@ volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
 {
   const auto r = range<dim>(rect);
 
-  return ((r.first < r.second)
-            ? ((r.second - r.first) * volume_rec(rect, ++index))
+  return ((r.lower < r.upper)
+            ? ((r.upper - r.lower) * volume_rec(rect, ++index))
             : 0);
 }
 

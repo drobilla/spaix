@@ -70,7 +70,7 @@ template<size_t dim, class... Ts>
 constexpr DimRange<Nth<dim, Ts...>>
 range(const Point<Ts...>& point)
 {
-  return std::make_pair(get<dim>(point), get<dim>(point));
+  return {get<dim>(point), get<dim>(point)};
 }
 
 namespace detail {
@@ -87,7 +87,7 @@ constexpr auto
 point_ranges_rec(Point<Ts...> point, Index<dim, n_dims> index)
 {
   return std::tuple_cat(
-    std::make_tuple(std::make_pair(get<dim>(point), get<dim>(point))),
+    std::make_tuple(make_dim_range(get<dim>(point), get<dim>(point))),
     point_ranges_rec(point, ++index));
 }
 

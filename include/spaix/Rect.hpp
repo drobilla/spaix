@@ -35,8 +35,8 @@ empty_ranges_rec(Index<dim, n_dims> index)
                 std::numeric_limits<T>::max());
 
   return std::tuple_cat(
-    std::make_tuple(std::make_pair(std::numeric_limits<T>::max(),
-                                   std::numeric_limits<T>::lowest())),
+    std::make_tuple(DimRange<T>{std::numeric_limits<T>::max(),
+                                std::numeric_limits<T>::lowest()}),
     empty_ranges_rec<Ts...>(++index));
 }
 
@@ -51,7 +51,9 @@ template<class Tuple, size_t dim, size_t n_dims>
 constexpr bool
 ranges_are_empty(const Tuple& tuple, Index<dim, n_dims> index)
 {
-  return (std::get<dim>(tuple).second < std::get<dim>(tuple).first) ||
+  const auto& dim_range = std::get<dim>(tuple);
+
+  return (dim_range.upper < dim_range.lower) ||
          ranges_are_empty(tuple, ++index);
 }
 
@@ -164,14 +166,14 @@ template<size_t dim, class... Ts>
 constexpr const Nth<dim, Ts...>&
 min(const Rect<Ts...>& rect)
 {
-  return std::get<dim>(rect.tuple()).first;
+  return std::get<dim>(rect.tuple()).lower;
 }
 
 template<size_t dim, class... Ts>
 constexpr const Nth<dim, Ts...>&
 max(const Rect<Ts...>& rect)
 {
-  return std::get<dim>(rect.tuple()).second;
+  return std::get<dim>(rect.tuple()).upper;
 }
 
 template<size_t dim, class... Ts>
@@ -179,9 +181,9 @@ constexpr DifferenceOf<Nth<dim, Ts...>, Nth<dim, Ts...>>
 span(const Rect<Ts...>& rect)
 {
   const auto& dim_range = get<dim>(rect);
-  return (dim_range.second < dim_range.first)
+  return (dim_range.upper < dim_range.lower)
            ? 0
-           : dim_range.second - dim_range.first;
+           : dim_range.upper - dim_range.lower;
 }
 
 namespace detail {

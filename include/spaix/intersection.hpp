@@ -7,11 +7,11 @@
 #include "spaix/Point.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
+#include "spaix/types.hpp"
 
 #include <algorithm>
 #include <cstddef>
 #include <tuple>
-#include <utility>
 
 namespace spaix {
 namespace detail {
@@ -32,10 +32,10 @@ intersection_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 
   const auto l  = range<dim>(lhs);
   const auto r  = range<dim>(rhs);
-  const auto lo = max(l.first, r.first);
-  const auto hi = min(l.second, r.second);
+  const auto lo = max(l.lower, r.lower);
+  const auto hi = min(l.upper, r.upper);
 
-  return std::tuple_cat(std::make_tuple(std::make_pair(lo, hi)),
+  return std::tuple_cat(std::make_tuple(make_dim_range(lo, hi)),
                         intersection_rec(lhs, rhs, ++index));
 }
 

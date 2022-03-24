@@ -27,7 +27,7 @@ contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
   const auto& p = range<dim>(parent);
   const auto& c = range<dim>(child);
 
-  return (!(c.first < p.first) && !(p.second < c.second) &&
+  return (!(c.lower < p.lower) && !(p.upper < c.upper) &&
           contains_rec(parent, child, ++index));
 }
 

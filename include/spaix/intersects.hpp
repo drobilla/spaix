@@ -27,7 +27,7 @@ intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
   const auto& l = range<dim>(lhs);
   const auto& r = range<dim>(rhs);
 
-  return (!(r.second < l.first) && !(l.second < r.first) &&
+  return (!(r.upper < l.lower) && !(l.upper < r.lower) &&
           intersects_rec(lhs, rhs, ++index));
 }
 

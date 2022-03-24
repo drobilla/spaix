@@ -14,7 +14,6 @@
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <utility>
 
 namespace spaix::test {
 
@@ -63,7 +62,7 @@ test_rect()
 
   // Printing
   std::ostringstream ss;
-  ss << make_rect(std::make_pair(1, 2), std::make_pair(3, 4));
+  ss << make_rect(make_dim_range(1, 2), make_dim_range(3, 4));
   CHECK((ss.str() == "[[1, 2], [3, 4]]"));
 }
 

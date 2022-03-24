@@ -23,8 +23,8 @@ expansion_rec(const Rect<Ts...>& base, const Added& added, LastIndex<last_dim>)
 {
   const auto l  = range<last_dim>(base);
   const auto r  = range<last_dim>(added);
-  const auto lo = min(l.first, r.first);
-  const auto hi = max(l.second, r.second);
+  const auto lo = min(l.lower, r.lower);
+  const auto hi = max(l.upper, r.upper);
 
   const auto old_span = span<last_dim>(base);
   const auto new_span = hi - lo;
@@ -40,8 +40,8 @@ expansion_rec(const Rect<Ts...>&            base,
 {
   const auto l  = range<dim>(base);
   const auto r  = range<dim>(added);
-  const auto lo = min(l.first, r.first);
-  const auto hi = max(l.second, r.second);
+  const auto lo = min(l.lower, r.lower);
+  const auto hi = max(l.upper, r.upper);
 
   const auto old_span = span<dim>(base);
   const auto new_span = hi - lo;

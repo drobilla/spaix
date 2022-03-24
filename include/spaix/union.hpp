@@ -7,12 +7,12 @@
 #include "spaix/Point.hpp"
 #include "spaix/Rect.hpp"
 #include "spaix/detail/meta.hpp"
+#include "spaix/types.hpp"
 
 #include <algorithm>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
-#include <utility>
 
 namespace spaix {
 namespace detail {
@@ -33,10 +33,10 @@ union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 {
   const auto l  = range<dim>(lhs);
   const auto r  = range<dim>(rhs);
-  const auto lo = min(l.first, r.first);
-  const auto hi = max(l.second, r.second);
+  const auto lo = min(l.lower, r.lower);
+  const auto hi = max(l.upper, r.upper);
 
-  return std::tuple_cat(std::make_tuple(std::make_pair(lo, hi)),
+  return std::tuple_cat(std::make_tuple(make_dim_range(lo, hi)),
                         union_rec(lhs, rhs, ++index));
 }
 
@@ -52,8 +52,8 @@ union_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
   auto&      l = range<dim>(lhs);
   const auto r = range<dim>(rhs);
 
-  l.first  = min(l.first, r.first);
-  l.second = max(l.second, r.second);
+  l.lower = min(l.lower, r.lower);
+  l.upper = max(l.upper, r.upper);
 
   union_rec(lhs, rhs, ++index);
 }
