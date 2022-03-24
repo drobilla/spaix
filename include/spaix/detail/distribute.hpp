@@ -5,6 +5,7 @@
 #define SPAIX_DETAIL_DISTRIBUTE_HPP
 
 #include "spaix/detail/DirectoryNode.hpp"
+#include "spaix/types.hpp"
 
 #include <cstddef>
 #include <utility>
@@ -12,11 +13,11 @@
 namespace spaix::detail {
 
 template<class DirEntry, class DirKey, class Entry>
-inline void
+inline ChildCount
 distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
 {
   parent.key = new_parent_key;
-  parent.node->append_child(std::forward<Entry>(child));
+  return parent.node->append_child(std::forward<Entry>(child));
 }
 
 template<class DirEntry, class Deposit>

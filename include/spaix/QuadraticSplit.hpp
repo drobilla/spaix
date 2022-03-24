@@ -79,10 +79,13 @@ public:
       auto&       parent = best.side == Side::left ? lhs : rhs;
 
       assert(best.child_index < deposit.size());
-      detail::distribute_child(parent, best.new_parent_key, std::move(*iter));
+
+      const auto n_children =
+        detail::distribute_child(parent, best.new_parent_key, std::move(*iter));
+
       deposit.pop(iter);
 
-      if (parent.node->num_children() == max_fanout) {
+      if (n_children == max_fanout) {
         detail::distribute_remaining(best.side == Side::left ? rhs : lhs,
                                      deposit);
         return;

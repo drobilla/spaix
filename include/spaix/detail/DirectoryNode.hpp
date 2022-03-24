@@ -113,16 +113,18 @@ public:
     return DatEntryType<DatNode, placement>::make(key, data);
   }
 
-  void append_child(DatEntry child)
+  ChildCount append_child(DatEntry child)
   {
     assert(_child_type == NodeType::data);
     _dat_children.emplace_back(std::move(child));
+    return _dat_children.size();
   }
 
-  void append_child(DirEntry entry)
+  ChildCount append_child(DirEntry entry)
   {
     assert(_child_type == NodeType::directory);
     _dir_children.emplace_back(std::move(entry));
+    return _dir_children.size();
   }
 
   size_t num_children() const

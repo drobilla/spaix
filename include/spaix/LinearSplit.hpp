@@ -83,16 +83,16 @@ public:
                                                       : Side::right;
 
       if (side == Side::left) {
-        detail::distribute_child(lhs, l_key, std::move(child));
-        if (lhs.node->num_children() == max_fanout) {
+        const auto n = detail::distribute_child(lhs, l_key, std::move(child));
+        if (n == max_fanout) {
           detail::distribute_remaining(rhs, std::forward<Deposit>(deposit));
           return;
         }
 
         lhs_volume = l_volume;
       } else {
-        detail::distribute_child(rhs, r_key, std::move(child));
-        if (rhs.node->num_children() == max_fanout) {
+        const auto n = detail::distribute_child(rhs, r_key, std::move(child));
+        if (n == max_fanout) {
           detail::distribute_remaining(lhs, std::forward<Deposit>(deposit));
           return;
         }
