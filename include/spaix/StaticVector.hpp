@@ -20,7 +20,8 @@ public:
   using iterator       = T*;
   using value_type     = T;
 
-  StaticVector() = default;
+  StaticVector() noexcept = default;
+
   ~StaticVector() { clear(); }
 
   StaticVector(StaticVector&& vec) noexcept
@@ -48,7 +49,7 @@ public:
     if (iter != cend() - 1) {
       auto last = std::move(back());
 
-      if (!std::is_trivially_destructible_v<T>) {
+      if constexpr (!std::is_trivially_destructible_v<T>) {
         iter->~T();
       }
 
@@ -63,7 +64,7 @@ public:
     assert(!empty());
     --_size;
 
-    if (!std::is_trivially_destructible_v<T>) {
+    if constexpr (!std::is_trivially_destructible_v<T>) {
       reinterpret_cast<T*>(&_array[_size])->~T();
     }
   }
@@ -102,7 +103,7 @@ public:
 
   void clear()
   {
-    if (!std::is_trivially_destructible_v<T>) {
+    if constexpr (!std::is_trivially_destructible_v<T>) {
       for (Size i = 0; i < _size; ++i) {
         reinterpret_cast<T*>(&_array[i])->~T();
       }
