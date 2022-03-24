@@ -50,21 +50,23 @@ public:
     const auto min_max_index = indices[max_separation.dimension].min_max;
     assert(max_min_index != min_max_index);
 
-    return {min(max_min_index, min_max_index),
-            max(max_min_index, min_max_index)};
+    const auto lhs_index = min(max_min_index, min_max_index);
+    const auto rhs_index = max(max_min_index, min_max_index);
+
+    return {lhs_index,
+            rhs_index,
+            volume(entry_key(deposit[lhs_index])),
+            volume(entry_key(deposit[rhs_index]))};
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirNode>
-  void distribute_children(Deposit&&        deposit,
-                           DirNode&         lhs,
-                           DirNode&         rhs,
-                           const ChildCount max_fanout)
+  void distribute_children(SplitSeeds<typename DirNode::Key>& seeds,
+                           Deposit&&                          deposit,
+                           DirNode&                           lhs,
+                           DirNode&                           rhs,
+                           const ChildCount                   max_fanout)
   {
-    // Calculate the initial side volumes, which will be updated as we go
-    auto lhs_volume = volume(lhs.key);
-    auto rhs_volume = volume(rhs.key);
-
     // Scan the deposit entries once, sending each left or right immediately
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
@@ -77,8 +79,8 @@ public:
       const auto  r_key      = rhs.key | child_key;
       const auto  l_volume   = volume(l_key);
       const auto  r_volume   = volume(r_key);
-      const auto  d_l_volume = l_volume - lhs_volume;
-      const auto  d_r_volume = r_volume - rhs_volume;
+      const auto  d_l_volume = l_volume - seeds.lhs_volume;
+      const auto  d_r_volume = r_volume - seeds.rhs_volume;
 
       // Choose the side with the least volume increase, then least volume
       const Side side = (d_l_volume < d_r_volume)   ? Side::left
@@ -95,7 +97,7 @@ public:
           return;
         }
 
-        lhs_volume = l_volume;
+        seeds.lhs_volume = l_volume;
       } else {
         const auto n = detail::distribute_child(rhs, r_key, std::move(child));
         if (n == max_fanout) {
@@ -103,7 +105,7 @@ public:
           return;
         }
 
-        rhs_volume = r_volume;
+        seeds.rhs_volume = r_volume;
       }
     }
   }

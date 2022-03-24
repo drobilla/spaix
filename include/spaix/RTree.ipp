@@ -190,7 +190,7 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
   assert(bounds == parent_key(deposit));
 
   // Pick two nodes to seed the left and right groups
-  const auto seeds = _split.pick_seeds(deposit, bounds);
+  auto seeds = _split.pick_seeds(deposit, bounds);
   assert(seeds.lhs_index < seeds.rhs_index);
 
   // Create left/right parent nodes with right/left seeds
@@ -200,7 +200,8 @@ RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 
   // Distribute remaining nodes between seeds
   _split.distribute_children(
-    std::move(deposit), sides[0], sides[1], max_fanout);
+    seeds, std::move(deposit), sides[0], sides[1], max_fanout);
+
   assert(sides[0].node->num_children() + sides[1].node->num_children() ==
          fanout + 1);
   assert(sides[0].key == ideal_key(*sides[0].node));

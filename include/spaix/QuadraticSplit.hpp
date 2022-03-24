@@ -45,7 +45,7 @@ public:
     }
 
     SeedWaste          max_waste{std::numeric_limits<Volume>::lowest()};
-    SplitSeeds<DirKey> seeds{deposit.size(), deposit.size()};
+    SplitSeeds<DirKey> seeds{deposit.size(), deposit.size(), {}, {}};
     for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
         const auto& k = entry_key(deposit[i]);
@@ -54,11 +54,15 @@ public:
         const SeedWaste waste = volume(k | l) - volumes[i] - volumes[j];
 
         if (waste >= max_waste) {
-          max_waste = waste;
-          seeds     = SplitSeeds<DirKey>{i, j};
+          max_waste       = waste;
+          seeds.lhs_index = i;
+          seeds.rhs_index = j;
         }
       }
     }
+
+    seeds.lhs_volume = volumes[seeds.lhs_index];
+    seeds.rhs_volume = volumes[seeds.rhs_index];
 
     assert(seeds.lhs_index < deposit.size());
     assert(seeds.rhs_index < deposit.size());
@@ -68,14 +72,15 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirEntry>
-  void distribute_children(Deposit&&        deposit,
-                           DirEntry&        lhs,
-                           DirEntry&        rhs,
-                           const ChildCount max_fanout)
+  void distribute_children(SplitSeeds<typename DirEntry::Key>& seeds,
+                           Deposit&&                           deposit,
+                           DirEntry&                           lhs,
+                           DirEntry&                           rhs,
+                           const ChildCount                    max_fanout)
   {
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
-      const auto  best   = pick_next(deposit, lhs, rhs);
+      const auto  best   = pick_next(seeds, deposit, lhs, rhs);
       auto* const iter   = deposit.begin() + best.child_index;
       auto&       parent = best.side == Side::left ? lhs : rhs;
 
@@ -91,16 +96,26 @@ public:
                                      deposit);
         return;
       }
+
+      if (best.side == Side::left) {
+        seeds.lhs_volume = best.new_parent_volume;
+      } else {
+        seeds.rhs_volume = best.new_parent_volume;
+      }
     }
   }
 
 private:
+  template<class DirKey>
+  using VolumeOf = decltype(volume(std::declval<DirKey>()));
+
   /// Assignment of a child to a parent during a split
   template<class DirKey>
   struct ChildAssignment {
-    size_t child_index;
-    DirKey new_parent_key;
-    Side   side;
+    size_t           child_index;
+    DirKey           new_parent_key;
+    VolumeOf<DirKey> new_parent_volume;
+    Side             side;
   };
 
   /// Return |a - b| safely for unsigned types
@@ -112,21 +127,20 @@ private:
 
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
-  ChildAssignment<typename DirEntry::Key> pick_next(const Deposit&  deposit,
-                                                    const DirEntry& lhs,
-                                                    const DirEntry& rhs)
+  ChildAssignment<typename DirEntry::Key> pick_next(
+    const SplitSeeds<typename DirEntry::Key>& seeds,
+    const Deposit&                            deposit,
+    const DirEntry&                           lhs,
+    const DirEntry&                           rhs)
   {
     using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::NodeKey;
-    using Volume     = decltype(volume(std::declval<DirKey>()));
+    using Volume     = VolumeOf<DirKey>;
     using Result     = ChildAssignment<DirKey>;
     using Preference = Volume;
 
     Preference best_preference{0};
-    Result     best{deposit.size(), DirKey{}, Side::left};
-
-    const auto lhs_volume = volume(lhs.key);
-    const auto rhs_volume = volume(rhs.key);
+    Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
 
     for (size_t i = 0; i < deposit.size(); ++i) {
       const auto& child       = deposit[i];
@@ -135,18 +149,22 @@ private:
       const auto  r_key       = rhs.key | child_key;
       const auto  l_volume    = volume(l_key);
       const auto  r_volume    = volume(r_key);
-      const auto  l_expansion = l_volume - lhs_volume;
-      const auto  r_expansion = r_volume - rhs_volume;
+      const auto  l_expansion = l_volume - seeds.lhs_volume;
+      const auto  r_expansion = r_volume - seeds.rhs_volume;
 
       const Preference preference = abs_diff(l_expansion, r_expansion);
       if (preference >= best_preference) {
+        const Side best_side =
+          (l_expansion < r_expansion)             ? Side::left
+          : (r_expansion < l_expansion)           ? Side::right
+          : (seeds.lhs_volume < seeds.rhs_volume) ? Side::left
+          : (seeds.rhs_volume < seeds.lhs_volume) ? Side::right
+                                                  : arbitrary_side();
+
         best_preference = preference;
-        best = (l_expansion < r_expansion)   ? Result{i, l_key, Side::left}
-               : (r_expansion < l_expansion) ? Result{i, r_key, Side::right}
-               : (lhs_volume < rhs_volume)   ? Result{i, l_key, Side::left}
-               : (rhs_volume < lhs_volume || arbitrary_side() == Side::right)
-                 ? Result{i, r_key, Side::right}
-                 : Result{i, l_key, Side::left};
+        best            = (best_side == Side::left)
+                            ? Result{i, l_key, l_volume, Side::left}
+                            : Result{i, r_key, r_volume, Side::right};
       }
     }
 
