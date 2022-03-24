@@ -17,41 +17,41 @@ namespace detail {
 using std::max;
 using std::min;
 
-template<class Rhs, size_t last_dim, class... Ts>
+template<class Added, size_t last_dim, class... Ts>
 SPAIX_ALWAYS_INLINE constexpr auto
-expansion_rec(const Rect<Ts...>& lhs, const Rhs& rhs, LastIndex<last_dim>)
+expansion_rec(const Rect<Ts...>& base, const Added& added, LastIndex<last_dim>)
 {
-  const auto l  = range<last_dim>(lhs);
-  const auto r  = range<last_dim>(rhs);
+  const auto l  = range<last_dim>(base);
+  const auto r  = range<last_dim>(added);
   const auto lo = min(l.first, r.first);
   const auto hi = max(l.second, r.second);
 
-  const auto old_span = span<last_dim>(lhs);
+  const auto old_span = span<last_dim>(base);
   const auto new_span = hi - lo;
 
   return (old_span < new_span) ? (new_span - old_span) : 0;
 }
 
-template<class Rhs, size_t dim, size_t last_dim, class... Ts>
+template<class Added, size_t dim, size_t last_dim, class... Ts>
 SPAIX_ALWAYS_INLINE constexpr auto
-expansion_rec(const Rect<Ts...>&            lhs,
-              const Rhs&                    rhs,
+expansion_rec(const Rect<Ts...>&            base,
+              const Added&                  added,
               InclusiveIndex<dim, last_dim> index)
 {
-  const auto l  = range<dim>(lhs);
-  const auto r  = range<dim>(rhs);
+  const auto l  = range<dim>(base);
+  const auto r  = range<dim>(added);
   const auto lo = min(l.first, r.first);
   const auto hi = max(l.second, r.second);
 
-  const auto old_span = span<dim>(lhs);
+  const auto old_span = span<dim>(base);
   const auto new_span = hi - lo;
 
   if (!(old_span < new_span)) {
-    return expansion_rec(lhs, rhs, ++index);
+    return expansion_rec(base, added, ++index);
   }
 
   const auto dim_expansion = new_span - old_span;
-  const auto rest          = expansion_rec(lhs, rhs, ++index);
+  const auto rest          = expansion_rec(base, added, ++index);
   if (rest == 0) {
     return static_cast<decltype(dim_expansion * rest)>(dim_expansion);
   }
@@ -73,17 +73,17 @@ expansion_rec(const Rect<Ts...>&            lhs,
 */
 template<class... Ts>
 constexpr auto
-expansion(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+expansion(const Rect<Ts...>& base, const Rect<Ts...>& added)
 {
-  return detail::expansion_rec(lhs, rhs, ibegin_inclusive<Ts...>());
+  return detail::expansion_rec(base, added, ibegin_inclusive<Ts...>());
 }
 
-/// Return the number of dimensions expanded by adding `rhs` to `lhs`
+/// Return the number of dimensions expanded by adding `added` to `base`
 template<class... Ts>
 constexpr auto
-expansion(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+expansion(const Rect<Ts...>& base, const Point<Ts...>& added)
 {
-  return detail::expansion_rec(lhs, rhs, ibegin_inclusive<Ts...>());
+  return detail::expansion_rec(base, added, ibegin_inclusive<Ts...>());
 }
 
 } // namespace spaix
