@@ -143,7 +143,7 @@ if __name__ == "__main__":
                    help="do not plot benchmarks")
     opt.add_option("--page-size", type="int", default=512,
                    help="page size for directory nodes")
-    opt.add_option("--inline", type="int", default=False,
+    opt.add_option("--inline", action="store_true",
                    help="inline data nodes in parents")
     opt.add_option("--program", type="string", default=["build/bench_spaix_rtree"],
                    action="append",
