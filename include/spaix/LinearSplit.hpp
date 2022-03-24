@@ -77,14 +77,10 @@ public:
       const auto l_expansion = l_volume - lhs_volume;
       const auto r_expansion = r_volume - rhs_volume;
 
-      Side side = Side::right;
-      if (l_expansion < r_expansion) {
-        side = Side::left;
-      } else if (r_expansion < l_expansion) {
-        side = Side::right;
-      } else if (l_volume < r_volume) {
-        side = Side::left;
-      }
+      const Side side = (l_expansion < r_expansion)   ? Side::left
+                        : (r_expansion < l_expansion) ? Side::right
+                        : (l_volume < r_volume)       ? Side::left
+                                                      : Side::right;
 
       if (side == Side::left) {
         detail::distribute_child(lhs, l_key, std::move(child));

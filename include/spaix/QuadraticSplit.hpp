@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_QUADRATICSPLIT_HPP
@@ -135,15 +135,10 @@ private:
       const Preference preference = abs_diff(l_expansion, r_expansion);
       if (preference >= best_preference) {
         best_preference = preference;
-        if (l_expansion < r_expansion) {
-          best = Result{i, l_key, Side::left};
-        } else if (r_expansion < l_expansion) {
-          best = Result{i, r_key, Side::right};
-        } else if (lhs_volume < rhs_volume) {
-          best = Result{i, l_key, Side::left};
-        } else {
-          best = Result{i, r_key, Side::right};
-        }
+        best = (l_expansion < r_expansion)   ? Result{i, l_key, Side::left}
+               : (r_expansion < l_expansion) ? Result{i, r_key, Side::right}
+               : (lhs_volume < rhs_volume)   ? Result{i, l_key, Side::left}
+                                             : Result{i, r_key, Side::right};
       }
     }
 

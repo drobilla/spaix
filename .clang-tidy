@@ -5,7 +5,6 @@ Checks: >
   -*-named-parameter,
   -*-uppercase-literal-suffix,
   -altera-*,
-  -bugprone-branch-clone,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -cppcoreguidelines-pro-bounds-constant-array-index,
