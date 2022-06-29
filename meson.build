@@ -1,21 +1,28 @@
 # Copyright 2019-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: CC0-1.0 OR GPL-3.0-only
 
-project('spaix', 'cpp',
+project('spaix', ['cpp'],
         version: '0.0.0',
+        license: 'GPLv3+',
+        meson_version : '>= 0.49.2',
         default_options: [
-          'buildtype=debugoptimized',
+          'b_ndebug=if-release',
+          'buildtype=release',
           'cpp_std=c++17',
-          'warning_level=2',
-        ],
-        meson_version : '>= 0.45.0',
-        license: 'GPLv3+')
+        ])
 
 spaix_src_root = meson.current_source_dir()
-
-cxx = meson.get_compiler('cpp')
 versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
 
+#######################
+# Compilers and Flags #
+#######################
+
+# Required tools
+pkg = import('pkgconfig')
+cxx = meson.get_compiler('cpp')
+
+# Set global warning flags
 if get_option('strict')
   subdir('warnings')
 
@@ -56,7 +63,30 @@ if get_option('strict')
                         language: ['cpp'])
 endif
 
-headers = [
+################
+# Dependencies #
+################
+
+# Boost for comparison benchmark program
+boost_dep = []
+enable_boost = get_option('boost')
+have_boost = false
+if enable_boost == 'no'
+  message('Boost support explicitly disabled')
+else
+  boost_dep = dependency('boost', required: false)
+  if boost_dep.found()
+    have_boost = true
+  elif enable_boost == 'yes' and not have_boost
+    error('Boost support not found, but was explicitly requested.')
+  endif
+endif
+
+###########
+# Library #
+###########
+
+headers = files(
   'include/spaix/Config.hpp',
   'include/spaix/DataIterator.hpp',
   'include/spaix/DataNode.hpp',
@@ -83,65 +113,26 @@ headers = [
   'include/spaix/types.hpp',
   'include/spaix/union.hpp',
   'include/spaix/volume.hpp',
-]
+)
 
-# Boost for comparison benchmark program
-boost_dep = []
-enable_boost = get_option('boost')
-have_boost = false
-if enable_boost == 'no'
-  message('Boost support explicitly disabled')
-else
-  boost_dep = dependency('boost', required: false)
-  if boost_dep.found()
-    have_boost = true
-  elif enable_boost == 'yes' and not have_boost
-    error('Boost support not found, but was explicitly requested.')
-  endif
-endif
-
+# Declare dependency for internal meson dependants
 spaix_dep = declare_dependency(
   include_directories: include_directories('include'))
 
-install_headers(headers, subdir: versioned_name + '/spaix')
-
-pkg = import('pkgconfig')
+# Generage pkg-config file for external dependants
 pkg.generate(name: 'Spaix',
+             description: 'C++ spatial indexing library',
              filebase: versioned_name,
              subdirs: [versioned_name],
-             version: meson.project_version(),
-             description: 'C++ spatial indexing library')
+             version: meson.project_version())
 
-spaix_test_dep = declare_dependency(
-  include_directories: include_directories('test/include'))
+# Install headers to a versioned include directory
+install_headers(headers, subdir: versioned_name + '/spaix')
 
-if get_option('tests')
+#########
+# Tests #
+#########
+
+if not get_option('tests').disabled()
   subdir('test')
-endif
-
-if get_option('tools')
-  draw_exe = executable('draw_tree', 'test/tools/draw_tree.cpp',
-                        dependencies: [spaix_dep, spaix_test_dep])
-
-  if get_option('tests')
-    test('default', draw_exe, suite: 'draw')
-    test('linear_insert', draw_exe, args: ['--insert', 'linear'], suite: 'draw')
-    test('linear_split', draw_exe, args: ['--split', 'linear'], suite: 'draw')
-    test('quadratic_split', draw_exe, args: ['--split', 'quadratic'], suite: 'draw')
-    test('page_256', draw_exe, args: ['--page-size', '256'], suite: 'draw')
-    test('page_512', draw_exe, args: ['--page-size', '512'], suite: 'draw')
-    test('page_1024', draw_exe, args: ['--page-size', '1024'], suite: 'draw')
-    test('page_2048', draw_exe, args: ['--page-size', '2048'], suite: 'draw')
-    test('page_4096', draw_exe, args: ['--page-size', '4096'], suite: 'draw')
-
-    test('bad_insert', draw_exe, args: ['--insert', 'unknown'], should_fail: true, suite: 'draw')
-    test('bad_split', draw_exe, args: ['--split', 'unknown'], should_fail: true, suite: 'draw')
-    test('bad_small_page', draw_exe, args: ['--page-size', '128'], should_fail: true, suite: 'draw')
-    test('bad_large_page', draw_exe, args: ['--page-size', '8192'], should_fail: true, suite: 'draw')
-    test('bad_option', draw_exe, args: ['--bad-arg'], should_fail: true, suite: 'draw')
-  endif
-endif
-
-if get_option('benchmark')
-  subdir('test/benchmark')
 endif
