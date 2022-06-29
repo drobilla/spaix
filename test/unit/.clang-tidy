@@ -1,7 +1,9 @@
 Checks: >
+  -*-magic-numbers,
   -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -fuchsia-default-arguments-calls,
+  -misc-no-recursion,
   -readability-function-cognitive-complexity,
   -readability-implicit-bool-conversion,
 InheritParentConfig: true

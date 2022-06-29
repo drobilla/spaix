@@ -1,4 +1,5 @@
 Checks: >
+  -*-magic-numbers,
   -*-vararg,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -fuchsia-default-arguments-*,
