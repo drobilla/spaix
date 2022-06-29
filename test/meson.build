@@ -19,6 +19,7 @@ endif
 # Test that all headers build cleanly
 test('build', executable('test_build',
                          'test_build.cpp',
+                         cpp_args: cpp_suppressions,
                          dependencies: [spaix_dep]))
 
 # Run unit tests
@@ -27,6 +28,7 @@ subdir('unit')
 # Build command line utilities and run their tests
 if get_option('tools')
   draw_exe = executable('draw_tree', 'tools/draw_tree.cpp',
+                        cpp_args: cpp_suppressions,
                         dependencies: [spaix_dep, spaix_test_dep])
 
   if not get_option('tests').disabled()

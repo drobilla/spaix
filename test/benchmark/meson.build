@@ -3,12 +3,14 @@
 
 bench_exe = executable('bench_spaix_rtree',
                        'bench_spaix_rtree.cpp',
+                       cpp_args: cpp_suppressions,
                        dependencies: [spaix_dep, spaix_test_dep])
 
 if have_boost
   boost_bench_exe = executable(
     'bench_boost_rtree',
     'bench_boost_rtree.cpp',
+    cpp_args: cpp_suppressions,
     dependencies: [boost_dep, spaix_dep, spaix_test_dep])
 endif
 

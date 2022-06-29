@@ -1,4 +1,4 @@
-# Copyright 2019-2022 David Robillard <d@drobilla.net>
+# Copyright 2020-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: CC0-1.0 OR GPL-3.0-only
 
 # General code to enable approximately all warnings in GCC 12, clang, and MSVC.
@@ -138,6 +138,12 @@ if is_variable('cpp')
       '-Wno-c++98-compat',
       '-Wno-c++98-compat-pedantic'
     ]
+
+    if not meson.is_cross_build()
+      all_cpp_warnings += [
+        '-Wno-poison-system-directories',
+      ]
+    endif
 
   elif cpp.get_id() == 'gcc'
     all_cpp_warnings += gcc_common_warnings + [

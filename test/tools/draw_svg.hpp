@@ -34,7 +34,7 @@ color(const NodePath& path, const double alpha)
     c = (c + 1) % 3;
   }
 
-  char buf[10];
+  char buf[36];
   snprintf(buf,
            sizeof(buf),
            "#%02X%02X%02X%02X",

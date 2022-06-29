@@ -20,48 +20,14 @@ versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
 
 # Required tools
 pkg = import('pkgconfig')
-cxx = meson.get_compiler('cpp')
+cpp = meson.get_compiler('cpp')
 
 # Set global warning flags
-if get_option('strict')
-  subdir('warnings')
-
-  if cxx.get_id() == 'clang'
-    cxx_warnings += [
-      '-Wno-float-equal',
-      '-Wno-implicit-int-float-conversion',
-      '-Wno-padded',
-    ]
-  elif cxx.get_id() == 'gcc'
-    cxx_warnings += [
-      '-Wno-conversion',
-      '-Wno-effc++',
-      '-Wno-float-equal',
-      '-Wno-padded',
-      '-Wno-suggest-attribute=const',
-      '-Wno-suggest-attribute=pure',
-      '-Wno-switch-default',
-    ]
-  elif cxx.get_id() == 'msvc'
-    cxx_warnings += [
-      '/wd4514',  # unreferenced inline function has been removed
-      '/wd4582',  # constructor is not explicitly called
-      '/wd4583',  # destructor is not explicitly called
-      '/wd4623',  # default constructor implicitly deleted
-      '/wd4625',  # copy constructor implicitly deleted
-      '/wd4626',  # copy assignment operator implicitly deleted
-      '/wd4710',  # function not inlined
-      '/wd4711',  # function selected for automatic inline expansion
-      '/wd4820',  # padding added after construct
-      '/wd4868',  # may not enforce left-to-right evaluation order
-      '/wd5027',  # move assignment operator implicitly deleted
-      '/wd5045',  # will insert Spectre mitigation for memory load
-    ]
-  endif
-
-  add_project_arguments(cxx.get_supported_arguments(cxx_warnings),
-                        language: ['cpp'])
+if get_option('strict') and not meson.is_subproject()
+  subdir('meson/warnings')
+  add_project_arguments(all_cpp_warnings, language: ['cpp'])
 endif
+subdir('meson/suppressions')
 
 ################
 # Dependencies #

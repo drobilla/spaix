@@ -17,6 +17,7 @@ foreach test : tests
   test(test,
        executable(test,
                   test + '.cpp',
+                  cpp_args: cpp_suppressions,
                   dependencies: [spaix_dep, spaix_test_dep]),
        suite: 'unit')
 endforeach
