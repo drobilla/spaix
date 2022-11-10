@@ -10,8 +10,9 @@
 #include "spaix/contains.hpp"
 
 namespace spaix::test {
+namespace {
 
-static void
+void
 test_contains()
 {
   constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
@@ -32,6 +33,7 @@ test_contains()
   STATIC_CHECK((contains(TestPoint{1, 2.0f}, TestPoint{1, 2.0f})));
 }
 
+} // namespace
 } // namespace spaix::test
 
 int

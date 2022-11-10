@@ -9,8 +9,9 @@
 #include "spaix/volume.hpp"
 
 namespace spaix::test {
+namespace {
 
-static void
+void
 test_volume()
 {
   STATIC_CHECK((volume(TestRect{{1, 3}, {2, 5}}) == 6));
@@ -18,6 +19,7 @@ test_volume()
   STATIC_CHECK((volume(TestRect{{1, 3}, {2, 2}}) == 0));
 }
 
+} // namespace
 } // namespace spaix::test
 
 int

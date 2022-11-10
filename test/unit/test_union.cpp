@@ -11,8 +11,9 @@
 #include "spaix/union.hpp"
 
 namespace spaix::test {
+namespace {
 
-static void
+void
 test_union()
 {
   constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
@@ -39,6 +40,7 @@ test_union()
   CHECK((mut == TestRect{{1, 4}, {1.0f, 6.0f}}));
 }
 
+} // namespace
 } // namespace spaix::test
 
 int

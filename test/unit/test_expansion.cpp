@@ -9,8 +9,9 @@
 #include "spaix/expansion.hpp"
 
 namespace spaix::test {
+namespace {
 
-static int
+int
 test_expansion()
 {
   STATIC_CHECK((expansion(TestRect{{1, 3}, {2, 5}}, TestPoint{1, 2}) == 0));
@@ -37,6 +38,7 @@ test_expansion()
   return 0;
 }
 
+} // namespace
 } // namespace spaix::test
 
 int

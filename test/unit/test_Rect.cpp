@@ -16,8 +16,9 @@
 #include <tuple>
 
 namespace spaix::test {
+namespace {
 
-static void
+void
 test_rect()
 {
   constexpr auto rect = make_rect(XRange{1, 3}, YRange{2.0f, 5.0f});
@@ -62,6 +63,7 @@ test_rect()
   CHECK((ss.str() == "[[1, 2], [3, 4]]"));
 }
 
+} // namespace
 } // namespace spaix::test
 
 int

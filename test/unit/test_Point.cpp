@@ -16,8 +16,9 @@
 #include <tuple>
 
 namespace spaix::test {
+namespace {
 
-static void
+void
 test_point()
 {
   constexpr auto point = make_point(XCoord{1}, YCoord{2.0f});
@@ -45,6 +46,7 @@ test_point()
   CHECK((ss.str() == "[1, 2]"));
 }
 
+} // namespace
 } // namespace spaix::test
 
 int

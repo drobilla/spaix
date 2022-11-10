@@ -10,8 +10,9 @@
 #include "spaix/intersects.hpp"
 
 namespace spaix::test {
+namespace {
 
-static void
+void
 test_intersects()
 {
   constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
@@ -38,6 +39,7 @@ test_intersects()
   STATIC_CHECK((!intersects(TestPoint{1, 0.0f}, rect)));
 }
 
+} // namespace
 } // namespace spaix::test
 
 int
