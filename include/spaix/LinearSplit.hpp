@@ -149,22 +149,27 @@ private:
     const auto& child      = deposit[child_index];
     const auto& child_key  = entry_key(child);
     const auto [low, high] = range<dim>(child_key);
+    auto& extremes         = indices[dim];
 
-    if (low <= range<dim>(entry_key(deposit[indices[dim].min_min])).lower) {
-      indices[dim].min_min = child_index;
+    const auto& min_min = entry_key(deposit[extremes.min_min]);
+    const auto& max_min = entry_key(deposit[extremes.max_min]);
+    const auto& min_max = entry_key(deposit[extremes.min_max]);
+    const auto& max_max = entry_key(deposit[extremes.max_max]);
+
+    if (low <= range<dim>(min_min).lower) {
+      extremes.min_min = child_index;
     }
 
-    if (low >= range<dim>(entry_key(deposit[indices[dim].max_min])).lower) {
-      indices[dim].max_min = child_index;
+    if (low >= range<dim>(max_min).lower) {
+      extremes.max_min = child_index;
     }
 
-    if (high <= range<dim>(entry_key(deposit[indices[dim].min_max])).upper &&
-        child_index != indices[dim].max_min) {
-      indices[dim].min_max = child_index;
+    if (high <= range<dim>(min_max).upper && child_index != extremes.max_min) {
+      extremes.min_max = child_index;
     }
 
-    if (high >= range<dim>(entry_key(deposit[indices[dim].max_max])).upper) {
-      indices[dim].max_max = child_index;
+    if (high >= range<dim>(max_max).upper) {
+      extremes.max_max = child_index;
     }
 
     update_indices(deposit, child_index, indices, ++index);
@@ -184,13 +189,16 @@ private:
     MaxSeparation<T>&                         max_separation,
     Index<dim, n_dims>                        index)
   {
-    const auto width = static_cast<T>(
-      range<dim>(entry_key(deposit[indices[dim].max_max])).upper -
-      range<dim>(entry_key(deposit[indices[dim].min_min])).lower);
+    const auto& min_min = entry_key(deposit[indices[dim].min_min]);
+    const auto& max_min = entry_key(deposit[indices[dim].max_min]);
+    const auto& min_max = entry_key(deposit[indices[dim].min_max]);
+    const auto& max_max = entry_key(deposit[indices[dim].max_max]);
 
-    const auto separation = static_cast<T>(
-      range<dim>(entry_key(deposit[indices[dim].min_max])).upper -
-      range<dim>(entry_key(deposit[indices[dim].max_min])).lower);
+    const auto width =
+      static_cast<T>(range<dim>(max_max).upper - range<dim>(min_min).lower);
+
+    const auto separation =
+      static_cast<T>(range<dim>(min_max).upper - range<dim>(max_min).lower);
 
     const auto normalized_separation =
       separation / (width > std::numeric_limits<T>::epsilon() ? width : T{1});
