@@ -1,4 +1,4 @@
-option('benchmark', type: 'boolean', value: false,
+option('benchmarks', type: 'feature', value: 'auto', yield: true,
        description: 'Build benchmarks')
 
 option('boost', type: 'combo', choices: ['yes', 'no', 'auto'], value: 'auto',

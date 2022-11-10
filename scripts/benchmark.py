@@ -133,7 +133,7 @@ if __name__ == "__main__":
     opt = optparse.OptionParser(usage="%prog [OPTION]...",
                                 description="Benchmark R-tree variants\n")
 
-    opt.add_option("--dir", type="string", default="build",
+    opt.add_option("--dir", type="string", default=".",
                    help="path to output directory")
     opt.add_option("--no-error", action="store_true",
                    help="do not show error bars")
@@ -145,7 +145,8 @@ if __name__ == "__main__":
                    help="page size for directory nodes")
     opt.add_option("--inline", action="store_true",
                    help="inline data nodes in parents")
-    opt.add_option("--program", type="string", default=["build/bench_spaix_rtree"],
+    opt.add_option("--program", type="string",
+                   default=["test/benchmark/bench_spaix_rtree"],
                    action="append",
                    help="path to benchmarking program",)
     opt.add_option("--queries", type="int", default=32,

@@ -51,6 +51,6 @@ if get_option('tools')
 endif
 
 # Build benchmarks
-if get_option('benchmark')
-  subdir('test/benchmark')
+if not get_option('benchmarks').disabled()
+  subdir('benchmark')
 endif

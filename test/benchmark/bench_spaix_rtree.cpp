@@ -13,7 +13,8 @@
 #include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
 #include "spaix/RTree.hpp"
 #include "spaix/Rect.hpp"
-#include "spaix/search/within.hpp"
+#include "spaix/contains.hpp"
+#include "spaix/intersects.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -43,12 +44,9 @@ struct Counts {
   size_t n_checked_dats = 0u;
 };
 
-template<class QueryKey>
-struct BenchmarkWithin : public spaix::search::Within<QueryKey> {
-  using Super = spaix::search::Within<QueryKey>;
-
-  BenchmarkWithin(QueryKey&& query_key, Counts* const counts)
-    : Super{std::forward<QueryKey>(query_key)}
+struct BenchmarkWithin {
+  BenchmarkWithin(Rect2 query_key, Counts* const counts)
+    : _query_key{std::move(query_key)}
     , _counts{counts}
   {}
 
@@ -56,17 +54,18 @@ struct BenchmarkWithin : public spaix::search::Within<QueryKey> {
   constexpr bool directory(const DirKey& k) const
   {
     ++_counts->n_checked_dirs;
-    return Super::directory(k);
+    return intersects(_query_key, k);
   }
 
   template<class DatKey>
   constexpr bool leaf(const DatKey& k) const
   {
     ++_counts->n_checked_dats;
-    return Super::leaf(k);
+    return contains(_query_key, k);
   }
 
 private:
+  const Rect2   _query_key;
   Counts* const _counts;
 };
 
@@ -95,12 +94,11 @@ benchmark_queries(std::mt19937& rng,
     const auto y0 = dist(rng) * query_span;
     const auto y1 = y0 + dist(rng) * query_span;
 
-    const typename Rect2::Tuple ranges{{x0, x1}, {y0, y1}};
-
     size_t n_results = 0u;
     Counts counts    = {0u, 0u};
 
-    const auto predicate    = spaix::within(Rect2{ranges});
+    const auto predicate = BenchmarkWithin{Rect2{{x0, x1}, {y0, y1}}, &counts};
+
     const auto t_iter_start = std::chrono::steady_clock::now();
 #if 0
     for (const auto& node : tree.query(predicate)) {
