@@ -71,10 +71,10 @@ public:
     : _ranges{std::move(ranges)}
   {}
 
-  Rect(const Rect& rect) noexcept = default;
+  Rect(const Rect& rect) noexcept            = default;
   Rect& operator=(const Rect& rect) noexcept = default;
 
-  Rect(Rect&& rect) noexcept = default;
+  Rect(Rect&& rect) noexcept            = default;
   Rect& operator=(Rect&& rect) noexcept = default;
 
   ~Rect() noexcept = default;

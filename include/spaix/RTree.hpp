@@ -87,10 +87,10 @@ public:
     , _split{std::move(split)}
   {}
 
-  RTree(const RTree&) = delete;
+  RTree(const RTree&)            = delete;
   RTree& operator=(const RTree&) = delete;
 
-  RTree(RTree&&) noexcept = default;
+  RTree(RTree&&) noexcept            = default;
   RTree& operator=(RTree&&) noexcept = default;
 
   ~RTree() = default;

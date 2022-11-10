@@ -30,10 +30,10 @@ public:
     : _values{std::move(values)}
   {}
 
-  constexpr Point(const Point&) noexcept = default;
+  constexpr Point(const Point&) noexcept            = default;
   constexpr Point& operator=(const Point&) noexcept = default;
 
-  constexpr Point(Point&&) noexcept = default;
+  constexpr Point(Point&&) noexcept            = default;
   constexpr Point& operator=(Point&&) noexcept = default;
 
   ~Point() noexcept = default;

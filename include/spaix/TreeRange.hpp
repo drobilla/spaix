@@ -21,10 +21,10 @@ struct TreeRange {
     , _last{std::move(last)}
   {}
 
-  TreeRange(const TreeRange&) = delete;
+  TreeRange(const TreeRange&)            = delete;
   TreeRange& operator=(const TreeRange&) = delete;
 
-  TreeRange(TreeRange&&) noexcept = default;
+  TreeRange(TreeRange&&) noexcept            = default;
   TreeRange& operator=(TreeRange&&) noexcept = default;
 
   ~TreeRange() = default;

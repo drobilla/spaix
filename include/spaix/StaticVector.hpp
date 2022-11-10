@@ -40,7 +40,7 @@ public:
     }
   }
 
-  StaticVector& operator=(StaticVector&) = delete;
+  StaticVector& operator=(StaticVector&)  = delete;
   StaticVector& operator=(StaticVector&&) = delete;
 
   void pop(T* const iter)

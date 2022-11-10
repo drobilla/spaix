@@ -102,10 +102,10 @@ public:
     }
   }
 
-  DirectoryNode(const DirectoryNode&) = delete;
+  DirectoryNode(const DirectoryNode&)            = delete;
   DirectoryNode& operator=(const DirectoryNode&) = delete;
 
-  DirectoryNode(DirectoryNode&&) = delete;
+  DirectoryNode(DirectoryNode&&)            = delete;
   DirectoryNode& operator=(DirectoryNode&&) = delete;
 
   static DatEntry make_dat_entry(Key key, Data data)
