@@ -31,10 +31,9 @@ class QuadraticSplit
 {
 public:
   /// Return the indices of the children that should be used for split seeds
-  template<class Entry, ChildCount count, class DirKey>
+  template<class DirKey, class Entry, ChildCount count>
   SplitSeeds<DirKey> pick_seeds(
-    const StaticVector<Entry, ChildCount, count>& deposit,
-    const DirKey&)
+    const StaticVector<Entry, ChildCount, count>& deposit)
   {
     using Volume    = decltype(volume(std::declval<DirKey>()));
     using SeedWaste = Volume;

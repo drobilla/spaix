@@ -30,8 +30,8 @@ class LinearSplit
 {
 public:
   /// Return the indices of the children that should be used for split seeds
-  template<class Entries, class DirKey>
-  SplitSeeds<DirKey> pick_seeds(const Entries& deposit, const DirKey& bounds)
+  template<class DirKey, class Entries>
+  SplitSeeds<DirKey> pick_seeds(const Entries& deposit)
   {
     using std::max;
     using std::min;
@@ -39,13 +39,14 @@ public:
     using Scalar = typename CommonElementType<typename DirKey::Scalars>::type;
 
     std::array<ExtremeIndices, DirKey::size()> indices{};
+    const Index<0U, DirKey::size()>            dim_begin{};
 
     for (size_t i = 1; i < deposit.size(); ++i) {
-      update_indices(deposit, i, indices, bounds.ibegin());
+      update_indices(deposit, i, indices, dim_begin);
     }
 
     MaxSeparation<Scalar> max_separation;
-    update_max_separation(deposit, indices, max_separation, bounds.ibegin());
+    update_max_separation(deposit, indices, max_separation, dim_begin);
 
     const auto max_min_index = indices[max_separation.dimension].max_min;
     const auto min_max_index = indices[max_separation.dimension].min_max;

@@ -197,7 +197,6 @@ private:
   template<class Entry, ChildCount fanout>
   DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                     Entry                                    entry,
-                    const Box&                               bounds,
                     NodeType                                 type);
 
   Insertion _insertion{};          ///< Insertion algorithm

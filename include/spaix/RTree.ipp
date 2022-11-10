@@ -98,10 +98,7 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
     if (sides[0].node) { // Child was split, replace it
       children[index] = std::move(sides[0]);
       if (children.size() == Conf::dir_fanout) {
-        return split(children,
-                     std::move(sides[1]),
-                     parent_entry.key | key,
-                     parent.child_type());
+        return split(children, std::move(sides[1]), parent.child_type());
       }
 
       parent.append_child(std::move(sides[1]));
@@ -120,7 +117,6 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
   } else { // Split leaf insert
     return split(parent.dat_children(),
                  DirNode::make_dat_entry(key, data),
-                 parent_entry.key | key,
                  parent.child_type());
   }
 
@@ -176,7 +172,6 @@ template<class Entry, ChildCount fanout>
 typename RTree<B, K, D, C>::DirNodePair
 RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                          Entry                                    entry,
-                         const Box&                               bounds,
                          const NodeType                           type)
 {
   constexpr auto max_fanout = fanout - (fanout / Conf::min_fill_divisor);
@@ -187,10 +182,9 @@ RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
     deposit.emplace_back(std::move(e));
   }
   deposit.emplace_back(std::move(entry));
-  assert(bounds == parent_key(deposit));
 
   // Pick two nodes to seed the left and right groups
-  auto seeds = _split.pick_seeds(deposit, bounds);
+  auto seeds = _split.template pick_seeds<B>(deposit);
   assert(seeds.lhs_index < seeds.rhs_index);
 
   // Create left/right parent nodes with right/left seeds
