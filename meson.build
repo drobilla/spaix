@@ -72,7 +72,6 @@ headers = files(
   'include/spaix/detail/DirectoryNode.hpp',
   'include/spaix/detail/distribute.hpp',
   'include/spaix/detail/meta.hpp',
-  'include/spaix/empty.hpp',
   'include/spaix/expansion.hpp',
   'include/spaix/intersects.hpp',
   'include/spaix/search/everything.hpp',
