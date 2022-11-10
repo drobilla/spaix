@@ -27,17 +27,18 @@ enum class VisitStatus { proceed, finish };
 /**
    An R-tree which spatially indexes points or rectangles.
 
+   @tparam B Geometric box type that can contain many keys.
    @tparam K Geometric key type for elements.
    @tparam D Data type for elements.
    @tparam C Tree configuration (an instantiation of spaix::Config).
 */
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 class RTree
 {
 public:
-  using Key  = K;            ///< Key for a single data element
-  using Data = D;            ///< Single data element
-  using Box  = UnionOf<Key>; ///< Aggregate key in a directory node
+  using Key  = K; ///< Key for a single data element
+  using Data = D; ///< Single data element
+  using Box  = B; ///< Aggregate key in a directory node
 
   using Conf      = C;                        ///< Tree configuration
   using Structure = typename Conf::Structure; ///< Tree structure configuration

@@ -16,9 +16,9 @@
 
 namespace spaix {
 
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 void
-RTree<K, D, C>::insert(const Key& key, const Data& data)
+RTree<B, K, D, C>::insert(const Key& key, const Data& data)
 {
   if (empty()) {
     _root = {Box{key}, std::make_unique<DirNode>(NodeType::data)};
@@ -39,10 +39,10 @@ RTree<K, D, C>::insert(const Key& key, const Data& data)
   ++_size;
 }
 
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<class S>
-TreeRange<typename RTree<K, D, C>::template ConstSearcher<S>>
-RTree<K, D, C>::query(S search) const
+TreeRange<typename RTree<B, K, D, C>::template ConstSearcher<S>>
+RTree<B, K, D, C>::query(S search) const
 {
   if (empty()) {
     return {{{Box{}, nullptr}, search}, {{Box{}, nullptr}, search}};
@@ -56,10 +56,10 @@ RTree<K, D, C>::query(S search) const
   return {std::move(first), std::move(last)};
 }
 
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<class Children>
-typename RTree<K, D, C>::Box
-RTree<K, D, C>::parent_key(const Children& children)
+typename RTree<B, K, D, C>::Box
+RTree<B, K, D, C>::parent_key(const Children& children)
 {
   Box key;
 
@@ -70,9 +70,9 @@ RTree<K, D, C>::parent_key(const Children& children)
   return key;
 }
 
-template<class K, class D, class C>
-typename RTree<K, D, C>::Box
-RTree<K, D, C>::ideal_key(const DirNode& node)
+template<class B, class K, class D, class C>
+typename RTree<B, K, D, C>::Box
+RTree<B, K, D, C>::ideal_key(const DirNode& node)
 {
   if (node.child_type() == NodeType::directory) {
     return parent_key(node.dir_children());
@@ -81,12 +81,12 @@ RTree<K, D, C>::ideal_key(const DirNode& node)
   return parent_key(node.dat_children());
 }
 
-template<class K, class D, class C>
-typename RTree<K, D, C>::DirNodePair
-RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
-                           const Box&  new_parent_key,
-                           const Key&  key,
-                           const Data& data)
+template<class B, class K, class D, class C>
+typename RTree<B, K, D, C>::DirNodePair
+RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
+                              const Box&  new_parent_key,
+                              const Key&  key,
+                              const Data& data)
 {
   auto& parent = *parent_entry.node;
   if (parent.child_type() == NodeType::directory) { // Recursing downwards
@@ -127,12 +127,12 @@ RTree<K, D, C>::insert_rec(DirEntry&   parent_entry,
   return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
 }
 
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<class Predicate, class Visitor>
 void
-RTree<K, D, C>::fast_query_rec(const DirNode&   node,
-                               const Predicate& predicate,
-                               const Visitor&   visitor) const
+RTree<B, K, D, C>::fast_query_rec(const DirNode&   node,
+                                  const Predicate& predicate,
+                                  const Visitor&   visitor) const
 {
   switch (node.child_type()) {
   case NodeType::directory:
@@ -153,12 +153,12 @@ RTree<K, D, C>::fast_query_rec(const DirNode&   node,
 }
 
 /// Create a new parent seeded with a child
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<class Entry, ChildCount count>
-typename RTree<K, D, C>::DirEntry
-RTree<K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
-                           ChildIndex                              index,
-                           NodeType                                child_type)
+typename RTree<B, K, D, C>::DirEntry
+RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
+                              ChildIndex                              index,
+                              NodeType child_type)
 {
   auto* const iter{deposit.begin() + index};
   Box         key{entry_key(*iter)};
@@ -171,13 +171,13 @@ RTree<K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
 }
 
 /// Split `nodes` plus `node` in two and return the resulting sides
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<class Entry, ChildCount fanout>
-typename RTree<K, D, C>::DirNodePair
-RTree<K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
-                      Entry                                    entry,
-                      const Box&                               bounds,
-                      const NodeType                           type)
+typename RTree<B, K, D, C>::DirNodePair
+RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
+                         Entry                                    entry,
+                         const Box&                               bounds,
+                         const NodeType                           type)
 {
   constexpr auto max_fanout = fanout - (fanout / Conf::min_fill_divisor);
 
@@ -259,10 +259,10 @@ visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
 
 } // namespace detail
 
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<typename DirVisitor, typename DatVisitor>
 void
-RTree<K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
+RTree<B, K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
 {
   NodePath path;
   path.emplace_back(0u);
@@ -272,10 +272,10 @@ RTree<K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
                           path);
 }
 
-template<class K, class D, class C>
+template<class B, class K, class D, class C>
 template<typename DirVisitor>
 void
-RTree<K, D, C>::visit(DirVisitor&& visit_dir) const
+RTree<B, K, D, C>::visit(DirVisitor&& visit_dir) const
 {
   NodePath path;
   path.emplace_back(0u);

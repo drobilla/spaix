@@ -7,7 +7,6 @@
 #include "spaix/DataNode.hpp"
 #include "spaix/DataPlacement.hpp"
 #include "spaix/types.hpp"
-#include "spaix/union.hpp"
 
 #include <cstddef>
 #include <limits>
@@ -48,16 +47,21 @@ struct FanoutStructure {
    Otherwise, with separate data placement, directory nodes will be page-sized,
    but data nodes may not, since DataNode is always its "natural" size.
 
+   @tparam B Box type that can maintain many keys.
    @tparam K Key type for data (leaf) nodes.
    @tparam D Data type for data (leaf) nodes.
    @tparam page_size Page size, the maximum size of a directory node, in bytes.
    @tparam data_placement Where data in the tree is stored.
 */
-template<class K, class D, size_t page_size, DataPlacement data_placement>
+template<class B,
+         class K,
+         class D,
+         size_t        page_size,
+         DataPlacement data_placement>
 struct PageStructure {
   static constexpr auto placement = data_placement;
 
-  static constexpr auto dir_entry_size = sizeof(UnionOf<K>) + sizeof(void*);
+  static constexpr auto dir_entry_size = sizeof(B) + sizeof(void*);
   static constexpr auto dat_entry_size = placement == DataPlacement::inlined
                                            ? sizeof(DataNode<K, D>)
                                            : sizeof(void*);
@@ -79,7 +83,7 @@ struct PageStructure {
    the tree (fanouts and data node placement) which determines node sizes.
 
    @tparam TreeStructure The tree structure configuration, either a
-   FanoutStructure, SeparatePageStructure, or InlinedPageStructure.
+   FanoutStructure or a PageStructure.
 
    @tparam SplitAlgorithm Node splitting algorithm, spaix::LinearSplit or
    spaix::QuadraticSplit.

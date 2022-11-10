@@ -291,22 +291,25 @@ template<class Key, spaix::DataPlacement placement, size_t page_size>
 void
 test_page_size(const unsigned span, const unsigned n_queries)
 {
-  using Structure = spaix::PageStructure<Key, Data, page_size, placement>;
+  using Structure = spaix::PageStructure<Rect, Key, Data, page_size, placement>;
 
   // Test a small tree where the root has leaf children
   test_tree<spaix::RTree<
+    Rect,
     Key,
     Data,
     spaix::Config<Structure, spaix::LinearSplit, spaix::LinearInsertion>>>(
     2, n_queries);
 
   test_tree<spaix::RTree<
+    Rect,
     Key,
     Data,
     spaix::Config<Structure, spaix::LinearSplit, spaix::LinearInsertion>>>(
     span, n_queries);
 
   test_tree<spaix::RTree<
+    Rect,
     Key,
     Data,
     spaix::Config<Structure, spaix::QuadraticSplit, spaix::LinearInsertion>>>(

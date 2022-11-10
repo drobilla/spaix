@@ -233,13 +233,13 @@ template<class Insertion,
 int
 run(const Parameters& params)
 {
-  using Conf =
-    spaix::Config<spaix::PageStructure<Rect2, Data, page_size, placement>,
-                  Split,
-                  Insertion,
-                  min_fill_divisor>;
+  using Conf = spaix::Config<
+    spaix::PageStructure<Rect2, Rect2, Data, page_size, placement>,
+    Split,
+    Insertion,
+    min_fill_divisor>;
 
-  return run<spaix::RTree<Rect2, Data, Conf>>(params, std::cout);
+  return run<spaix::RTree<Rect2, Rect2, Data, Conf>>(params, std::cout);
 }
 
 template<class Insertion, class Split, spaix::DataPlacement placement>
