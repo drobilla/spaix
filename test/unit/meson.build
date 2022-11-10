@@ -7,7 +7,6 @@ tests = [
   'test_Rect',
   'test_contains',
   'test_expansion',
-  'test_intersection',
   'test_intersects',
   'test_union',
   'test_volume',
