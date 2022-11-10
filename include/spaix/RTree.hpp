@@ -169,15 +169,6 @@ private:
   using DatEntry    = typename DirNode::DatEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 
-  static constexpr auto placement      = Conf::placement;
-  static constexpr auto dir_fanout     = Conf::dir_fanout;
-  static constexpr auto dat_fanout     = Conf::dat_fanout;
-  static constexpr auto min_dir_fanout = dir_fanout / Conf::min_fill_divisor;
-  static constexpr auto min_dat_fanout = dat_fanout / Conf::min_fill_divisor;
-
-  static_assert(min_dir_fanout > 1);
-  static_assert(min_dat_fanout > 1);
-
   static_assert(sizeof(DirNode) <= Structure::max_dir_node_size);
   static_assert(sizeof(DirNode) >= Structure::min_dir_node_size);
 

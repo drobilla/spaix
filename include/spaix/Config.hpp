@@ -115,6 +115,8 @@ struct Config {
   static_assert(dir_fanout > 1);
   static_assert(dat_fanout > 1);
   static_assert(min_fill_divisor > 1);
+  static_assert(min_dir_fanout > 1);
+  static_assert(min_dat_fanout > 1);
 };
 
 } // namespace spaix
