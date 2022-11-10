@@ -29,9 +29,15 @@ namespace spaix {
 class LinearSplit
 {
 public:
+  template<class DirKey>
+  using VolumeOf = decltype(volume(std::declval<DirKey>()));
+
+  template<class DirKey>
+  using SeedsFor = SplitSeeds<VolumeOf<DirKey>>;
+
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entries>
-  SplitSeeds<DirKey> pick_seeds(const Entries& deposit)
+  SeedsFor<DirKey> pick_seeds(const Entries& deposit)
   {
     using std::max;
     using std::min;
@@ -63,11 +69,11 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirNode>
-  void distribute_children(SplitSeeds<typename DirNode::Key>& seeds,
-                           Deposit&&                          deposit,
-                           DirNode&                           lhs,
-                           DirNode&                           rhs,
-                           const ChildCount                   max_fanout)
+  void distribute_children(SeedsFor<typename DirNode::Key>& seeds,
+                           Deposit&&                        deposit,
+                           DirNode&                         lhs,
+                           DirNode&                         rhs,
+                           const ChildCount                 max_fanout)
   {
     // Scan the deposit entries once, sending each left or right immediately
     const size_t n_entries = deposit.size();

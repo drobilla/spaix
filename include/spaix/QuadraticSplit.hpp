@@ -30,9 +30,15 @@ class StaticVector;
 class QuadraticSplit
 {
 public:
+  template<class DirKey>
+  using VolumeOf = decltype(volume(std::declval<DirKey>()));
+
+  template<class DirKey>
+  using SeedsFor = SplitSeeds<VolumeOf<DirKey>>;
+
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entry, ChildCount count>
-  SplitSeeds<DirKey> pick_seeds(
+  SeedsFor<DirKey> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit)
   {
     using Volume    = decltype(volume(std::declval<DirKey>()));
@@ -44,8 +50,8 @@ public:
       volumes[i] = volume(entry_key(deposit[i]));
     }
 
-    SeedWaste          max_waste{std::numeric_limits<Volume>::lowest()};
-    SplitSeeds<DirKey> seeds{deposit.size(), deposit.size(), {}, {}};
+    SeedWaste        max_waste{std::numeric_limits<Volume>::lowest()};
+    SeedsFor<DirKey> seeds{deposit.size(), deposit.size(), {}, {}};
     for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
         const auto& k = entry_key(deposit[i]);
@@ -72,11 +78,11 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirEntry>
-  void distribute_children(SplitSeeds<typename DirEntry::Key>& seeds,
-                           Deposit&&                           deposit,
-                           DirEntry&                           lhs,
-                           DirEntry&                           rhs,
-                           const ChildCount                    max_fanout)
+  void distribute_children(SeedsFor<typename DirEntry::Key>& seeds,
+                           Deposit&&                         deposit,
+                           DirEntry&                         lhs,
+                           DirEntry&                         rhs,
+                           const ChildCount                  max_fanout)
   {
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
@@ -106,9 +112,6 @@ public:
   }
 
 private:
-  template<class DirKey>
-  using VolumeOf = decltype(volume(std::declval<DirKey>()));
-
   /// Assignment of a child to a parent during a split
   template<class DirKey>
   struct ChildAssignment {
@@ -128,10 +131,10 @@ private:
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
   ChildAssignment<typename DirEntry::Key> pick_next(
-    const SplitSeeds<typename DirEntry::Key>& seeds,
-    const Deposit&                            deposit,
-    const DirEntry&                           lhs,
-    const DirEntry&                           rhs)
+    const SeedsFor<typename DirEntry::Key>& seeds,
+    const Deposit&                          deposit,
+    const DirEntry&                         lhs,
+    const DirEntry&                         rhs)
   {
     using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::NodeKey;

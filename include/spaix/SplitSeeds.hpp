@@ -5,16 +5,11 @@
 #define SPAIX_SPLITSEEDS_HPP
 
 #include "spaix/types.hpp"
-#include "spaix/volume.hpp"
-
-#include <type_traits>
 
 namespace spaix {
 
-template<class DirKey>
+template<typename Volume>
 struct SplitSeeds {
-  using Volume = decltype(volume(std::declval<DirKey>()));
-
   ChildIndex lhs_index;
   ChildIndex rhs_index;
   Volume     lhs_volume;
