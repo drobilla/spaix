@@ -30,18 +30,18 @@ color(const NodePath& path, const double alpha)
   uint32_t components[3] = {0, 0, 0};
   int      c             = 0;
   for (ChildIndex index : path) {
-    components[c] += ((uint32_t(index) * u8max) / ((fanout - 1u)));
+    components[c] += ((static_cast<uint32_t>(index) * u8max) / ((fanout - 1u)));
     c = (c + 1) % 3;
   }
 
-  char buf[36];
-  snprintf(buf,
-           sizeof(buf),
-           "#%02X%02X%02X%02X",
-           (components[0] % u8max),
-           (components[1] % u8max),
-           (components[2] % u8max),
-           static_cast<unsigned>(alpha * u8max));
+  char buf[36] = {};
+  (void)snprintf(buf,
+                 sizeof(buf),
+                 "#%02X%02X%02X%02X",
+                 (components[0] % u8max),
+                 (components[1] % u8max),
+                 (components[2] % u8max),
+                 static_cast<unsigned>(alpha * u8max));
 
   return buf;
 }

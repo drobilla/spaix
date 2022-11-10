@@ -43,21 +43,23 @@ template<>
 Point
 make_key<Point>(const unsigned x, const unsigned y)
 {
-  return Point{float(x), float(y)};
+  return Point{static_cast<float>(x), static_cast<float>(y)};
 }
 
 template<>
 Rect
 make_key<Rect>(const unsigned x, const unsigned y)
 {
-  return Rect{{float(x), float(x) + 1.0f}, {float(y), float(y) + 1.0f}};
+  return Rect{{static_cast<float>(x), static_cast<float>(x) + 1.0f},
+              {static_cast<float>(y), static_cast<float>(y) + 1.0f}};
 }
 
 template<class Tree>
 void
 test_empty_tree(const Tree& tree, const unsigned span)
 {
-  const Rect everything{{0.0f, float(span)}, {0.0f, float(span)}};
+  const Rect everything{{0.0f, static_cast<float>(span)},
+                        {0.0f, static_cast<float>(span)}};
 
   CHECK(tree.empty());
   CHECK(tree.begin() == tree.end());
@@ -232,7 +234,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   unsigned count = 0;
 
   // Test a query that is in the tree bounds, but has no matches
-  const auto mid = float(span) / 2.0f;
+  const auto mid = static_cast<float>(span) / 2.0f;
   const auto no_matches_query =
     Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
   for (const auto& node : tree.query(spaix::search::within(no_matches_query))) {
@@ -254,15 +256,16 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto x_span = x_high - x_low;
     const auto y_span = y_high - y_low;
     const auto query =
-      Rect{{Scalar(x_low), Scalar(x_high)}, {Scalar(y_low), Scalar(y_high)}};
+      Rect{{static_cast<Scalar>(x_low), static_cast<Scalar>(x_high)},
+           {static_cast<Scalar>(y_low), static_cast<Scalar>(y_high)}};
 
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
     const auto verify = [&](const auto& node) {
-      CHECK((spaix::range<0>(node.key).lower >= float(x_low)));
-      CHECK((spaix::range<0>(node.key).upper <= float(x_high)));
-      CHECK((spaix::range<1>(node.key).lower >= float(y_low)));
-      CHECK((spaix::range<1>(node.key).upper <= float(y_high)));
+      CHECK((spaix::range<0>(node.key).lower >= static_cast<float>(x_low)));
+      CHECK((spaix::range<0>(node.key).upper <= static_cast<float>(x_high)));
+      CHECK((spaix::range<1>(node.key).lower >= static_cast<float>(y_low)));
+      CHECK((spaix::range<1>(node.key).upper <= static_cast<float>(y_high)));
       CHECK((contains(tree.bounds(), node.key)));
       ++count;
     };
