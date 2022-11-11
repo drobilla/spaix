@@ -5,4 +5,4 @@ Source: https://gitlab.com/drobilla/spaix
 
 Files: **/.clang-tidy *.md .clang* .clant.json .includes.imp .git* NEWS meson_options.txt
 Copyright: 2020-2021 David Robillard <d@drobilla.net>
-License: CC0-1.0 OR GPL-3.0-only
+License: 0BSD OR GPL-3.0-only

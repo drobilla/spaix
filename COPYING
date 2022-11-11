@@ -1,4 +1,4 @@
-Copyright 2019-2021 David Robillard <d@drobilla.net>
+Copyright 2019-2022 David Robillard <d@drobilla.net>
 
 This distribution adheres to the REUSE standard for machine-readable license
 information <https://reuse.software/>.  The machine-readable information is
@@ -6,9 +6,8 @@ authoritative, this document is only a summary for convenience.  A bill of
 materials in SPDX format can be generated with the `reuse spdx` command.
 
 Spaix is licensed under the GNU General Public License, Version 3.0.  Some
-auxiliary parts of this distribution are also licensed under the CC0 1.0
-Universal Public Domain Dedication.  The full text of all licenses is available
-in the LICENSES directory.
+auxiliary parts of this distribution are also licensed under the 0BSD license.
+The full text of all licenses is available in the LICENSES directory.
 
 Where possible, licenses are explicitly stated at the top of every file.
 Otherwise, licenses are given in the .reuse/dep5 file.
