@@ -4,6 +4,7 @@
 #ifndef SPAIX_QUADRATICSPLIT_HPP
 #define SPAIX_QUADRATICSPLIT_HPP
 
+#include "spaix/Split.hpp"
 #include "spaix/SplitSeeds.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
@@ -27,7 +28,7 @@ class StaticVector;
 
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
-class QuadraticSplit
+class QuadraticSplit : public Split
 {
 public:
   template<class DirKey>
@@ -175,28 +176,6 @@ private:
 
     return best;
   }
-
-  /// Choose a side to break a tie when the volume comparisons fail
-  template<class DirKey, class ChildKey>
-  Side tie_side(const DirKey&   lhs_key,
-                const DirKey&   rhs_key,
-                const ChildKey& child_key)
-  {
-    const auto l_expansion = spaix::expansion(lhs_key, child_key);
-    const auto r_expansion = spaix::expansion(rhs_key, child_key);
-
-    return (l_expansion < r_expansion)   ? Side::left
-           : (r_expansion < l_expansion) ? Side::right
-                                         : arbitrary_side();
-  }
-
-  /// Choose an arbitrary fallback side (which flip-flops to avoid bias)
-  Side arbitrary_side()
-  {
-    return (_bias = (_bias == Side::left ? Side::right : Side::left));
-  }
-
-  Side _bias = Side::left;
 };
 
 } // namespace spaix
