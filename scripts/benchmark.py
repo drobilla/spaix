@@ -41,7 +41,8 @@ def plot(sources,
          y_col,
          y_label,
          show_error=True,
-         y_max=None):
+         y_max=None,
+         y_divisor_col=None):
     """Plot results"""
 
     matplotlib.use("agg")
@@ -61,25 +62,34 @@ def plot(sources,
     min_col = y_col + "_min" if show_error else y_col
     max_col = y_col + "_max" if show_error else y_col
 
+    def get_y_data(source):
+        y_data = source.data[y_col]
+        if y_divisor_col is not None:
+            y_data = y_data / source.data[y_divisor_col]
+
+        return y_data
+
     if y_max is None:
         y_max = 0.0
         for source in sources:
-            y_max = max(y_max, source.data[max_col].max())
+            y_max = max(y_max, get_y_data(source).max())
 
     ax.set_ylim([0.0, y_max * 1.01])
     ax.grid(linewidth=0.25, linestyle=":", color="0", dashes=[0.2, 1.6])
     ax.ticklabel_format(style="sci", scilimits=(4, 0), useMathText=True)
     ax.tick_params(axis="both", width=0.75)
 
-    yerr = None
-    if show_error:
-        yerr = [source.data[y_col] - source.data[min_col],
-                source.data[max_col] - source.data[y_col]]
-
     for source in sources:
+        y_data = get_y_data(source)
+
+        yerr = None
+        if show_error:
+            yerr = [source.data[y_col] - source.data[min_col],
+                    source.data[max_col] - source.data[y_col]]
+
         ax.errorbar(
             source.data[x_col],
-            source.data[y_col],
+            y_data,
             yerr=yerr,
             label=source.label,
             marker=next(markers),
@@ -201,23 +211,30 @@ if __name__ == "__main__":
             result = 0.0
             for source in sources:
                 for col in cols:
-                    max_col = col if options.no_error else col + "_max"
-                    result = max(result, source.data[max_col].max())
+                    if options.no_error or col.endswith("_max"):
+                        result = max(result, source.data[col].max())
+                    else:
+                        result = max(result, source.data[col + "_max"].max())
 
             return result
 
         plot(sources, os.path.join(options.dir, "insert.svg"),
-             "n", "Size", "t_ins", "Insert time (s)", not options.no_error)
+             "n", "Size", "t_ins", "Insert time (s)", not options.no_error,
+             max_value(["t_ins"]))
+
+        plot(sources, os.path.join(options.dir, "throughput.svg"),
+             "n", "Size", "n", "Insert throughput (/s)", False, y_divisor_col="elapsed")
 
         plot(sources, os.path.join(options.dir, "iter.svg"),
              "n", "Size", "t_iter", "Range query time (s)", not options.no_error)
 
-        nodes_y_max = max_value(["q_dirs", "q_dats"])
         plot(sources, os.path.join(options.dir, "q_dirs.svg"),
-             "n", "Size", "q_dirs", "Directory nodes searched", not options.no_error)
+             "n", "Size", "q_dirs", "Directory nodes searched",
+             not options.no_error, max_value(["q_dirs_max"]))
 
         plot(sources, os.path.join(options.dir, "q_dats.svg"),
-             "n", "Size", "q_dats", "Leaf nodes searched", not options.no_error)
+             "n", "Size", "q_dats", "Leaf nodes searched",
+             not options.no_error, max_value(["q_dats_max"]))
 
         html_path = os.path.join(options.dir, "benchmarks.html")
         with open(html_path, "w") as html:
@@ -227,6 +244,7 @@ if __name__ == "__main__":
   <meta charset="utf-8"/></head>
   <body>
     <figure><img src="insert.svg" alt="Insert time"/></figure>
+    <figure><img src="throughput.svg" alt="Insert throughput"/></figure>
     <figure><img src="iter.svg" alt="Range query time"/></figure>
     <figure><img src="q_dirs.svg" alt="Directory nodes searched"/></figure>
     <figure><img src="q_dats.svg" alt="Leaf nodes searched"/></figure>

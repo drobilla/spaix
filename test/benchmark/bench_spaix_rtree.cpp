@@ -142,6 +142,8 @@ template<class Tree>
 int
 run(const Parameters& params, std::ostream& os)
 {
+  using Seconds = std::chrono::duration<double>;
+
   const auto span         = params.span;
   const auto n_per_record = params.n_elements / params.n_steps;
 
@@ -157,12 +159,10 @@ run(const Parameters& params, std::ostream& os)
                          "page_size",
                          "fanout",
                          "elapsed",
+                         "throughput",
                          "t_ins",
                          "t_ins_min",
                          "t_ins_max",
-                         // "t_visit",
-                         // "t_visit_min",
-                         // "t_visit_max",
                          "t_iter",
                          "t_iter_min",
                          "t_iter_max",
@@ -175,6 +175,8 @@ run(const Parameters& params, std::ostream& os)
                          "n_results");
 
   const auto t_bench_start = std::chrono::steady_clock::now();
+  auto       last_row_time = t_bench_start;
+  size_t     last_row_n    = 0U;
   for (size_t i = 0; i < params.n_elements; ++i) {
     const auto x1 = floorf(dist(rng));
     const auto x2 = floorf(dist(rng));
@@ -190,36 +192,40 @@ run(const Parameters& params, std::ostream& os)
     t.insert(key, value);
     const auto t_end = std::chrono::steady_clock::now();
 
-    const auto d = std::chrono::duration<double>(t_end - t_start).count();
+    const auto d = Seconds(t_end - t_start).count();
     times.update(d);
     total_times.update(d);
 
     if (i % n_per_record == n_per_record - 1) {
       const auto metrics = benchmark_queries(rng, t, span, params.n_queries);
 
-      spaix::test::write_row(
-        os,
-        total_times.n(),
-        params.page_size,
-        Tree::Conf::dir_fanout,
-        std::chrono::duration<double>(t_end - t_bench_start).count(),
-        times.mean(),
-        times.min(),
-        times.max(),
-        metrics.iter_times.mean(),
-        metrics.iter_times.min(),
-        metrics.iter_times.max(),
-        // metrics.visit_times.mean(),
-        // metrics.visit_times.min(),
-        // metrics.visit_times.max(),
-        metrics.checked_dirs.mean(),
-        metrics.checked_dirs.min(),
-        metrics.checked_dirs.max(),
-        metrics.checked_dats.mean(),
-        metrics.checked_dats.min(),
-        metrics.checked_dats.max(),
-        metrics.result_counts.mean());
-      times = {};
+      const auto total_elapsed = t_end - t_bench_start;
+      const auto row_elapsed   = t_end - last_row_time;
+      const auto row_count     = static_cast<double>(i - last_row_n);
+
+      spaix::test::write_row(os,
+                             total_times.n(),
+                             params.page_size,
+                             Tree::Conf::dir_fanout,
+                             Seconds(total_elapsed).count(),
+                             row_count / Seconds(row_elapsed).count(),
+                             times.mean(),
+                             times.min(),
+                             times.max(),
+                             metrics.iter_times.mean(),
+                             metrics.iter_times.min(),
+                             metrics.iter_times.max(),
+                             metrics.checked_dirs.mean(),
+                             metrics.checked_dirs.min(),
+                             metrics.checked_dirs.max(),
+                             metrics.checked_dats.mean(),
+                             metrics.checked_dats.min(),
+                             metrics.checked_dats.max(),
+                             metrics.result_counts.mean());
+
+      times         = {};
+      last_row_n    = i;
+      last_row_time = t_end;
     }
   }
 
