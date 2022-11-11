@@ -30,7 +30,7 @@ color(const NodePath& path, const double alpha)
   uint32_t components[3] = {0, 0, 0};
   int      c             = 0;
   for (ChildIndex index : path) {
-    components[c] += ((static_cast<uint32_t>(index) * u8max) / ((fanout - 1u)));
+    components[c] += ((static_cast<uint32_t>(index) * u8max) / ((fanout - 1U)));
     c = (c + 1) % 3;
   }
 

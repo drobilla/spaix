@@ -212,7 +212,7 @@ visit_children(const Children& children, NodePath& path, ChildFunc&& child_func)
 {
   VisitStatus status = VisitStatus::proceed;
 
-  for (ChildIndex i = 0u; i < children.size() && status == VisitStatus::proceed;
+  for (ChildIndex i = 0U; i < children.size() && status == VisitStatus::proceed;
        ++i) {
     path.emplace_back(i);
     status = child_func(children[i]);

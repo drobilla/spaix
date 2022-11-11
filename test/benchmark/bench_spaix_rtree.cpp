@@ -40,8 +40,8 @@ using Distribution = spaix::test::Distribution<T>;
 constexpr unsigned min_fill_divisor = 3;
 
 struct Counts {
-  size_t n_checked_dirs = 0u;
-  size_t n_checked_dats = 0u;
+  size_t n_checked_dirs = 0U;
+  size_t n_checked_dats = 0U;
 };
 
 struct BenchmarkWithin {
@@ -94,8 +94,8 @@ benchmark_queries(std::mt19937& rng,
     const auto y0 = dist(rng) * query_span;
     const auto y1 = y0 + dist(rng) * query_span;
 
-    size_t n_results = 0u;
-    Counts counts    = {0u, 0u};
+    size_t n_results = 0U;
+    Counts counts    = {0U, 0U};
 
     const auto predicate = BenchmarkWithin{Rect2{{x0, x1}, {y0, y1}}, &counts};
 

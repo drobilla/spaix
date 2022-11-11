@@ -80,7 +80,7 @@ benchmark_queries(std::mt19937& rng,
     const auto y0 = dist(rng) * query_span;
     const auto y1 = y0 + dist(rng) * query_span;
 
-    size_t n_results = 0u;
+    size_t n_results = 0U;
 
     const Box query_box{{x0, y0}, {x1, y1}};
 

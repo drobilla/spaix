@@ -79,8 +79,8 @@ make_tree(std::mt19937& rng, const unsigned span)
   std::vector<unsigned> y_values(span + 1);
   std::vector<unsigned> x_values(span + 1);
 
-  std::iota(y_values.begin(), y_values.end(), 0u);
-  std::iota(x_values.begin(), x_values.end(), 0u);
+  std::iota(y_values.begin(), y_values.end(), 0U);
+  std::iota(x_values.begin(), x_values.end(), 0U);
 
   std::shuffle(y_values.begin(), y_values.end(), rng);
   std::shuffle(x_values.begin(), x_values.end(), rng);
@@ -212,7 +212,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   const auto seed       = std::random_device{}() ^ start_time;
 
   std::mt19937                            rng{seed};
-  std::uniform_int_distribution<unsigned> dist{0, span - 1u};
+  std::uniform_int_distribution<unsigned> dist{0, span - 1U};
 
   auto tree = make_tree<Tree>(rng, span);
 
@@ -243,15 +243,15 @@ test_tree(const unsigned span, const unsigned n_queries)
   }
   CHECK((count == 0));
 
-  for (auto i = 0u; i < n_queries; ++i) {
+  for (auto i = 0U; i < n_queries; ++i) {
     const auto x0     = dist(rng);
     const auto x1     = dist(rng);
     const auto y0     = dist(rng);
     const auto y1     = dist(rng);
     const auto x_low  = std::min(x0, x1);
-    const auto x_high = std::max(x0, x1) + 1u;
+    const auto x_high = std::max(x0, x1) + 1U;
     const auto y_low  = std::min(y0, y1);
-    const auto y_high = std::max(y0, y1) + 1u;
+    const auto y_high = std::max(y0, y1) + 1U;
 
     const auto x_span = x_high - x_low;
     const auto y_span = y_high - y_low;

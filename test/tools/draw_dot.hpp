@@ -60,7 +60,7 @@ draw_dat_dot(std::ostream& os,
 
 template<class Tree>
 void
-draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0u)
+draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0U)
 {
   using Key      = typename Tree::Key;
   using Data     = typename Tree::Data;

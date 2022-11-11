@@ -82,7 +82,7 @@ private:
   {
     switch (dir.child_type()) {
     case NodeType::directory:
-      for (ChildIndex i = 0u; i < dir.dir_children().size(); ++i) {
+      for (ChildIndex i = 0U; i < dir.dir_children().size(); ++i) {
         if (predicate.directory(dir.dir_children()[i].key)) {
           return i;
         }
@@ -90,7 +90,7 @@ private:
       return dir.dir_children().size();
 
     case NodeType::data:
-      for (ChildIndex i = 0u; i < dir.dat_children().size(); ++i) {
+      for (ChildIndex i = 0U; i < dir.dat_children().size(); ++i) {
         if (predicate.leaf(entry_key(dir.dat_children()[i]))) {
           return i;
         }

@@ -99,7 +99,7 @@ struct PageStructure {
 template<class TreeStructure,
          class SplitAlgorithm,
          class InsertionAlgorithm,
-         unsigned minimum_fill_divisor = 3u>
+         unsigned minimum_fill_divisor = 3U>
 struct Config {
   using Structure = TreeStructure;
   using Split     = SplitAlgorithm;

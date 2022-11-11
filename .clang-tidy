@@ -2,7 +2,6 @@ Checks: >
   *,
   -*-c-arrays,
   -*-named-parameter,
-  -*-uppercase-literal-suffix,
   -altera-*,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
@@ -19,3 +18,8 @@ Checks: >
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 FormatStyle: file
+CheckOptions:
+  - key:   hicpp-uppercase-literal-suffix.NewSuffixes
+    value: 'L;U;UL;ULL'
+  - key:   readability-uppercase-literal-suffix.NewSuffixes
+    value: 'L;U;UL;ULL'
