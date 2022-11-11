@@ -27,7 +27,7 @@ public:
   StaticVector(StaticVector&& vec) noexcept
   {
     for (Size i = 0; i < vec.size(); ++i) {
-      new (&_array[i]) T(std::move(vec[i]));
+      new (&_array[i]) T{std::move(vec[i])};
       ++_size;
     }
   }
@@ -35,7 +35,7 @@ public:
   StaticVector(const StaticVector& vec)
   {
     for (Size i = 0; i < vec.size(); ++i) {
-      new (&_array[i]) T(vec[i]);
+      new (&_array[i]) T{vec[i]};
       ++_size;
     }
   }
@@ -53,7 +53,7 @@ public:
         iter->~T();
       }
 
-      new (iter) T(std::move(last));
+      new (iter) T{std::move(last)};
     }
 
     pop_back();
@@ -74,7 +74,7 @@ public:
   {
     assert(_size < Capacity);
 
-    new (&_array[_size++]) T(std::forward<Args>(args)...);
+    new (&_array[_size++]) T{std::forward<Args>(args)...};
   }
 
   bool empty() const { return _size == 0; }
