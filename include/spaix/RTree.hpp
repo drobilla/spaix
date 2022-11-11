@@ -163,10 +163,7 @@ public:
   iterator       begin() { return iterator{_root, {}}; }
 
 private:
-  using DatNodePtr  = std::unique_ptr<DatNode>;
-  using DirNodePtr  = std::unique_ptr<DirNode>;
   using DirEntry    = typename DirNode::DirEntry;
-  using DatEntry    = typename DirNode::DatEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 
   static_assert(sizeof(DirNode) <= Structure::max_dir_node_size);

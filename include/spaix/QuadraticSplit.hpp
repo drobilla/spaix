@@ -138,7 +138,7 @@ private:
     const DirEntry&                         rhs)
   {
     using DirNode    = typename DirEntry::Node;
-    using DirKey     = typename DirNode::NodeKey;
+    using DirKey     = typename DirNode::DirKey;
     using Volume     = VolumeOf<DirKey>;
     using Result     = ChildAssignment<DirKey>;
     using Preference = Volume;

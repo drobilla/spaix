@@ -25,7 +25,7 @@ class Iterator : public DataIterator<DirNode, DatNode, max_height>
 public:
   using Base     = DataIterator<DirNode, DatNode, max_height>;
   using DirEntry = typename DirNode::DirEntry;
-  using DirKey   = typename DirNode::NodeKey;
+  using DirKey   = typename DirNode::DirKey;
   using Frame    = typename Base::Frame;
 
   Iterator(const DataIterator<DirNode, DatNode, max_height>& base,

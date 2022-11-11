@@ -54,22 +54,18 @@ struct DatEntryType<DatNode, DataPlacement::separate> {
   }
 };
 
-template<class DirKey, class DatNode, class Structure>
+template<class Box, class DatNode, class Structure>
 struct DirectoryNode {
 public:
   static constexpr auto placement  = Structure::placement;
   static constexpr auto dir_fanout = Structure::dir_fanout;
   static constexpr auto dat_fanout = Structure::dat_fanout;
 
-  using DirNode = DirectoryNode<DirKey, DatNode, Structure>;
+  using Key    = decltype(std::declval<DatNode>().key);
+  using Data   = decltype(std::declval<DatNode>().data);
+  using DirKey = Box;
 
-  using Key     = decltype(std::declval<DatNode>().key);
-  using Data    = decltype(std::declval<DatNode>().data);
-  using NodeKey = DirKey;
-
-  using DirNodePtr = std::unique_ptr<DirNode>;
-  using DatNodePtr = std::unique_ptr<DatNode>;
-
+  using DirNode  = DirectoryNode<Box, DatNode, Structure>;
   using DirEntry = NodePointerEntry<DirKey, DirNode>;
   using DatEntry = typename DatEntryType<DatNode, placement>::Type;
 
