@@ -18,7 +18,7 @@
 #include <array>
 #include <cstddef>
 #include <memory>
-#include <utility> // IWYU pragma: keep
+#include <utility>
 
 namespace spaix {
 

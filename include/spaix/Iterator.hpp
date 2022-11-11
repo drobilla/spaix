@@ -10,7 +10,7 @@
 
 #include <cassert>
 #include <cstddef>
-#include <utility> // IWYU pragma: keep
+#include <utility>
 
 namespace spaix {
 

@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <limits>
 #include <type_traits>
-#include <utility> // IWYU pragma: keep
+#include <utility>
 
 namespace spaix {
 
