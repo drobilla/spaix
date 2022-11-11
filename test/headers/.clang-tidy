@@ -1,17 +1,19 @@
 Checks: >
   *,
-  -*-avoid-c-arrays,
+  -*-c-arrays,
   -*-named-parameter,
   -altera-*,
-  -clang-diagnostic-unused-macros,
-  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-type-union-access,
   -fuchsia-overloaded-operator,
+  -hicpp-no-array-decay,
   -llvmlibc-*,
   -misc-no-recursion,
   -modernize-use-nodiscard,
   -modernize-use-trailing-return-type,
+  -readability-identifier-length,
 WarningsAsErrors: ''
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '.*\.[chi]pp$'
 FormatStyle: file

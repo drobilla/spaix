@@ -17,10 +17,7 @@ if reuse.found()
 endif
 
 # Test that all headers build cleanly
-test('build', executable('test_build',
-                         'test_build.cpp',
-                         cpp_args: cpp_suppressions,
-                         dependencies: [spaix_dep]))
+subdir('headers')
 
 # Run unit tests
 subdir('unit')

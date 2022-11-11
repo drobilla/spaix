@@ -1,8 +1,4 @@
 Checks: >
-  -*-magic-numbers,
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-  -fuchsia-default-arguments-calls,
   -google-readability-casting,
   -misc-non-private-member-variables-in-classes,
-  -readability-implicit-bool-conversion,
 InheritParentConfig: true
