@@ -24,6 +24,7 @@ _Pragma("clang diagnostic pop")
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <iostream>
@@ -150,10 +151,10 @@ run(const Parameters& params)
 
   const auto t_bench_start = std::chrono::steady_clock::now();
   for (size_t i = 0; i < params.n_elements; ++i) {
-    const auto x1 = dist(rng);
-    const auto x2 = dist(rng);
-    const auto y1 = dist(rng);
-    const auto y2 = dist(rng);
+    const auto x1 = floorf(dist(rng));
+    const auto x2 = floorf(dist(rng));
+    const auto y1 = floorf(dist(rng));
+    const auto y2 = floorf(dist(rng));
 
     const Box key{{std::min(x1, x2), std::min(y1, y2)},
                   {std::max(x1, x2), std::max(y1, y2)}};
