@@ -31,9 +31,6 @@ empty_ranges_rec(Index<dim, n_dims> index) noexcept
 {
   using T = Nth<dim, Ts...>;
 
-  static_assert(std::numeric_limits<T>::lowest() <
-                std::numeric_limits<T>::max());
-
   return std::tuple_cat(
     std::make_tuple(DimRange<T>{std::numeric_limits<T>::max(),
                                 std::numeric_limits<T>::lowest()}),
