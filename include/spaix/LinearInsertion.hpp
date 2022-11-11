@@ -7,7 +7,6 @@
 #include "spaix/union.hpp"
 #include "spaix/volume.hpp"
 
-#include <cstddef>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -24,8 +23,8 @@ class LinearInsertion
 public:
   /// Choose the best child node to insert/expand by `key`
   template<class Children, class Key>
-  std::pair<size_t, UnionOf<Key>> choose(const Children& children,
-                                         const Key&      key)
+  std::pair<ChildIndex, UnionOf<Key>> choose(const Children& children,
+                                             const Key&      key)
   {
     using Volume = decltype(volume(std::declval<Key>()));
     using DirKey = UnionOf<Key>;
@@ -33,11 +32,11 @@ public:
 
     constexpr auto max_volume = std::numeric_limits<Volume>::max();
 
-    size_t best_index{0};
-    DirKey best_key{children[0].key};
-    Sizes  best_sizes{max_volume, max_volume};
+    ChildIndex best_index{0};
+    DirKey     best_key{children[0].key};
+    Sizes      best_sizes{max_volume, max_volume};
 
-    for (size_t i = 0; i < children.size(); ++i) {
+    for (ChildIndex i = 0; i < children.size(); ++i) {
       const auto& child_key    = children[i].key;
       const auto  child_volume = volume(child_key);
       const auto  expanded     = child_key | key;

@@ -47,14 +47,14 @@ public:
     assert(deposit.size() == deposit.capacity());
 
     Volume volumes[count];
-    for (size_t i = 0; i < deposit.size(); ++i) {
+    for (ChildIndex i = 0; i < deposit.size(); ++i) {
       volumes[i] = volume(entry_key(deposit[i]));
     }
 
     Volume           max_waste{std::numeric_limits<Volume>::lowest()};
     SeedsFor<DirKey> seeds{};
-    for (size_t i = 0; i < deposit.size() - 1; ++i) {
-      for (size_t j = i + 1; j < deposit.size(); ++j) {
+    for (ChildIndex i = 0; i < deposit.size() - 1; ++i) {
+      for (ChildIndex j = i + 1; j < deposit.size(); ++j) {
         const auto& k = entry_key(deposit[i]);
         const auto& l = entry_key(deposit[j]);
 
@@ -85,8 +85,8 @@ public:
                            DirEntry&                         rhs,
                            const ChildCount                  max_fanout)
   {
-    const size_t n_entries = deposit.size();
-    for (size_t i = 0; i < n_entries; ++i) {
+    const ChildIndex n_entries = deposit.size();
+    for (ChildIndex i = 0; i < n_entries; ++i) {
       const auto  best   = pick_next(seeds, deposit, lhs, rhs);
       auto* const iter   = deposit.begin() + best.child_index;
       auto&       parent = best.side == Side::left ? lhs : rhs;
@@ -116,7 +116,7 @@ private:
   /// Assignment of a child to a parent during a split
   template<class DirKey>
   struct ChildAssignment {
-    size_t           child_index;
+    ChildIndex       child_index;
     DirKey           new_parent_key;
     VolumeOf<DirKey> new_parent_volume;
     Side             side;
@@ -146,7 +146,7 @@ private:
     Preference best_preference{0};
     Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
 
-    for (size_t i = 0; i < deposit.size(); ++i) {
+    for (ChildIndex i = 0; i < deposit.size(); ++i) {
       const auto& child      = deposit[i];
       const auto& child_key  = entry_key(child);
       const auto  l_key      = lhs.key | child_key;

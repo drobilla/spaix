@@ -259,7 +259,7 @@ void
 RTree<B, K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
 {
   NodePath path;
-  path.emplace_back(0u);
+  path.emplace_back(ChildIndex{});
   detail::visit_dir_entry(_root,
                           std::forward<DirVisitor>(visit_dir),
                           std::forward<DatVisitor>(visit_dat),
@@ -272,7 +272,7 @@ void
 RTree<B, K, D, C>::visit(DirVisitor&& visit_dir) const
 {
   NodePath path;
-  path.emplace_back(0u);
+  path.emplace_back(ChildIndex{});
   detail::visit_dir_entry(
     _root,
     std::forward<DirVisitor>(visit_dir),

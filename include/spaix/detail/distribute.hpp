@@ -24,7 +24,7 @@ template<class DirEntry, class Deposit>
 inline void
 distribute_remaining(DirEntry& parent, Deposit&& deposit)
 {
-  for (size_t i = 0; i < deposit.size(); ++i) {
+  for (ChildIndex i = 0; i < deposit.size(); ++i) {
     parent.key |= entry_key(deposit[i]);
     parent.node->append_child(std::move(deposit[i]));
   }

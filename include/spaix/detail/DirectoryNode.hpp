@@ -9,7 +9,6 @@
 #include "spaix/types.hpp"
 
 #include <cassert>
-#include <cstddef>
 #include <memory>
 #include <new>
 #include <type_traits>
@@ -127,7 +126,7 @@ public:
     return _dir_children.size();
   }
 
-  size_t num_children() const
+  ChildIndex num_children() const
   {
     return _child_type == NodeType::directory ? _dir_children.size()
                                               : _dat_children.size();

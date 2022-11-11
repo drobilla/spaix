@@ -47,7 +47,7 @@ public:
     std::array<ExtremeIndices, DirKey::size()> indices{};
     const Index<0U, DirKey::size()>            dim_begin{};
 
-    for (size_t i = 1; i < deposit.size(); ++i) {
+    for (ChildIndex i = 1; i < deposit.size(); ++i) {
       update_indices(deposit, i, indices, dim_begin);
     }
 
@@ -121,10 +121,10 @@ public:
 
 private:
   struct ExtremeIndices {
-    size_t min_min = 1;
-    size_t max_min = 1;
-    size_t min_max = 0;
-    size_t max_max = 0;
+    ChildIndex min_min = 1;
+    ChildIndex max_min = 1;
+    ChildIndex min_max = 0;
+    ChildIndex max_max = 0;
   };
 
   template<class T>
@@ -135,14 +135,14 @@ private:
 
   template<class Entries, size_t n_dims>
   static void update_indices(const Entries&,
-                             const size_t,
+                             const ChildIndex,
                              std::array<ExtremeIndices, n_dims>&,
                              Index<n_dims, n_dims>)
   {}
 
   template<class Entries, size_t dim, size_t n_dims>
   static void update_indices(const Entries&                      deposit,
-                             const size_t                        child_index,
+                             const ChildIndex                    child_index,
                              std::array<ExtremeIndices, n_dims>& indices,
                              Index<dim, n_dims>                  index)
   {
