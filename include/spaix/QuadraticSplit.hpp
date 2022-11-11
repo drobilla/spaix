@@ -41,23 +41,24 @@ public:
   SeedsFor<DirKey> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit)
   {
-    using Volume    = decltype(volume(std::declval<DirKey>()));
-    using SeedWaste = Volume;
+    using Volume = decltype(volume(std::declval<DirKey>()));
 
+    assert(deposit.size() > 1U);
     assert(deposit.size() == deposit.capacity());
+
     Volume volumes[count];
     for (size_t i = 0; i < deposit.size(); ++i) {
       volumes[i] = volume(entry_key(deposit[i]));
     }
 
-    SeedWaste        max_waste{std::numeric_limits<Volume>::lowest()};
-    SeedsFor<DirKey> seeds{deposit.size(), deposit.size(), {}, {}};
+    Volume           max_waste{std::numeric_limits<Volume>::lowest()};
+    SeedsFor<DirKey> seeds{};
     for (size_t i = 0; i < deposit.size() - 1; ++i) {
       for (size_t j = i + 1; j < deposit.size(); ++j) {
         const auto& k = entry_key(deposit[i]);
         const auto& l = entry_key(deposit[j]);
 
-        const SeedWaste waste = volume(k | l) - volumes[i] - volumes[j];
+        const Volume waste = volume(k | l) - volumes[i] - volumes[j];
 
         if (waste >= max_waste) {
           max_waste       = waste;
