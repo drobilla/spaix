@@ -69,6 +69,14 @@ mingw64:
 
 # Non-Linux/Docker rows (not hosted)
 
+freebsd:
+  tags: [freebsd,meson]
+  script:
+    - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - ninja -C build test
+    - meson configure -Dbuildtype=release build
+    - ninja -C build test
+
 mac:
   tags: [macos]
   script:

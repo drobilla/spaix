@@ -8,9 +8,33 @@
 
 #include "spaix/types.hpp"
 
-#ifdef __APPLE__
+#ifdef __clang__
 _Pragma("clang diagnostic push")
-_Pragma("clang diagnostic ignored \"-Weverything\"")
+_Pragma("clang diagnostic ignored \"-Wcomma\"")
+_Pragma("clang diagnostic ignored \"-Wcovered-switch-default\"")
+_Pragma("clang diagnostic ignored \"-Wdeprecated\"")
+_Pragma("clang diagnostic ignored \"-Wdisabled-macro-expansion\"")
+_Pragma("clang diagnostic ignored \"-Wdocumentation-unknown-command\"")
+_Pragma("clang diagnostic ignored \"-Wdocumentation\"")
+_Pragma("clang diagnostic ignored \"-Wdouble-promotion\"")
+_Pragma("clang diagnostic ignored \"-Wexit-time-destructors\"")
+_Pragma("clang diagnostic ignored \"-Wextra-semi-stmt\"")
+_Pragma("clang diagnostic ignored \"-Wimplicit-int-conversion\"")
+_Pragma("clang diagnostic ignored \"-Wmissing-noreturn\"")
+_Pragma("clang diagnostic ignored \"-Wold-style-cast\"")
+_Pragma("clang diagnostic ignored \"-Wredundant-parens\"")
+_Pragma("clang diagnostic ignored \"-Wreserved-id-macro\"")
+_Pragma("clang diagnostic ignored \"-Wshadow-field-in-constructor\"")
+_Pragma("clang diagnostic ignored \"-Wshadow\"")
+_Pragma("clang diagnostic ignored \"-Wshorten-64-to-32\"")
+_Pragma("clang diagnostic ignored \"-Wsign-conversion\"")
+_Pragma("clang diagnostic ignored \"-Wsuggest-destructor-override\"")
+_Pragma("clang diagnostic ignored \"-Wsuggest-override\"")
+_Pragma("clang diagnostic ignored \"-Wundef\"")
+_Pragma("clang diagnostic ignored \"-Wunused-parameter\"")
+_Pragma("clang diagnostic ignored \"-Wunused-template\"")
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")
+_Pragma("clang diagnostic ignored \"-Wzero-as-null-pointer-constant\"")
 #endif
 
 #include <boost/geometry.hpp>
@@ -18,7 +42,7 @@ _Pragma("clang diagnostic ignored \"-Weverything\"")
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
 
-#ifdef __APPLE__
+#ifdef __clang__
 _Pragma("clang diagnostic pop")
 #endif
 
