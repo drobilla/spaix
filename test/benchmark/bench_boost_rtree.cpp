@@ -308,7 +308,6 @@ main(int argc, char** argv)
     }
 
     run(Parameters{args}, args);
-
   } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);

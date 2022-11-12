@@ -349,7 +349,6 @@ main(int argc, char** argv)
 
     test_key<spaix::Point<float, float>>(span, queries);
     test_key<spaix::Rect<float, float>>(span, queries);
-
   } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);
