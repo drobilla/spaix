@@ -113,8 +113,8 @@ benchmark_queries(std::mt19937& rng,
     auto       iter         = tree.qbegin(bgi::within(query_box));
 
     while (iter != tree.qend()) {
-      volatile Box  box   = iter->first;
-      volatile Data value = iter->second;
+      const volatile Box  box   = iter->first;
+      const volatile Data value = iter->second;
 
       (void)box;
       (void)value;
