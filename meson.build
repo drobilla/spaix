@@ -1,4 +1,4 @@
-# Copyright 2019-2022 David Robillard <d@drobilla.net>
+# Copyright 2019-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 project('spaix', ['cpp'],
@@ -22,12 +22,72 @@ versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
 pkg = import('pkgconfig')
 cpp = meson.get_compiler('cpp')
 
-# Set global warning flags
-if get_option('strict') and not meson.is_subproject()
-  subdir('meson/warnings')
-  add_project_arguments(all_cpp_warnings, language: ['cpp'])
+# Set global warning suppressions
+warning_level = get_option('warning_level')
+cpp_suppressions = []
+if cpp.get_id() in ['clang', 'emscripten']
+  if warning_level == 'everything'
+    cpp_suppressions = [
+      '-Wno-c++98-compat-pedantic',
+      '-Wno-float-equal',
+      '-Wno-implicit-int-float-conversion',
+      '-Wno-padded',
+    ]
+
+    if not meson.is_cross_build()
+      cpp_suppressions += [
+        '-Wno-poison-system-directories',
+      ]
+    endif
+  endif
+
+  if warning_level in ['everything', '3']
+    cpp_suppressions += [
+      '-Wno-nullability-extension',
+    ]
+  endif
+
+elif cpp.get_id() == 'gcc'
+  if warning_level == 'everything'
+    cpp_suppressions = [
+      '-Wno-conversion',
+      '-Wno-effc++',
+      '-Wno-float-equal',
+      '-Wno-inline',
+      '-Wno-padded',
+      '-Wno-suggest-attribute=const',
+      '-Wno-suggest-attribute=pure',
+      '-Wno-switch-default',
+    ]
+  endif
+
+elif cpp.get_id() == 'msvc'
+  cpp_suppressions += [
+    '/experimental:external',
+    '/external:W0',
+    '/external:anglebrackets',
+  ]
+
+  if warning_level == 'everything'
+    cpp_suppressions = [
+      '/wd4514', # unreferenced inline function has been removed
+      '/wd4582', # constructor is not explicitly called
+      '/wd4583', # destructor is not explicitly called
+      '/wd4623', # default constructor implicitly deleted
+      '/wd4625', # copy constructor implicitly deleted
+      '/wd4626', # copy assignment operator implicitly deleted
+      '/wd4710', # function not inlined
+      '/wd4711', # function selected for automatic inline expansion
+      '/wd4820', # padding added after construct
+      '/wd4868', # may not enforce left-to-right evaluation order
+      '/wd5027', # move assignment operator implicitly deleted
+      '/wd5045', # will insert Spectre mitigation for memory load
+      '/wd5219', # implicit conversion to float
+    ]
+  endif
 endif
-subdir('meson/suppressions')
+
+cpp_suppressions = cpp.get_supported_arguments(cpp_suppressions)
 
 ################
 # Dependencies #
