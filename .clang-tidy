@@ -3,6 +3,7 @@ Checks: >
   -*-c-arrays,
   -*-named-parameter,
   -altera-*,
+  -cert-dcl58-cpp,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,

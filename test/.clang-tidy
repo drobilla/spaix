@@ -1,6 +1,10 @@
 Checks: >
   -*-magic-numbers,
+  -clang-diagnostic-unused-function,
+  -clang-diagnostic-unused-template,
+  -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -fuchsia-default-arguments-calls,
+  -misc-non-private-member-variables-in-classes,
   -readability-implicit-bool-conversion,
 InheritParentConfig: true
