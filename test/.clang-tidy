@@ -2,6 +2,7 @@ Checks: >
   -*-magic-numbers,
   -clang-diagnostic-unused-function,
   -clang-diagnostic-unused-template,
+  -cppcoreguidelines-avoid-do-while,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -fuchsia-default-arguments-calls,
