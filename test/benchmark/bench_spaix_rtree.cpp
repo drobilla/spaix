@@ -65,8 +65,8 @@ struct BenchmarkWithin {
   }
 
 private:
-  const Rect2   _query_key;
-  Counts* const _counts;
+  Rect2   _query_key;
+  Counts* _counts;
 };
 
 struct QueryMetrics {
