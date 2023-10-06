@@ -4,7 +4,7 @@
 project('spaix', ['cpp'],
         version: '0.0.0',
         license: 'GPLv3+',
-        meson_version : '>= 0.49.2',
+        meson_version : '>= 0.52.0',
         default_options: [
           'b_ndebug=if-release',
           'buildtype=release',
@@ -101,7 +101,7 @@ have_boost = false
 if enable_boost == 'no'
   message('Boost support explicitly disabled')
 else
-  boost_dep = dependency('boost', required: false)
+  boost_dep = dependency('boost', include_type: 'system', required: false)
   if boost_dep.found()
     have_boost = true
   elif enable_boost == 'yes' and not have_boost
