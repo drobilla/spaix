@@ -32,6 +32,7 @@ if cpp.get_id() in ['clang', 'emscripten']
       '-Wno-float-equal',
       '-Wno-implicit-int-float-conversion',
       '-Wno-padded',
+      '-Wno-switch-default',
       '-Wno-unsafe-buffer-usage',
     ]
 

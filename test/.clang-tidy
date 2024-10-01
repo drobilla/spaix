@@ -1,5 +1,7 @@
 Checks: >
   -*-magic-numbers,
+  -bugprone-switch-missing-default-case,
+  -cert-dcl58-cpp,
   -clang-diagnostic-unused-function,
   -clang-diagnostic-unused-template,
   -cppcoreguidelines-avoid-do-while,

@@ -3,17 +3,25 @@ Checks: >
   -*-c-arrays,
   -*-named-parameter,
   -altera-*,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-missing-std-forward,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-rvalue-reference-param-not-moved,
   -fuchsia-overloaded-operator,
   -hicpp-no-array-decay,
   -llvmlibc-*,
+  -misc-include-cleaner,
   -misc-no-recursion,
   -modernize-use-nodiscard,
   -modernize-use-trailing-return-type,
+  -performance-enum-size,
+  -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,
+  -readability-redundant-inline-specifier,
 WarningsAsErrors: ''
-HeaderFilterRegex: '.*\.[chi]pp$'
+HeaderFilterRegex: '.*\.[hi]pp$'
 FormatStyle: file

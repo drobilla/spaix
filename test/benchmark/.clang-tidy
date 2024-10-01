@@ -1,4 +1,5 @@
 Checks: >
   -google-readability-casting,
   -misc-non-private-member-variables-in-classes,
+  -readability-avoid-unconditional-preprocessor-if,
 InheritParentConfig: true
