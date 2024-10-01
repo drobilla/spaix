@@ -4,7 +4,7 @@
 #ifndef SPAIX_TEST_TESTRECT_HPP
 #define SPAIX_TEST_TESTRECT_HPP
 
-#include "Scalar.hpp"
+#include "Scalar.hpp" // IWYU pragma: export
 
 #include "spaix/Point.hpp"
 #include "spaix/Rect.hpp"

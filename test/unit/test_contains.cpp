@@ -3,7 +3,6 @@
 
 #undef NDEBUG
 
-#include "spaix_test/Scalar.hpp"
 #include "spaix_test/TestRect.hpp"
 #include "spaix_test/check.hpp"
 

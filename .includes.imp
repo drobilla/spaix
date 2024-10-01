@@ -10,14 +10,5 @@
   { include: ["<boost/move/utility_core.hpp>",                                 "private", "<boost/geometry.hpp>", "public" ] },
   { include: ["<boost/variant/detail/apply_visitor_unary.hpp>",                "private", "<boost/geometry.hpp>", "public" ] },
 
-  { include: ["<bits/chrono.h>", "private", "<chrono>", "public" ] },
-
-  { "symbol": [ "std::equal",                   "private", "<algorithm>", "public" ] },
-  { "symbol": [ "std::lexicographical_compare", "private", "<algorithm>", "public" ] },
-  { "symbol": [ "std::max",                     "private", "<algorithm>", "public" ] },
-  { "symbol": [ "std::min",                     "private", "<algorithm>", "public" ] },
-  { "symbol": [ "std::move",                    "private", "<utility>",   "public" ] },
-  { "symbol": [ "std::ofstream",                "private", "<fstream>",   "public" ] },
-  { "symbol": [ "std::tuple_element",           "private", "<tuple>",     "public" ] },
-  { "symbol": [ "std::tuple_element_t",         "private", "<tuple>",     "public" ] }
+  { include: ["<bits/chrono.h>", "private", "<chrono>", "public" ] }
 ]
