@@ -58,9 +58,8 @@ public:
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
-  constexpr explicit Rect(DimRange<T0>&& first, DimRange<Ts>&&... rest) noexcept
-    : Rect{std::make_tuple(std::forward<DimRange<T0>>(first),
-                           std::forward<DimRange<Ts>>(rest)...)}
+  constexpr explicit Rect(DimRange<T0> first, DimRange<Ts>... rest) noexcept
+    : Rect{std::make_tuple(std::move(first), std::move(rest)...)}
   {}
 
   /// Construct a rectangle for the given ranges in each dimension
@@ -88,9 +87,9 @@ private:
 
 template<class... Ts>
 constexpr Rect<Ts...>
-make_rect(DimRange<Ts>&&... ranges)
+make_rect(DimRange<Ts>... ranges)
 {
-  return Rect<Ts...>{std::forward<DimRange<Ts>>(ranges)...};
+  return Rect<Ts...>{std::move(ranges)...};
 }
 
 template<class... Ts>
