@@ -56,6 +56,7 @@ elif cpp.get_id() == 'gcc'
       '-Wno-effc++',
       '-Wno-float-equal',
       '-Wno-inline',
+      '-Wno-maybe-uninitialized', # Bug
       '-Wno-padded',
       '-Wno-suggest-attribute=const',
       '-Wno-suggest-attribute=pure',
