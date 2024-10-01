@@ -101,7 +101,7 @@ public:
 
       if (n_children == max_fanout) {
         detail::distribute_remaining(best.side == Side::left ? rhs : lhs,
-                                     deposit);
+                                     std::forward<Deposit>(deposit));
         return;
       }
 

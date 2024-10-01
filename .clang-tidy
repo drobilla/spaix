@@ -5,7 +5,6 @@ Checks: >
   -altera-*,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-do-while,
-  -cppcoreguidelines-missing-std-forward,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,

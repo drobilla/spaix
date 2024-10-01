@@ -25,8 +25,9 @@ inline void
 distribute_remaining(DirEntry& parent, Deposit&& deposit)
 {
   for (ChildIndex i = 0; i < deposit.size(); ++i) {
-    parent.key |= entry_key(deposit[i]);
-    parent.node->append_child(std::move(deposit[i]));
+    auto& entry = std::forward<Deposit>(deposit)[i];
+    parent.key |= entry_key(entry);
+    parent.node->append_child(std::move(entry));
   }
 }
 
