@@ -5,16 +5,23 @@ spaix_test_dep = declare_dependency(
   include_directories: include_directories('include'),
 )
 
-# Check project metadata
-autoship = find_program('autoship', required: false)
-if autoship.found()
-  test('autoship', autoship, args: ['test', spaix_src_root], suite: 'data')
-endif
+if not meson.is_subproject() and get_option('lint')
+  # Check project metadata
+  autoship = find_program('autoship', required: false)
+  if autoship.found()
+    test('autoship', autoship, args: ['test', spaix_src_root], suite: 'data')
+  endif
 
-# Check licensing metadata
-reuse = find_program('reuse', required: false)
-if reuse.found()
-  test('REUSE', reuse, args: ['--root', spaix_src_root, 'lint'], suite: 'data')
+  # Check licensing metadata
+  reuse = find_program('reuse', required: false)
+  if reuse.found()
+    test(
+      'REUSE',
+      reuse,
+      args: ['--root', spaix_src_root, 'lint'],
+      suite: 'data',
+    )
+  endif
 endif
 
 # Test that all headers build cleanly
