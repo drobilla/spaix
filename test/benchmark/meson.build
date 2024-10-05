@@ -19,18 +19,93 @@ if boost_dep.found()
   )
 endif
 
-test('bench', bench_exe, args: ['--size', '16', '--insert', 'linear'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--split', 'linear'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--split', 'quadratic'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--page-size', '256'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--page-size', '512'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--page-size', '1024'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--page-size', '2048'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--page-size', '4096'], suite: 'benchmark')
-test('bench', bench_exe, args: ['--size', '16', '--page-size', '8192'], suite: 'benchmark')
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--insert', 'linear'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--split', 'linear'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--split', 'quadratic'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--page-size', '256'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--page-size', '512'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--page-size', '1024'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--page-size', '2048'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--page-size', '4096'],
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--size', '16', '--page-size', '8192'],
+  suite: 'benchmark',
+)
 
-test('bench', bench_exe, args: ['--insert', 'unknown'], should_fail: true, suite: 'benchmark')
-test('bench', bench_exe, args: ['--split', 'unknown'], should_fail: true, suite: 'benchmark')
-test('bench', bench_exe, args: ['--page-size', '128'], should_fail: true, suite: 'benchmark')
-test('bench', bench_exe, args: ['--page-size', '16384'], should_fail: true, suite: 'benchmark')
-test('bench', bench_exe, args: ['--bad-arg'], should_fail: true, suite: 'benchmark')
+test(
+  'bench',
+  bench_exe,
+  args: ['--insert', 'unknown'],
+  should_fail: true,
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--split', 'unknown'],
+  should_fail: true,
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--page-size', '128'],
+  should_fail: true,
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--page-size', '16384'],
+  should_fail: true,
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--bad-arg'],
+  should_fail: true,
+  suite: 'benchmark',
+)

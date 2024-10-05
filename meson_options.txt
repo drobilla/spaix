@@ -1,11 +1,29 @@
-option('benchmarks', type: 'feature', value: 'auto', yield: true,
-       description: 'Build benchmarks')
+option(
+  'benchmarks',
+  type: 'feature',
+  yield: true,
+  description: 'Build benchmarks',
+)
 
-option('boost', type: 'combo', choices: ['yes', 'no', 'auto'], value: 'auto',
-       description : 'Build boost benchmarking program')
+option(
+  'boost',
+  type: 'combo',
+  choices: ['yes', 'no', 'auto'],
+  value: 'auto',
+  description: 'Build boost benchmarking program',
+)
 
-option('tests', type: 'feature', value: 'auto', yield: true,
-       description: 'Build tests')
+option(
+  'tests',
+  type: 'feature',
+  yield: true,
+  description: 'Build tests',
+)
 
-option('tools', type: 'boolean', value: true, yield: true,
-       description: 'Build command line tools')
+option(
+  'tools',
+  type: 'boolean',
+  value: true,
+  yield: true,
+  description: 'Build command line tools',
+)

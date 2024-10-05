@@ -1,15 +1,18 @@
 # Copyright 2019-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
-project('spaix', ['cpp'],
-        version: '0.0.0',
-        license: 'GPLv3+',
-        meson_version : '>= 0.52.0',
-        default_options: [
-          'b_ndebug=if-release',
-          'buildtype=release',
-          'cpp_std=c++17',
-        ])
+project(
+  'spaix',
+  ['cpp'],
+  version: '0.0.0',
+  license: 'GPLv3+',
+  meson_version: '>= 0.52.0',
+  default_options: [
+    'b_ndebug=if-release',
+    'buildtype=release',
+    'cpp_std=c++17',
+  ],
+)
 
 spaix_src_root = meson.current_source_dir()
 versioned_name = 'spaix-@0@'.format(meson.project_version().split('.')[0])
@@ -148,14 +151,17 @@ headers = files(
 
 # Declare dependency for internal meson dependants
 spaix_dep = declare_dependency(
-  include_directories: include_directories('include'))
+  include_directories: include_directories('include'),
+)
 
 # Generage pkg-config file for external dependants
-pkg.generate(name: 'Spaix',
-             description: 'C++ spatial indexing library',
-             filebase: versioned_name,
-             subdirs: [versioned_name],
-             version: meson.project_version())
+pkg.generate(
+  name: 'Spaix',
+  description: 'C++ spatial indexing library',
+  filebase: versioned_name,
+  subdirs: [versioned_name],
+  version: meson.project_version(),
+)
 
 # Install headers to a versioned include directory
 install_headers(headers, subdir: versioned_name + '/spaix')
