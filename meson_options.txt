@@ -9,7 +9,6 @@ option(
   'boost',
   type: 'combo',
   choices: ['yes', 'no', 'auto'],
-  value: 'auto',
   description: 'Build boost benchmarking program',
 )
 
@@ -31,7 +30,6 @@ option(
 option(
   'tools',
   type: 'boolean',
-  value: true,
   yield: true,
   description: 'Build command line tools',
 )
