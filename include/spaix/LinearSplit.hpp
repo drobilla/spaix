@@ -1,10 +1,10 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_LINEARSPLIT_HPP
 #define SPAIX_LINEARSPLIT_HPP
 
-#include "spaix/Split.hpp"
+#include "spaix/SideChooser.hpp"
 #include "spaix/SplitSeeds.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
@@ -26,7 +26,7 @@ namespace spaix {
 
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
-class LinearSplit : public Split
+class LinearSplit
 {
 public:
   template<class DirKey>
@@ -75,46 +75,36 @@ public:
                            DirNode&                         rhs,
                            const ChildCount                 max_fanout)
   {
+    using detail::distribute_child;
+
     // Scan the deposit entries once, sending each left or right immediately
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
       auto child = std::move(deposit.back());
       deposit.pop_back();
 
-      // Calculate the change in volume from inserting left or right
-      const auto& child_key  = entry_key(child);
-      const auto  l_key      = lhs.key | child_key;
-      const auto  r_key      = rhs.key | child_key;
-      const auto  l_volume   = volume(l_key);
-      const auto  r_volume   = volume(r_key);
-      const auto  d_l_volume = l_volume - seeds.lhs_volume;
-      const auto  d_r_volume = r_volume - seeds.rhs_volume;
-
-      // Choose the side with the least volume increase, then least volume
-      const Side side = (d_l_volume < d_r_volume)   ? Side::left
-                        : (d_r_volume < d_l_volume) ? Side::right
-                        : (l_volume < r_volume)     ? Side::left
-                        : (r_volume < l_volume)
-                          ? Side::right
-                          : tie_side(lhs.key, rhs.key, child_key);
+      const auto& key     = entry_key(child);
+      auto        chooser = make_side_chooser(seeds, lhs.key, rhs.key, key);
+      const Side  side    = chooser.choose_side();
+      const auto  outcome = chooser.outcome(side);
 
       // Distribute the child to the chosen side and update its volume
       if (side == Side::left) {
-        const auto n = detail::distribute_child(lhs, l_key, std::move(child));
+        const auto n = distribute_child(lhs, outcome.key, std::move(child));
         if (n == max_fanout) {
           detail::distribute_remaining(rhs, std::forward<Deposit>(deposit));
           return;
         }
 
-        seeds.lhs_volume = l_volume;
+        seeds.lhs_volume = outcome.volume;
       } else {
-        const auto n = detail::distribute_child(rhs, r_key, std::move(child));
+        const auto n = distribute_child(rhs, outcome.key, std::move(child));
         if (n == max_fanout) {
           detail::distribute_remaining(lhs, std::forward<Deposit>(deposit));
           return;
         }
 
-        seeds.rhs_volume = r_volume;
+        seeds.rhs_volume = outcome.volume;
       }
     }
   }

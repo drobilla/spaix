@@ -1,10 +1,10 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_QUADRATICSPLIT_HPP
 #define SPAIX_QUADRATICSPLIT_HPP
 
-#include "spaix/Split.hpp"
+#include "spaix/SideChooser.hpp"
 #include "spaix/SplitSeeds.hpp"
 #include "spaix/StaticVector.hpp"
 #include "spaix/detail/DirectoryNode.hpp"
@@ -24,7 +24,7 @@ namespace spaix {
 
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
-class QuadraticSplit : public Split
+class QuadraticSplit
 {
 public:
   template<class DirKey>
@@ -119,13 +119,6 @@ private:
     Side             side;
   };
 
-  /// Return |a - b| safely for unsigned types
-  template<class T>
-  static constexpr T abs_diff(T a, T b)
-  {
-    return a > b ? a - b : b - a;
-  }
-
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
   ChildAssignment<typename DirEntry::Key> pick_next(
@@ -144,29 +137,16 @@ private:
     Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
 
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
-      const auto& child      = deposit[i];
-      const auto& child_key  = entry_key(child);
-      const auto  l_key      = lhs.key | child_key;
-      const auto  r_key      = rhs.key | child_key;
-      const auto  l_volume   = volume(l_key);
-      const auto  r_volume   = volume(r_key);
-      const auto  l_d_volume = l_volume - seeds.lhs_volume;
-      const auto  r_d_volume = r_volume - seeds.rhs_volume;
+      const auto& key     = entry_key(deposit[i]);
+      auto        chooser = make_side_chooser(seeds, lhs.key, rhs.key, key);
 
-      const Preference preference = abs_diff(l_d_volume, r_d_volume);
+      const auto preference = chooser.preference();
       if (preference >= best_preference) {
-        const Side best_side = (l_d_volume < r_d_volume)   ? Side::left
-                               : (r_d_volume < l_d_volume) ? Side::right
-                               : (seeds.lhs_volume < seeds.rhs_volume)
-                                 ? Side::left
-                               : (seeds.rhs_volume < seeds.lhs_volume)
-                                 ? Side::right
-                                 : tie_side(lhs.key, rhs.key, child_key);
+        const Side best_side = chooser.choose_side();
+        const auto outcome   = chooser.outcome(best_side);
 
         best_preference = preference;
-        best            = (best_side == Side::left)
-                            ? Result{i, l_key, l_volume, Side::left}
-                            : Result{i, r_key, r_volume, Side::right};
+        best            = Result{i, outcome.key, outcome.volume, best_side};
       }
     }
 
