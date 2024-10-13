@@ -208,7 +208,7 @@ namespace detail {
 
 template<typename Children, typename NodePath, typename ChildFunc>
 VisitStatus
-visit_children(const Children& children, NodePath& path, ChildFunc&& child_func)
+visit_children(const Children& children, NodePath& path, ChildFunc child_func)
 {
   VisitStatus status = VisitStatus::proceed;
 
@@ -229,8 +229,8 @@ template<class Key,
          typename NodePath>
 VisitStatus
 visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
-                DirVisitor&&                       visit_dir,
-                DatVisitor&&                       visit_dat,
+                DirVisitor                         visit_dir,
+                DatVisitor                         visit_dat,
                 NodePath&                          path)
 {
   const auto& node = *entry.node;
