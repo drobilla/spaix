@@ -30,10 +30,10 @@ public:
     ++_n;
   }
 
-  inline size_t n() const { return _n; }
-  inline T      min() const { return _min; }
-  inline T      max() const { return _max; }
-  inline T      mean() const { return _mean; }
+  size_t n() const { return _n; }
+  T      min() const { return _min; }
+  T      max() const { return _max; }
+  T      mean() const { return _mean; }
 
 private:
   size_t _n{};

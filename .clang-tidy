@@ -20,7 +20,6 @@ Checks: >
   -performance-enum-size,
   -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,
-  -readability-redundant-inline-specifier,
 CheckOptions:
   - key:   hicpp-uppercase-literal-suffix.NewSuffixes
     value: 'L;U;UL;ULL'
