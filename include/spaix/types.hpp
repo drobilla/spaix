@@ -11,12 +11,12 @@ namespace spaix {
 using ChildIndex = size_t;
 using ChildCount = size_t;
 
-enum class NodeType : size_t {
+enum class NodeType : unsigned char {
   directory, ///< Internal directory node
   data,      ///< Leaf data node
 };
 
-enum class Side { left, right };
+enum class Side : unsigned char { left, right };
 
 /// A range in a dimension from a low value (first) to a high value (second)
 template<class T>

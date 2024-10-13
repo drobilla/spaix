@@ -19,7 +19,7 @@
 
 namespace spaix {
 
-enum class VisitStatus { proceed, finish };
+enum class VisitStatus : unsigned char { proceed, finish };
 
 /**
    An R-tree which spatially indexes points or rectangles.

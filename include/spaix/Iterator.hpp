@@ -66,7 +66,7 @@ private:
   using Base::node;
   using Base::stack;
 
-  enum class Status {
+  enum class Status : unsigned char {
     success,
     reached_end,
   };

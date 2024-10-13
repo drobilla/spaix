@@ -18,7 +18,6 @@ Checks: >
   -misc-no-recursion,
   -modernize-use-nodiscard,
   -modernize-use-trailing-return-type,
-  -performance-enum-size,
   -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,
 FormatStyle: file

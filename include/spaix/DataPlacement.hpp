@@ -16,7 +16,7 @@ namespace spaix {
    Pointers to data nodes are only stable across tree modifications if they are
    allocated separately.
 */
-enum class DataPlacement {
+enum class DataPlacement : unsigned char {
   inlined,  //!< Data nodes stored within directory node entries
   separate, //!< Data nodes separately allocated
 };

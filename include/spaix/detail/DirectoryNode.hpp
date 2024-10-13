@@ -154,11 +154,11 @@ public:
   }
 
 private:
-  const NodeType _child_type; ///< Type of children nodes
   union {
     DirChildren _dir_children; ///< Directory node children
     DatChildren _dat_children; ///< Data node children
   };
+  const NodeType _child_type; ///< Type of children nodes
 };
 
 template<class Key, class Node>
