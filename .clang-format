@@ -1,7 +1,12 @@
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR GPL-3.0-only
+
 ---
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
-AlignEscapedNewlinesLeft: true
+AlignEscapedNewlines: Left
+AttributeMacros:
+  - SPAIX_ALWAYS_INLINE
 BasedOnStyle: Mozilla
 BraceWrapping:
   AfterNamespace: false
@@ -21,5 +26,4 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 SpacesInContainerLiterals: false
 StatementMacros:
   - _Pragma
-  - __pragma
 ...
