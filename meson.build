@@ -120,6 +120,7 @@ headers = files(
   'include/spaix/RTree.hpp',
   'include/spaix/RTree.ipp',
   'include/spaix/Rect.hpp',
+  'include/spaix/Split.hpp',
   'include/spaix/SplitSeeds.hpp',
   'include/spaix/StaticVector.hpp',
   'include/spaix/TreeRange.hpp',

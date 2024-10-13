@@ -12,6 +12,7 @@
 #include "spaix/RTree.hpp"                // IWYU pragma: keep
 #include "spaix/RTree.ipp"                // IWYU pragma: keep
 #include "spaix/Rect.hpp"                 // IWYU pragma: keep
+#include "spaix/Split.hpp"                // IWYU pragma: keep
 #include "spaix/StaticVector.hpp"         // IWYU pragma: keep
 #include "spaix/contains.hpp"             // IWYU pragma: keep
 #include "spaix/detail/DirectoryNode.hpp" // IWYU pragma: keep
