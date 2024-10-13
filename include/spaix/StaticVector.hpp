@@ -131,16 +131,6 @@ private:
 
 template<class T, class Size, Size capacity>
 bool
-operator==(const spaix::StaticVector<T, Size, capacity>& lhs,
-           const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
-{
-  using std::equal;
-
-  return lhs.size() == rhs.size() && equal(lhs.begin(), rhs.end(), rhs.begin());
-}
-
-template<class T, class Size, Size capacity>
-bool
 operator<(const spaix::StaticVector<T, Size, capacity>& lhs,
           const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
 {
