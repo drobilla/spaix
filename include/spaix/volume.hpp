@@ -9,6 +9,7 @@
 #include "spaix/detail/meta.hpp"
 
 #include <cstddef>
+#include <utility>
 
 namespace spaix {
 namespace detail {
@@ -27,9 +28,11 @@ volume_rec(const Rect<Ts...>&            rect,
 {
   const auto r = range<dim>(rect);
 
-  return ((r.lower < r.upper)
-            ? ((r.upper - r.lower) * volume_rec(rect, ++index))
-            : 0);
+  if (r.lower < r.upper) {
+    return (r.upper - r.lower) * volume_rec(rect, ++index);
+  }
+
+  return DifferenceOf<Nth<dim + 1U, Ts...>, Nth<dim + 1U, Ts...>>{};
 }
 
 } // namespace detail
@@ -45,7 +48,7 @@ template<class... Ts>
 constexpr ProductOf<Ts...>
 volume(const Point<Ts...>&) noexcept
 {
-  return 0;
+  return {};
 }
 
 } // namespace spaix

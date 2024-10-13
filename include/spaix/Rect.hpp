@@ -139,9 +139,11 @@ constexpr DifferenceOf<Nth<dim, Ts...>, Nth<dim, Ts...>>
 span(const Rect<Ts...>& rect) noexcept
 {
   const auto& dim_range = get<dim>(rect);
-  return (dim_range.upper < dim_range.lower)
-           ? 0
-           : dim_range.upper - dim_range.lower;
+  if (dim_range.upper < dim_range.lower) {
+    return {};
+  }
+
+  return dim_range.upper - dim_range.lower;
 }
 
 namespace detail {

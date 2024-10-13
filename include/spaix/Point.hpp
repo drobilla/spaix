@@ -113,7 +113,7 @@ template<size_t dim, class... Ts>
 constexpr Nth<dim, Ts...>
 span(const Point<Ts...>&) noexcept
 {
-  return 0;
+  return {};
 }
 
 namespace detail {

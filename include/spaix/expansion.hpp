@@ -31,7 +31,9 @@ expansion_rec(const Rect<Ts...>& base,
   const auto old_span = span<last_dim>(base);
   const auto new_span = hi - lo;
 
-  return (old_span < new_span) ? (new_span - old_span) : 0;
+  using Result = decltype(new_span - old_span);
+
+  return (old_span < new_span) ? (new_span - old_span) : Result{};
 }
 
 template<class Added, size_t dim, size_t last_dim, class... Ts>
@@ -54,7 +56,7 @@ expansion_rec(const Rect<Ts...>&            base,
 
   const auto dim_expansion = new_span - old_span;
   const auto rest          = expansion_rec(base, added, ++index);
-  if (rest == 0) {
+  if (rest == decltype(rest){}) {
     return static_cast<decltype(dim_expansion * rest)>(dim_expansion);
   }
 
