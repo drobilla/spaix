@@ -51,14 +51,14 @@ struct BenchmarkWithin {
   {}
 
   template<class DirKey>
-  constexpr bool directory(const DirKey& k) const
+  [[nodiscard]] constexpr bool directory(const DirKey& k) const
   {
     ++_counts->n_checked_dirs;
     return intersects(_query_key, k);
   }
 
   template<class DatKey>
-  constexpr bool leaf(const DatKey& k) const
+  [[nodiscard]] constexpr bool leaf(const DatKey& k) const
   {
     ++_counts->n_checked_dats;
     return contains(_query_key, k);

@@ -78,8 +78,8 @@ public:
   static constexpr auto   ibegin() { return spaix::ibegin<T0, Ts...>(); }
   static constexpr size_t size() { return 1 + sizeof...(Ts); }
 
-  constexpr const Tuple& tuple() const { return _ranges; }
-  constexpr Tuple&       tuple() { return _ranges; }
+  [[nodiscard]] constexpr const Tuple& tuple() const { return _ranges; }
+  [[nodiscard]] constexpr Tuple&       tuple() { return _ranges; }
 
 private:
   Tuple _ranges{};

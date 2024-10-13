@@ -30,10 +30,10 @@ public:
     ++_n;
   }
 
-  size_t n() const { return _n; }
-  T      min() const { return _min; }
-  T      max() const { return _max; }
-  T      mean() const { return _mean; }
+  [[nodiscard]] size_t n() const { return _n; }
+  [[nodiscard]] T      min() const { return _min; }
+  [[nodiscard]] T      max() const { return _max; }
+  [[nodiscard]] T      mean() const { return _mean; }
 
 private:
   size_t _n{};

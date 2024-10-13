@@ -52,7 +52,7 @@ public:
     return !operator==(rhs);
   }
 
-  bool empty() const { return _stack.empty(); }
+  [[nodiscard]] bool empty() const { return _stack.empty(); }
 
 protected:
   struct Frame {
@@ -69,23 +69,23 @@ protected:
 
   DataIterator() = default;
 
-  Frame& back()
+  [[nodiscard]] Frame& back()
   {
     assert(!_stack.empty());
     return _stack.back();
   }
 
-  const Frame& back() const
+  [[nodiscard]] const Frame& back() const
   {
     assert(!_stack.empty());
     return _stack.back();
   }
 
-  Stack& stack() { return _stack; }
+  [[nodiscard]] Stack& stack() { return _stack; }
 
-  const DirNode* node() const { return back().node; }
-  ChildIndex     index() const { return back().index; }
-  const Stack&   stack() const { return _stack; }
+  [[nodiscard]] const DirNode* node() const { return back().node; }
+  [[nodiscard]] ChildIndex     index() const { return back().index; }
+  [[nodiscard]] const Stack&   stack() const { return _stack; }
 
 private:
   Stack _stack;

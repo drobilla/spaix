@@ -16,7 +16,6 @@ Checks: >
   -llvmlibc-*,
   -misc-include-cleaner,
   -misc-no-recursion,
-  -modernize-use-nodiscard,
   -modernize-use-trailing-return-type,
   -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,

@@ -38,9 +38,10 @@ public:
 
   ~Point() noexcept = default;
 
-  constexpr auto         ibegin() const { return spaix::ibegin<Ts...>(); }
-  constexpr size_t       size() const { return sizeof...(Ts); }
-  constexpr const Tuple& tuple() const { return _values; }
+  [[nodiscard]] constexpr auto ibegin() const { return spaix::ibegin<Ts...>(); }
+
+  [[nodiscard]] constexpr size_t       size() const { return sizeof...(Ts); }
+  [[nodiscard]] constexpr const Tuple& tuple() const { return _values; }
 
 private:
   Tuple _values;

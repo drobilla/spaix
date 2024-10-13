@@ -29,10 +29,10 @@ struct TreeRange {
 
   ~TreeRange() = default;
 
-  IteratorType&       begin() { return _first; }
-  const IteratorType& end() { return _last; }
+  [[nodiscard]] IteratorType&       begin() { return _first; }
+  [[nodiscard]] const IteratorType& end() { return _last; }
 
-  bool empty() const { return _first == _last; }
+  [[nodiscard]] bool empty() const { return _first == _last; }
 
 private:
   IteratorType _first;

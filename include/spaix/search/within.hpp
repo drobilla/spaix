@@ -14,13 +14,13 @@ namespace spaix::search {
 template<typename QueryKey>
 struct Within {
   template<class DirKey>
-  constexpr bool directory(const DirKey& k) const noexcept
+  [[nodiscard]] constexpr bool directory(const DirKey& k) const noexcept
   {
     return intersects(key, k);
   }
 
   template<class DatKey>
-  constexpr bool leaf(const DatKey& k) const noexcept
+  [[nodiscard]] constexpr bool leaf(const DatKey& k) const noexcept
   {
     return contains(key, k);
   }
@@ -30,7 +30,7 @@ struct Within {
 
 /// Return a query predicate that matches items contained within a region
 template<class QueryKey>
-Within<QueryKey>
+[[nodiscard]] Within<QueryKey>
 within(QueryKey&& key) noexcept
 {
   return Within<QueryKey>{std::forward<QueryKey>(key)};

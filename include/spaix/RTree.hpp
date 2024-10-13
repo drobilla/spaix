@@ -125,13 +125,13 @@ public:
   void clear() { _root = {Box{}, nullptr}; }
 
   /// Return the number of items in the tree
-  size_t size() const { return _size; }
+  [[nodiscard]] size_t size() const { return _size; }
 
   /// Return true iff there are no items in the tree
-  bool empty() const { return !_root.node; }
+  [[nodiscard]] bool empty() const { return !_root.node; }
 
   /// Return a key that encompasses all items in the tree
-  Box bounds() const { return _root.node ? _root.key : Box{}; }
+  [[nodiscard]] Box bounds() const { return _root.node ? _root.key : Box{}; }
 
   /**
      Visit every node in the tree.
@@ -153,11 +153,11 @@ public:
 
   using EndIterator = DataIterator<const DirNode, const DatNode, max_height()>;
 
-  const_iterator begin() const { return const_iterator{_root, {}}; }
-  EndIterator    end() const { return EndIterator::make_end(); }
-  const_iterator cbegin() const { return begin(); }
-  EndIterator    cend() const { return EndIterator::make_end(); }
-  iterator       begin() { return iterator{_root, {}}; }
+  [[nodiscard]] const_iterator begin() const { return {_root, {}}; }
+  [[nodiscard]] EndIterator    end() const { return EndIterator::make_end(); }
+  [[nodiscard]] const_iterator cbegin() const { return begin(); }
+  [[nodiscard]] EndIterator    cend() const { return EndIterator::make_end(); }
+  [[nodiscard]] iterator       begin() { return {_root, {}}; }
 
 private:
   using DirEntry    = typename DirNode::DirEntry;

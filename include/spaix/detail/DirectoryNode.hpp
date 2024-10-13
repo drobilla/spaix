@@ -121,33 +121,33 @@ public:
     return _dir_children.size();
   }
 
-  ChildIndex num_children() const
+  [[nodiscard]] ChildIndex num_children() const
   {
     return _child_type == NodeType::directory ? _dir_children.size()
                                               : _dat_children.size();
   }
 
-  NodeType child_type() const { return _child_type; }
+  [[nodiscard]] NodeType child_type() const { return _child_type; }
 
-  const DirChildren& dir_children() const
+  [[nodiscard]] const DirChildren& dir_children() const
   {
     assert(_child_type == NodeType::directory);
     return _dir_children;
   }
 
-  const DatChildren& dat_children() const
+  [[nodiscard]] const DatChildren& dat_children() const
   {
     assert(_child_type == NodeType::data);
     return _dat_children;
   }
 
-  DirChildren& dir_children()
+  [[nodiscard]] DirChildren& dir_children()
   {
     assert(_child_type == NodeType::directory);
     return _dir_children;
   }
 
-  DatChildren& dat_children()
+  [[nodiscard]] DatChildren& dat_children()
   {
     assert(_child_type == NodeType::data);
     return _dat_children;

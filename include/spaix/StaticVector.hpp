@@ -77,26 +77,26 @@ public:
     new (&_array[_size++]) T{std::forward<Args>(args)...};
   }
 
-  bool empty() const { return _size == 0; }
+  [[nodiscard]] bool empty() const { return _size == 0; }
 
-  const T& back() const
+  [[nodiscard]] const T& back() const
   {
     assert(_size > 0);
     return *reinterpret_cast<const T*>(&_array[_size - 1]);
   }
 
-  T& back()
+  [[nodiscard]] T& back()
   {
     assert(_size > 0);
     return *reinterpret_cast<T*>(&_array[_size - 1]);
   }
 
-  const T& operator[](const Size index) const
+  [[nodiscard]] const T& operator[](const Size index) const
   {
     return *reinterpret_cast<const T*>(&_array[index]);
   }
 
-  T& operator[](const Size index)
+  [[nodiscard]] T& operator[](const Size index)
   {
     return *reinterpret_cast<T*>(&_array[index]);
   }
@@ -112,15 +112,22 @@ public:
     _size = 0;
   }
 
-  Size                  size() const { return _size; }
-  static constexpr Size capacity() { return Capacity; }
+  [[nodiscard]] Size                  size() const { return _size; }
+  [[nodiscard]] static constexpr Size capacity() { return Capacity; }
 
-  iterator       begin() { return reinterpret_cast<T*>(_array); }
-  const_iterator begin() const { return reinterpret_cast<const T*>(_array); }
-  const_iterator cbegin() const { return reinterpret_cast<const T*>(_array); }
-  iterator       end() { return begin() + _size; }
-  const_iterator end() const { return begin() + _size; }
-  const_iterator cend() const { return begin() + _size; }
+  [[nodiscard]] iterator       begin() { return reinterpret_cast<T*>(_array); }
+  [[nodiscard]] const_iterator begin() const
+  {
+    return reinterpret_cast<const T*>(_array);
+  }
+  [[nodiscard]] const_iterator cbegin() const
+  {
+    return reinterpret_cast<const T*>(_array);
+  }
+
+  [[nodiscard]] iterator       end() { return begin() + _size; }
+  [[nodiscard]] const_iterator end() const { return begin() + _size; }
+  [[nodiscard]] const_iterator cend() const { return begin() + _size; }
 
 private:
   using Element = typename std::aligned_storage_t<sizeof(T), alignof(T)>;

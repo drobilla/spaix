@@ -39,7 +39,7 @@ struct Scalar {
     return _value - rhs._value;
   }
 
-  constexpr Rep value() const { return _value; }
+  [[nodiscard]] constexpr Rep value() const { return _value; }
 
 private:
   Rep _value{};

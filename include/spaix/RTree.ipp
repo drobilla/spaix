@@ -41,7 +41,7 @@ RTree<B, K, D, C>::insert(const Key& key, const Data& data)
 
 template<class B, class K, class D, class C>
 template<class S>
-TreeRange<typename RTree<B, K, D, C>::template ConstSearcher<S>>
+[[nodiscard]] TreeRange<typename RTree<B, K, D, C>::template ConstSearcher<S>>
 RTree<B, K, D, C>::query(S search) const
 {
   if (empty()) {
