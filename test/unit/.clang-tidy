@@ -1,3 +1,6 @@
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR GPL-3.0-only
+
 Checks: >
   -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-macro-usage,

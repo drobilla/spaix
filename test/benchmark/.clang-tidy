@@ -1,3 +1,6 @@
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR GPL-3.0-only
+
 Checks: >
   -google-readability-casting,
   -misc-non-private-member-variables-in-classes,
