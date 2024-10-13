@@ -15,7 +15,7 @@ template<class Tag, class Rep>
 struct Scalar {
   constexpr Scalar() = default;
 
-  constexpr Scalar(const Rep v) // NOLINT
+  constexpr explicit Scalar(const Rep v)
     : _value{v}
   {}
 
@@ -58,7 +58,18 @@ namespace std {
 
 template<class Tag, class Rep>
 class numeric_limits<spaix::test::Scalar<Tag, Rep>> : public numeric_limits<Rep>
-{};
+{
+public:
+  static constexpr spaix::test::Scalar<Tag, Rep> lowest() noexcept
+  {
+    return spaix::test::Scalar<Tag, Rep>{numeric_limits<Rep>::lowest()};
+  }
+
+  static constexpr spaix::test::Scalar<Tag, Rep> max() noexcept
+  {
+    return spaix::test::Scalar<Tag, Rep>{numeric_limits<Rep>::max()};
+  }
+};
 
 } // namespace std
 

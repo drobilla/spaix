@@ -21,6 +21,18 @@ using YRange = DimRange<YCoord>;
 using TestRect  = Rect<XCoord, YCoord>;
 using TestPoint = Point<XCoord, YCoord>;
 
+constexpr XCoord
+operator""_xc(const unsigned long long value)
+{
+  return XCoord{static_cast<int>(value)};
+}
+
+constexpr YCoord
+operator""_yc(const long double value)
+{
+  return YCoord{static_cast<float>(value)};
+}
+
 } // namespace spaix::test
 
 #endif // SPAIX_TEST_TESTRECT_HPP

@@ -14,28 +14,28 @@ namespace {
 void
 test_intersects()
 {
-  constexpr auto rect = TestRect{{1, 3}, {2.0f, 5.0f}};
+  constexpr auto rect = TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}};
 
-  STATIC_CHECK((intersects(rect, TestRect{{1, 3}, {2.0f, 5.0f}})));
-  STATIC_CHECK((intersects(rect, TestRect{{0, 3}, {2.0f, 5.0f}})));
-  STATIC_CHECK((intersects(rect, TestRect{{1, 4}, {2.0f, 5.0f}})));
-  STATIC_CHECK((intersects(rect, TestRect{{1, 3}, {1.0f, 5.0f}})));
-  STATIC_CHECK((intersects(rect, TestRect{{1, 3}, {2.0f, 6.0f}})));
+  STATIC_CHECK((intersects(rect, TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}})));
+  STATIC_CHECK((intersects(rect, TestRect{{0_xc, 3_xc}, {2.0_yc, 5.0_yc}})));
+  STATIC_CHECK((intersects(rect, TestRect{{1_xc, 4_xc}, {2.0_yc, 5.0_yc}})));
+  STATIC_CHECK((intersects(rect, TestRect{{1_xc, 3_xc}, {1.0_yc, 5.0_yc}})));
+  STATIC_CHECK((intersects(rect, TestRect{{1_xc, 3_xc}, {2.0_yc, 6.0_yc}})));
 
-  STATIC_CHECK((!intersects(rect, TestRect{{0, 0}, {2.0f, 5.0f}})));
-  STATIC_CHECK((!intersects(rect, TestRect{{4, 5}, {2.0f, 5.0f}})));
-  STATIC_CHECK((!intersects(rect, TestRect{{1, 3}, {0.0f, 1.0f}})));
-  STATIC_CHECK((!intersects(rect, TestRect{{1, 3}, {6.0f, 7.0f}})));
+  STATIC_CHECK((!intersects(rect, TestRect{{0_xc, 0_xc}, {2.0_yc, 5.0_yc}})));
+  STATIC_CHECK((!intersects(rect, TestRect{{4_xc, 5_xc}, {2.0_yc, 5.0_yc}})));
+  STATIC_CHECK((!intersects(rect, TestRect{{1_xc, 3_xc}, {0.0_yc, 1.0_yc}})));
+  STATIC_CHECK((!intersects(rect, TestRect{{1_xc, 3_xc}, {6.0_yc, 7.0_yc}})));
 
-  STATIC_CHECK((intersects(rect, TestPoint{1, 2.0f})));
-  STATIC_CHECK((intersects(rect, TestPoint{2, 5.0f})));
-  STATIC_CHECK((!intersects(rect, TestPoint{0, 2.0f})));
-  STATIC_CHECK((!intersects(rect, TestPoint{1, 0.0f})));
+  STATIC_CHECK((intersects(rect, TestPoint{1_xc, 2.0_yc})));
+  STATIC_CHECK((intersects(rect, TestPoint{2_xc, 5.0_yc})));
+  STATIC_CHECK((!intersects(rect, TestPoint{0_xc, 2.0_yc})));
+  STATIC_CHECK((!intersects(rect, TestPoint{1_xc, 0.0_yc})));
 
-  STATIC_CHECK((intersects(TestPoint{1, 2.0f}, rect)));
-  STATIC_CHECK((intersects(TestPoint{2, 5.0f}, rect)));
-  STATIC_CHECK((!intersects(TestPoint{0, 2.0f}, rect)));
-  STATIC_CHECK((!intersects(TestPoint{1, 0.0f}, rect)));
+  STATIC_CHECK((intersects(TestPoint{1_xc, 2.0_yc}, rect)));
+  STATIC_CHECK((intersects(TestPoint{2_xc, 5.0_yc}, rect)));
+  STATIC_CHECK((!intersects(TestPoint{0_xc, 2.0_yc}, rect)));
+  STATIC_CHECK((!intersects(TestPoint{1_xc, 0.0_yc}, rect)));
 }
 
 } // namespace

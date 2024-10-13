@@ -24,20 +24,20 @@ test_point()
   STATIC_CHECK((TestPoint{std::make_tuple(XCoord{1}, YCoord{2.0f})} == point));
 
   // Comparison
-  STATIC_CHECK((point == TestPoint{1, 2.0f}));
-  STATIC_CHECK((point != TestPoint{2, 2.0f}));
-  STATIC_CHECK((point != TestPoint{1, 3.0f}));
+  STATIC_CHECK((point == TestPoint{1_xc, 2.0_yc}));
+  STATIC_CHECK((point != TestPoint{2_xc, 2.0_yc}));
+  STATIC_CHECK((point != TestPoint{1_xc, 3.0_yc}));
 
   // Basic access
-  STATIC_CHECK(
-    (ranges(point) == std::make_tuple(XRange{1, 1}, YRange{2.0f, 2.0f})));
+  STATIC_CHECK((ranges(point) ==
+                std::make_tuple(XRange{1_xc, 1_xc}, YRange{2.0_yc, 2.0_yc})));
   STATIC_CHECK((point.size() == 2));
-  STATIC_CHECK((get<0>(point) == 1));
-  STATIC_CHECK((get<1>(point) == 2.0f));
-  STATIC_CHECK((range<0>(point) == XRange{1, 1}));
-  STATIC_CHECK((range<1>(point) == YRange{2.0f, 2.0f}));
-  STATIC_CHECK((span<0>(point) == 0));
-  STATIC_CHECK((span<1>(point) == 0.0f));
+  STATIC_CHECK((get<0>(point) == 1_xc));
+  STATIC_CHECK((get<1>(point) == 2.0_yc));
+  STATIC_CHECK((range<0>(point) == XRange{1_xc, 1_xc}));
+  STATIC_CHECK((range<1>(point) == YRange{2.0_yc, 2.0_yc}));
+  STATIC_CHECK((span<0>(point).value() == 0));
+  STATIC_CHECK((span<1>(point).value() == 0.0f));
 
   std::ostringstream ss;
   ss << make_point(1, 2);

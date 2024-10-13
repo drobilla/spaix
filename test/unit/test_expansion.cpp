@@ -14,26 +14,29 @@ namespace {
 int
 test_expansion()
 {
-  STATIC_CHECK((expansion(TestRect{{1, 3}, {2, 5}}, TestPoint{1, 2}) == 0));
-  STATIC_CHECK((expansion(TestRect{{1, 3}, {2, 5}}, TestPoint{0, 2}) == 1));
-  STATIC_CHECK((expansion(TestRect{{1, 3}, {2, 5}}, TestPoint{1, 6}) == 1));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestPoint{1_xc, 2.0_yc}) == 0));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestPoint{0_xc, 2.0_yc}) == 1));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestPoint{1_xc, 6.0_yc}) == 1));
 
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{1, 3}, {2, 5}}) == 0));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}}) == 0));
 
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{0, 3}, {2, 5}}) == 1));
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{1, 4}, {2, 5}}) == 1));
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{1, 3}, {1, 5}}) == 1));
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{1, 3}, {2, 6}}) == 1));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{0_xc, 3_xc}, {2.0_yc, 5.0_yc}}) == 1));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{1_xc, 4_xc}, {2.0_yc, 5.0_yc}}) == 1));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{1_xc, 3_xc}, {1.0_yc, 5.0_yc}}) == 1));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{1_xc, 3_xc}, {2.0_yc, 6.0_yc}}) == 1));
 
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{1, 3}, {2, 7}}) == 2));
-  STATIC_CHECK(
-    (expansion(TestRect{{1, 3}, {2, 5}}, TestRect{{1, 5}, {2, 7}}) == 4));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{1_xc, 3_xc}, {2.0_yc, 7.0_yc}}) == 2));
+  STATIC_CHECK((expansion(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}},
+                          TestRect{{1_xc, 5_xc}, {2.0_yc, 7.0_yc}}) == 4));
 
   return 0;
 }
