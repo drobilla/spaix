@@ -27,23 +27,23 @@ color(const NodePath& path, const double alpha)
   constexpr uint32_t fanout = 4;
   constexpr uint32_t u8max  = std::numeric_limits<uint8_t>::max();
 
-  uint32_t components[3] = {0, 0, 0};
-  int      c             = 0;
+  std::array<uint32_t, 3U> components{};
+  unsigned                 c = 0U;
   for (const ChildIndex index : path) {
     components[c] += ((static_cast<uint32_t>(index) * u8max) / ((fanout - 1U)));
     c = (c + 1) % 3;
   }
 
-  char buf[36] = {};
-  (void)snprintf(buf,
-                 sizeof(buf),
+  std::array<char, 36> buf{};
+  (void)snprintf(buf.data(),
+                 buf.size(),
                  "#%02X%02X%02X%02X",
                  (components[0] % u8max),
                  (components[1] % u8max),
                  (components[2] % u8max),
                  static_cast<unsigned>(alpha * u8max));
 
-  return buf;
+  return {buf.data()};
 }
 
 template<size_t axis, class Key, class DirKey>

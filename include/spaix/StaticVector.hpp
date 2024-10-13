@@ -133,7 +133,7 @@ private:
   using Element = typename std::aligned_storage_t<sizeof(T), alignof(T)>;
 
   Size    _size{};
-  Element _array[Capacity]{};
+  Element _array[Capacity]{}; // NOLINT(*-c-arrays)
 };
 
 template<class T, class Size, Size capacity>

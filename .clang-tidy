@@ -3,7 +3,6 @@
 
 Checks: >
   *,
-  -*-c-arrays,
   -*-named-parameter,
   -altera-*,
   -cppcoreguidelines-avoid-do-while,

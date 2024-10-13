@@ -12,6 +12,7 @@
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 
+#include <array>
 #include <cassert>
 #include <limits>
 #include <utility>
@@ -42,7 +43,7 @@ public:
     assert(deposit.size() > 1U);
     assert(deposit.size() == deposit.capacity());
 
-    Volume volumes[count];
+    std::array<Volume, count> volumes{};
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
       volumes[i] = volume(entry_key(deposit[i]));
     }
