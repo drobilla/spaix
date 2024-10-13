@@ -8,8 +8,6 @@ bench_exe = executable(
   dependencies: [spaix_dep, spaix_test_dep],
 )
 
-boost_dep = dependency('boost', required: get_option('benchmarks'))
-
 if boost_dep.found()
   boost_bench_exe = executable(
     'bench_boost_rtree',

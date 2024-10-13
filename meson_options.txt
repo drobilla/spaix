@@ -7,8 +7,7 @@ option(
 
 option(
   'boost',
-  type: 'combo',
-  choices: ['yes', 'no', 'auto'],
+  type: 'feature',
   description: 'Build boost benchmarking program',
 )
 

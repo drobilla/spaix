@@ -1,4 +1,4 @@
-# Copyright 2019-2023 David Robillard <d@drobilla.net>
+# Copyright 2019-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 project(
@@ -100,18 +100,13 @@ cpp_suppressions = cpp.get_supported_arguments(cpp_suppressions)
 ################
 
 # Boost for comparison benchmark program
-boost_dep = []
-enable_boost = get_option('boost')
-have_boost = false
-if enable_boost == 'no'
-  message('Boost support explicitly disabled')
-else
-  boost_dep = dependency('boost', include_type: 'system', required: false)
-  if boost_dep.found()
-    have_boost = true
-  elif enable_boost == 'yes' and not have_boost
-    error('Boost support not found, but was explicitly requested.')
-  endif
+boost_dep = disabler()
+if not (get_option('benchmarks').disabled() or get_option('boost').disabled())
+  boost_dep = dependency(
+    'boost',
+    include_type: 'system',
+    required: get_option('boost')
+  )
 endif
 
 ###########
