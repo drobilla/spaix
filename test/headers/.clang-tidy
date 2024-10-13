@@ -6,7 +6,6 @@ Checks: >
   -*-c-arrays,
   -*-named-parameter,
   -altera-*,
-  -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-do-while,
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,

@@ -9,8 +9,8 @@ namespace spaix {
 /// A data record in a tree
 template<class Key, class Data>
 struct DataNode {
-  const Key key;  ///< Point or Rect key
-  Data      data; ///< Arbitrary user data
+  Key  key;  ///< Point or Rect key
+  Data data; ///< Arbitrary user data
 };
 
 } // namespace spaix

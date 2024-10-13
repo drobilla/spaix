@@ -6,6 +6,7 @@
 
 #include "spaix/intersects.hpp"
 
+#include <type_traits>
 #include <utility>
 
 namespace spaix::search {
@@ -24,7 +25,7 @@ struct Touching {
     return intersects(key, k);
   }
 
-  const QueryKey key;
+  std::decay_t<QueryKey> key;
 };
 
 /// Return a query predicate that matches items that intersect a region
