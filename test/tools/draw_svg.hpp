@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DRAW_SVG_HPP
@@ -61,7 +61,7 @@ write_attr(std::ostream& os, const std::string& key, const T& value)
 }
 
 template<class DirKey, class NodePath>
-inline bool
+inline void
 draw_dir(std::ostream&   os,
          const DirKey&   key,
          const NodePath& path,
@@ -69,7 +69,7 @@ draw_dir(std::ostream&   os,
          const double    scale)
 {
   if (path.size() == 1) {
-    return true;
+    return;
   }
 
   const auto style =
@@ -82,8 +82,6 @@ draw_dir(std::ostream&   os,
   write_attr(os, "width", span<0>(key) * scale);
   write_attr(os, "height", span<1>(key) * scale);
   os << "/>\n";
-
-  return true;
 }
 
 template<class... Values, class NodePath>
@@ -140,10 +138,9 @@ draw_svg(std::ostream&  os,
   tree.visit(
     [&os, bounds, scale, max_depth](
       const NodePath& path, const DirKey& key, size_t) {
-      return svg::draw_dir(os, key, path, bounds, scale) &&
-                 (!max_depth || path.size() <= max_depth)
-               ? VisitStatus::proceed
-               : VisitStatus::finish;
+      svg::draw_dir(os, key, path, bounds, scale);
+      return (!max_depth || path.size() <= max_depth) ? VisitStatus::proceed
+                                                      : VisitStatus::finish;
     },
     [&os, bounds, scale](const NodePath& path, const Key& key, const Data&) {
       svg::draw_dat(os, key, path, bounds, scale);

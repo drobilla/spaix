@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DRAW_DOT_HPP
@@ -27,7 +27,7 @@ to_string(const NodePath& path)
 }
 
 template<class DirKey, class NodePath>
-static inline bool
+static inline void
 draw_dir_dot(std::ostream&   os,
              const DirKey&   key,
              const NodePath& path,
@@ -42,8 +42,6 @@ draw_dir_dot(std::ostream&   os,
     os << "  " << id << " -- " << to_string(child_path) << ";\n";
     child_path.pop_back();
   }
-
-  return true;
 }
 
 template<class Key, class Data, class NodePath>
@@ -74,10 +72,9 @@ draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0U)
   tree.visit(
     [&os, max_depth](
       const NodePath& path, const DirKey& key, const size_t n_children) {
-      return detail::draw_dir_dot(os, key, path, n_children) &&
-                 (!max_depth || path.size() <= max_depth)
-               ? VisitStatus::proceed
-               : VisitStatus::finish;
+      detail::draw_dir_dot(os, key, path, n_children);
+      return (!max_depth || path.size() <= max_depth) ? VisitStatus::proceed
+                                                      : VisitStatus::finish;
     },
     [&os](const NodePath& path, const Key& key, const Data& data) {
       detail::draw_dat_dot(os, key, data, path);
