@@ -46,12 +46,6 @@ if cpp.get_id() in ['clang', 'emscripten']
     endif
   endif
 
-  if warning_level in ['everything', '3']
-    cpp_suppressions += [
-      '-Wno-nullability-extension',
-    ]
-  endif
-
 elif cpp.get_id() == 'gcc'
   if warning_level == 'everything'
     cpp_suppressions = [
