@@ -3,8 +3,6 @@
 
 Checks: >
   -*-vararg,
-  -hicpp-no-array-decay,
-  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -fuchsia-default-arguments-*,
   -llvm-header-guard,
   -misc-non-private-member-variables-in-classes,

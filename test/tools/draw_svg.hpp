@@ -130,7 +130,7 @@ draw_svg(std::ostream&  os,
   const auto bounds = tree.bounds();
 
   os << "<svg";
-  svg::write_attr(os, "xmlns", "http://www.w3.org/2000/svg");
+  svg::write_attr(os, "xmlns", std::string{"http://www.w3.org/2000/svg"});
   svg::write_attr(os, "width", (span<0>(bounds) * scale) + (2 * svg::pad));
   svg::write_attr(os, "height", (span<1>(bounds) * scale) + (2 * svg::pad));
   os << ">\n";
