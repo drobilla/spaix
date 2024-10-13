@@ -11,7 +11,6 @@
 #include <cassert>
 #include <memory>
 #include <new>
-#include <type_traits>
 #include <utility>
 
 namespace spaix {

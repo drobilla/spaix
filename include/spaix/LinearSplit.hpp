@@ -9,7 +9,6 @@
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/detail/distribute.hpp"
 #include "spaix/detail/meta.hpp"
-#include "spaix/expansion.hpp"
 #include "spaix/types.hpp"
 #include "spaix/volume.hpp"
 

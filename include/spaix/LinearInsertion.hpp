@@ -4,11 +4,11 @@
 #ifndef SPAIX_LINEARINSERTION_HPP
 #define SPAIX_LINEARINSERTION_HPP
 
+#include "spaix/types.hpp"
 #include "spaix/union.hpp"
 #include "spaix/volume.hpp"
 
 #include <limits>
-#include <type_traits>
 #include <utility>
 
 namespace spaix {

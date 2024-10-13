@@ -10,7 +10,6 @@
 
 #include <cassert>
 #include <cstddef>
-#include <utility>
 
 namespace spaix {
 

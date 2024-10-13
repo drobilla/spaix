@@ -13,12 +13,9 @@
 #include "spaix/search/everything.hpp"    // IWYU pragma: keep
 #include "spaix/sizes.hpp"
 #include "spaix/types.hpp"
-#include "spaix/union.hpp"
 
 #include <array>
 #include <cstddef>
-#include <memory>
-#include <utility>
 
 namespace spaix {
 

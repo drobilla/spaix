@@ -7,7 +7,6 @@
 #include "spaix/detail/DirectoryNode.hpp"
 #include "spaix/types.hpp"
 
-#include <cstddef>
 #include <utility>
 
 namespace spaix::detail {

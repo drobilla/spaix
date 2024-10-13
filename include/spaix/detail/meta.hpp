@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #if defined(__GNUC__)
 #  define SPAIX_ALWAYS_INLINE __attribute__((always_inline))
