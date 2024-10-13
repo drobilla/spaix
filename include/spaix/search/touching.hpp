@@ -13,13 +13,13 @@ namespace spaix::search {
 template<class QueryKey>
 struct Touching {
   template<class DirKey>
-  constexpr bool directory(const DirKey& k) const
+  constexpr bool directory(const DirKey& k) const noexcept
   {
     return intersects(key, k);
   }
 
   template<class DatKey>
-  constexpr bool leaf(const DatKey& k) const
+  constexpr bool leaf(const DatKey& k) const noexcept
   {
     return intersects(key, k);
   }
@@ -30,7 +30,7 @@ struct Touching {
 /// Return a query predicate that matches items that intersect a region
 template<class QueryKey>
 Touching<QueryKey>
-touching(QueryKey&& key)
+touching(QueryKey&& key) noexcept
 {
   return Touching<QueryKey>{std::forward<QueryKey>(key)};
 }

@@ -59,7 +59,7 @@ protected:
     const DirNode* node;  ///< Pointer to directory node
     ChildIndex     index; ///< Index of child
 
-    inline friend bool operator==(const Frame& lhs, const Frame& rhs)
+    friend bool operator==(const Frame& lhs, const Frame& rhs) noexcept
     {
       return lhs.node == rhs.node && lhs.index == rhs.index;
     }

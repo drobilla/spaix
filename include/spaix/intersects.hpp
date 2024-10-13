@@ -15,14 +15,16 @@ namespace detail {
 
 template<class Lhs, class Rhs, size_t num_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-intersects_rec(const Lhs&, const Rhs&, EndIndex<num_dims>)
+intersects_rec(const Lhs&, const Rhs&, EndIndex<num_dims>) noexcept
 {
   return true;
 }
 
 template<class Lhs, class Rhs, size_t dim, size_t num_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
+intersects_rec(const Lhs&           lhs,
+               const Rhs&           rhs,
+               Index<dim, num_dims> index) noexcept
 {
   const auto& l = range<dim>(lhs);
   const auto& r = range<dim>(rhs);
@@ -36,7 +38,7 @@ intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
 template<class... Ts>
 constexpr bool
-intersects(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
+intersects(const Point<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   return lhs == rhs;
 }
@@ -44,7 +46,7 @@ intersects(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
 template<class... Ts>
 constexpr bool
-intersects(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+intersects(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
 }
@@ -52,7 +54,7 @@ intersects(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
 template<class... Ts>
 constexpr bool
-intersects(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
+intersects(const Point<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   return detail::intersects_rec(rhs, lhs, ibegin<Ts...>());
 }
@@ -60,7 +62,7 @@ intersects(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
 template<class... Ts>
 constexpr bool
-intersects(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+intersects(const Rect<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
 }

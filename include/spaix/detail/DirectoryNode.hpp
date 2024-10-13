@@ -163,63 +163,63 @@ private:
 
 template<class Key, class Node>
 const auto&
-entry_key(const NodePointerEntry<Key, Node>& entry)
+entry_key(const NodePointerEntry<Key, Node>& entry) noexcept
 {
   return entry.key;
 }
 
 template<class Key, class Data>
 const auto&
-entry_key(const DataNode<Key, Data>& entry)
+entry_key(const DataNode<Key, Data>& entry) noexcept
 {
   return entry.key;
 }
 
 template<class Key, class Data>
 const auto&
-entry_data(const DataNode<Key, Data>& entry)
+entry_data(const DataNode<Key, Data>& entry) noexcept
 {
   return entry.data;
 }
 
 template<class Key, class Data>
 const auto&
-entry_data(const std::unique_ptr<DataNode<Key, Data>>& entry)
+entry_data(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return entry->data;
 }
 
 template<class Key, class Data>
 const auto&
-entry_key(const std::unique_ptr<DataNode<Key, Data>>& entry)
+entry_key(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return entry->key;
 }
 
 template<class Key, class Data>
 const auto&
-entry_ref(const DataNode<Key, Data>& entry)
+entry_ref(const DataNode<Key, Data>& entry) noexcept
 {
   return entry;
 }
 
 template<class Key, class Data>
 const auto&
-entry_ref(const std::unique_ptr<DataNode<Key, Data>>& entry)
+entry_ref(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return *entry;
 }
 
 template<class Key, class Data>
 const auto*
-entry_ptr(const DataNode<Key, Data>& entry)
+entry_ptr(const DataNode<Key, Data>& entry) noexcept
 {
   return &entry;
 }
 
 template<class Key, class Data>
 const auto*
-entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry)
+entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return entry.get();
 }

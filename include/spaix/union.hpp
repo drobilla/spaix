@@ -22,14 +22,14 @@ using std::min;
 
 template<class Lhs, class Rhs, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr auto
-union_rec(const Lhs&, const Rhs&, EndIndex<n_dims>)
+union_rec(const Lhs&, const Rhs&, EndIndex<n_dims>) noexcept
 {
   return std::make_tuple();
 }
 
 template<class Lhs, class Rhs, size_t dim, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr auto
-union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
+union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index) noexcept
 {
   const auto l  = range<dim>(lhs);
   const auto r  = range<dim>(rhs);
@@ -42,12 +42,12 @@ union_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 
 template<class Lhs, class Rhs, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr void
-union_rec(Lhs&, const Rhs&, EndIndex<n_dims>)
+union_rec(Lhs&, const Rhs&, EndIndex<n_dims>) noexcept
 {}
 
 template<class Lhs, class Rhs, size_t dim, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr void
-union_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
+union_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index) noexcept
 {
   auto&      l = range<dim>(lhs);
   const auto r = range<dim>(rhs);
@@ -63,7 +63,7 @@ union_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index)
 /// Return the geometric union of two points
 template<class... Ts>
 constexpr Rect<Ts...>
-operator|(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
+operator|(const Point<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, rhs.ibegin())};
 }
@@ -71,7 +71,7 @@ operator|(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
 /// Return the geometric union of two rectangles
 template<class... Ts>
 constexpr Rect<Ts...>
-operator|(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+operator|(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
 }
@@ -79,7 +79,7 @@ operator|(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 /// Return the geometric union of a point and a rectangle
 template<class... Ts>
 constexpr Rect<Ts...>
-operator|(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
+operator|(const Point<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
 }
@@ -87,7 +87,7 @@ operator|(const Point<Ts...>& lhs, const Rect<Ts...>& rhs)
 /// Return the geometric union of a rectangle and a point
 template<class... Ts>
 constexpr Rect<Ts...>
-operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
 }
@@ -95,7 +95,7 @@ operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs)
 /// Expand `lhs` to include `rhs`
 template<class... Ts>
 constexpr Rect<Ts...>&
-operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   detail::union_rec(lhs, rhs, ibegin<Ts...>());
   return lhs;
@@ -104,7 +104,7 @@ operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
 /// Expand `lhs` to include `rhs`
 template<class... Ts>
 constexpr Rect<Ts...>
-operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs)
+operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   detail::union_rec(lhs, rhs, ibegin<Ts...>());
   return lhs;

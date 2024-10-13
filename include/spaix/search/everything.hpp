@@ -8,13 +8,13 @@ namespace spaix::search {
 
 struct Everything {
   template<class DirKey>
-  static constexpr bool directory(const DirKey&)
+  static constexpr bool directory(const DirKey&) noexcept
   {
     return true;
   }
 
   template<class DatKey>
-  static constexpr bool leaf(const DatKey&)
+  static constexpr bool leaf(const DatKey&) noexcept
   {
     return true;
   }
@@ -22,7 +22,7 @@ struct Everything {
 
 /// Return a tree query predicate that matches everything
 constexpr Everything
-everything()
+everything() noexcept
 {
   return Everything{};
 }

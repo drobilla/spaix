@@ -48,35 +48,35 @@ private:
 
 template<class... Ts>
 constexpr auto
-make_point(Ts&&... values)
+make_point(Ts&&... values) noexcept
 {
   return Point<Ts...>{std::forward<Ts>(values)...};
 }
 
 template<class... Ts>
 constexpr bool
-operator==(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
+operator==(const Point<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   return lhs.tuple() == rhs.tuple();
 }
 
 template<class... Ts>
 constexpr bool
-operator!=(const Point<Ts...>& lhs, const Point<Ts...>& rhs)
+operator!=(const Point<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
   return !(lhs == rhs);
 }
 
 template<size_t dim, class... Ts>
 constexpr const Nth<dim, Ts...>&
-get(const Point<Ts...>& point)
+get(const Point<Ts...>& point) noexcept
 {
   return std::get<dim>(point.tuple());
 }
 
 template<size_t dim, class... Ts>
 constexpr DimRange<Nth<dim, Ts...>>
-range(const Point<Ts...>& point)
+range(const Point<Ts...>& point) noexcept
 {
   return {get<dim>(point), get<dim>(point)};
 }
@@ -85,14 +85,14 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 constexpr auto
-point_ranges_rec(const Point<Ts...>&, EndIndex<n_dims>)
+point_ranges_rec(const Point<Ts...>&, EndIndex<n_dims>) noexcept
 {
   return std::make_tuple();
 }
 
 template<class... Ts, size_t dim, size_t n_dims>
 constexpr auto
-point_ranges_rec(Point<Ts...> point, Index<dim, n_dims> index)
+point_ranges_rec(Point<Ts...> point, Index<dim, n_dims> index) noexcept
 {
   return std::tuple_cat(
     std::make_tuple(make_dim_range(get<dim>(point), get<dim>(point))),
@@ -103,14 +103,14 @@ point_ranges_rec(Point<Ts...> point, Index<dim, n_dims> index)
 
 template<class... Ts>
 constexpr auto
-ranges(const Point<Ts...>& point)
+ranges(const Point<Ts...>& point) noexcept
 {
   return detail::point_ranges_rec(point, ibegin<Ts...>());
 }
 
 template<size_t dim, class... Ts>
 constexpr Nth<dim, Ts...>
-span(const Point<Ts...>&)
+span(const Point<Ts...>&) noexcept
 {
   return 0;
 }
@@ -119,7 +119,7 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 void
-print_rec(std::ostream&, const Point<Ts...>&, EndIndex<n_dims>)
+print_rec(std::ostream&, const Point<Ts...>&, EndIndex<n_dims>) noexcept
 {}
 
 template<class... Ts, size_t dim, size_t n_dims>

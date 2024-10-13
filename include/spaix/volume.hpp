@@ -15,14 +15,15 @@ namespace detail {
 
 template<class... Ts, size_t last_dim>
 constexpr auto
-volume_rec(const Rect<Ts...>& rect, LastIndex<last_dim>)
+volume_rec(const Rect<Ts...>& rect, LastIndex<last_dim>) noexcept
 {
   return span<last_dim>(rect);
 }
 
 template<class... Ts, size_t dim, size_t last_dim>
 constexpr auto
-volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
+volume_rec(const Rect<Ts...>&            rect,
+           InclusiveIndex<dim, last_dim> index) noexcept
 {
   const auto r = range<dim>(rect);
 
@@ -35,14 +36,14 @@ volume_rec(const Rect<Ts...>& rect, InclusiveIndex<dim, last_dim> index)
 
 template<class... Ts>
 constexpr auto
-volume(const Rect<Ts...>& rect)
+volume(const Rect<Ts...>& rect) noexcept
 {
   return detail::volume_rec(rect, ibegin_inclusive<Ts...>());
 }
 
 template<class... Ts>
 constexpr ProductOf<Ts...>
-volume(const Point<Ts...>&)
+volume(const Point<Ts...>&) noexcept
 {
   return 0;
 }

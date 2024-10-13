@@ -27,13 +27,13 @@ struct DimRange {
 
 template<class T>
 constexpr DimRange<T>
-make_dim_range(T lower, T upper)
+make_dim_range(T lower, T upper) noexcept
 {
   return DimRange<T>{lower, upper};
 }
 
 template<class T>
-inline constexpr bool
+constexpr bool
 operator==(const DimRange<T>& lhs, const DimRange<T>& rhs) noexcept
 {
   return lhs.lower == rhs.lower && lhs.upper == rhs.upper;

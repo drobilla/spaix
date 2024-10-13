@@ -15,14 +15,16 @@ namespace detail {
 
 template<class Parent, class Child, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-contains_rec(const Parent&, const Child&, EndIndex<n_dims>)
+contains_rec(const Parent&, const Child&, EndIndex<n_dims>) noexcept
 {
   return true;
 }
 
 template<class Parent, class Child, size_t dim, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
+contains_rec(const Parent&      parent,
+             const Child&       child,
+             Index<dim, n_dims> index) noexcept
 {
   const auto& p = range<dim>(parent);
   const auto& c = range<dim>(child);
@@ -36,7 +38,7 @@ contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Point<Ts...>& parent, const Point<Ts...>& child)
+contains(const Point<Ts...>& parent, const Point<Ts...>& child) noexcept
 {
   return parent == child;
 }
@@ -44,7 +46,7 @@ contains(const Point<Ts...>& parent, const Point<Ts...>& child)
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Rect<Ts...>& parent, const Rect<Ts...>& child)
+contains(const Rect<Ts...>& parent, const Rect<Ts...>& child) noexcept
 {
   return detail::contains_rec(parent, child, ibegin<Ts...>());
 }
@@ -52,7 +54,7 @@ contains(const Rect<Ts...>& parent, const Rect<Ts...>& child)
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Point<Ts...>& parent, const Rect<Ts...>& child)
+contains(const Point<Ts...>& parent, const Rect<Ts...>& child) noexcept
 {
   return detail::contains_rec(parent, child, ibegin<Ts...>());
 }
@@ -60,7 +62,7 @@ contains(const Point<Ts...>& parent, const Rect<Ts...>& child)
 /// Return true iff `parent` contains `child`
 template<class... Ts>
 constexpr bool
-contains(const Rect<Ts...>& parent, const Point<Ts...>& child)
+contains(const Rect<Ts...>& parent, const Point<Ts...>& child) noexcept
 {
   return detail::contains_rec(parent, child, ibegin<Ts...>());
 }

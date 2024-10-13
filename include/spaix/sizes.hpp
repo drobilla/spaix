@@ -15,7 +15,7 @@ namespace spaix {
 /// Return log_2(n)
 template<class T>
 constexpr T
-log_2(const T n)
+log_2(const T n) noexcept
 {
   return (n < 2) ? 1 : 1 + log_2(n / 2);
 }
@@ -23,7 +23,7 @@ log_2(const T n)
 /// Return log_b(n)
 template<class T>
 constexpr T
-log_b(const T n, const T b)
+log_b(const T n, const T b) noexcept
 {
   return log_2(n) / log_2(b);
 }
@@ -31,7 +31,7 @@ log_b(const T n, const T b)
 /// Return b^e (b raised to the power e)
 template<class T>
 constexpr T
-power(const T b, const T e)
+power(const T b, const T e) noexcept
 {
   return !e ? 1 : b * power(b, e - 1);
 }
@@ -45,7 +45,7 @@ power(const T b, const T e)
 */
 template<class DirectoryNodeType, class DataNodeType, DataPlacement placement>
 constexpr size_t
-max_tree_height(const ChildCount min_fanout)
+max_tree_height(const ChildCount min_fanout) noexcept
 {
   constexpr auto total_space = std::numeric_limits<size_t>::max();
   constexpr auto dir_size    = sizeof(DirectoryNodeType);

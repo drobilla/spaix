@@ -19,7 +19,9 @@ using std::min;
 
 template<class Added, size_t last_dim, class... Ts>
 SPAIX_ALWAYS_INLINE constexpr auto
-expansion_rec(const Rect<Ts...>& base, const Added& added, LastIndex<last_dim>)
+expansion_rec(const Rect<Ts...>& base,
+              const Added&       added,
+              LastIndex<last_dim>) noexcept
 {
   const auto l  = range<last_dim>(base);
   const auto r  = range<last_dim>(added);
@@ -36,7 +38,7 @@ template<class Added, size_t dim, size_t last_dim, class... Ts>
 SPAIX_ALWAYS_INLINE constexpr auto
 expansion_rec(const Rect<Ts...>&            base,
               const Added&                  added,
-              InclusiveIndex<dim, last_dim> index)
+              InclusiveIndex<dim, last_dim> index) noexcept
 {
   const auto l  = range<dim>(base);
   const auto r  = range<dim>(added);
@@ -73,7 +75,7 @@ expansion_rec(const Rect<Ts...>&            base,
 */
 template<class... Ts>
 constexpr auto
-expansion(const Rect<Ts...>& base, const Rect<Ts...>& added)
+expansion(const Rect<Ts...>& base, const Rect<Ts...>& added) noexcept
 {
   return detail::expansion_rec(base, added, ibegin_inclusive<Ts...>());
 }
@@ -81,7 +83,7 @@ expansion(const Rect<Ts...>& base, const Rect<Ts...>& added)
 /// Return the number of dimensions expanded by adding `added` to `base`
 template<class... Ts>
 constexpr auto
-expansion(const Rect<Ts...>& base, const Point<Ts...>& added)
+expansion(const Rect<Ts...>& base, const Point<Ts...>& added) noexcept
 {
   return detail::expansion_rec(base, added, ibegin_inclusive<Ts...>());
 }

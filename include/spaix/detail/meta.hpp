@@ -46,28 +46,30 @@ using LastIndex = InclusiveIndex<n, n>;
 
 template<class... Ts>
 constexpr Index<0, sizeof...(Ts)>
-ibegin()
+ibegin() noexcept
 {
   return {};
 }
 
 template<class... Ts>
 constexpr InclusiveIndex<0, sizeof...(Ts) - 1>
-ibegin_inclusive()
+ibegin_inclusive() noexcept
 {
   return {};
 }
 
 template<class... Ts, size_t last>
 constexpr auto
-tuple_product(const std::tuple<Ts...>& tuple, InclusiveIndex<last, last>)
+tuple_product(const std::tuple<Ts...>& tuple,
+              InclusiveIndex<last, last>) noexcept
 {
   return std::get<last>(tuple);
 }
 
 template<class... Ts, size_t i, size_t last>
 constexpr auto
-tuple_product(const std::tuple<Ts...>& tuple, InclusiveIndex<i, last> index)
+tuple_product(const std::tuple<Ts...>& tuple,
+              InclusiveIndex<i, last>  index) noexcept
 {
   return std::get<i>(tuple) * tuple_product(tuple, ++index);
 }

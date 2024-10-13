@@ -87,56 +87,56 @@ private:
 
 template<class... Ts>
 constexpr Rect<Ts...>
-make_rect(DimRange<Ts>... ranges)
+make_rect(DimRange<Ts>... ranges) noexcept
 {
   return Rect<Ts...>{std::move(ranges)...};
 }
 
 template<class... Ts>
 constexpr bool
-operator==(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+operator==(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   return lhs.tuple() == rhs.tuple();
 }
 
 template<class... Ts>
 constexpr bool
-operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs)
+operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
   return !(lhs == rhs);
 }
 
 template<size_t dim, class... Ts>
 constexpr const DimRange<Nth<dim, Ts...>>&
-get(const Rect<Ts...>& rect)
+get(const Rect<Ts...>& rect) noexcept
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<size_t dim, class... Ts>
 constexpr const DimRange<Nth<dim, Ts...>>&
-range(const Rect<Ts...>& rect)
+range(const Rect<Ts...>& rect) noexcept
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<size_t dim, class... Ts>
 DimRange<Nth<dim, Ts...>>&
-range(Rect<Ts...>& rect)
+range(Rect<Ts...>& rect) noexcept
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<class... Ts>
 constexpr const auto&
-ranges(const Rect<Ts...>& rect)
+ranges(const Rect<Ts...>& rect) noexcept
 {
   return rect.tuple();
 }
 
 template<size_t dim, class... Ts>
 constexpr DifferenceOf<Nth<dim, Ts...>, Nth<dim, Ts...>>
-span(const Rect<Ts...>& rect)
+span(const Rect<Ts...>& rect) noexcept
 {
   const auto& dim_range = get<dim>(rect);
   return (dim_range.upper < dim_range.lower)
@@ -148,7 +148,7 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 void
-print_rec(std::ostream&, const Rect<Ts...>&, EndIndex<n_dims>)
+print_rec(std::ostream&, const Rect<Ts...>&, EndIndex<n_dims>) noexcept
 {}
 
 template<class... Ts, size_t dim, size_t n_dims>
