@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_RTREE_IPP
@@ -10,8 +10,10 @@
 #include "spaix/types.hpp"
 #include "spaix/union.hpp" // IWYU pragma: keep
 
+#include <algorithm>
 #include <cassert>
 #include <memory>
+#include <numeric>
 #include <utility>
 
 namespace spaix {
@@ -61,13 +63,11 @@ template<class Children>
 typename RTree<B, K, D, C>::Box
 RTree<B, K, D, C>::parent_key(const Children& children)
 {
-  Box key;
-
-  for (const auto& entry : children) {
-    key |= entry_key(entry);
-  }
-
-  return key;
+  return std::accumulate(
+    children.begin(),
+    children.end(),
+    Box{},
+    [](const Box& box, const auto& entry) { return box | entry_key(entry); });
 }
 
 template<class B, class K, class D, class C>
@@ -178,9 +178,9 @@ RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
 
   // Make an array of all nodes to deposit
   StaticVector<Entry, ChildCount, fanout + 1> deposit;
-  for (auto&& e : nodes) {
-    deposit.emplace_back(std::move(e));
-  }
+  std::for_each(nodes.begin(), nodes.end(), [&deposit](auto& node) {
+    deposit.emplace_back(std::move(node));
+  });
   deposit.emplace_back(std::move(entry));
 
   // Pick two nodes to seed the left and right groups
