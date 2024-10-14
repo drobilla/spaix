@@ -191,7 +191,8 @@ private:
       static_cast<T>(range<dim>(min_max).upper - range<dim>(max_min).lower);
 
     const auto normalized_separation =
-      separation / (width > std::numeric_limits<T>::epsilon() ? width : T{1});
+      (width < std::numeric_limits<T>::epsilon()) ? separation
+                                                  : separation / width;
 
     if (normalized_separation > max_separation.separation) {
       max_separation.separation = normalized_separation;
