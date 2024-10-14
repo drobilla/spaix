@@ -95,8 +95,6 @@ int
 run(const Parameters& params)
 {
   switch (params.page_size) {
-  // case 64: return run<Insertion, Split, 64>(params);
-  // case 128: return run<Insertion, Split, 128>(params);
   case 256:
     return run<Insertion, Split, 256>(params);
   case 512:

@@ -90,11 +90,6 @@ benchmark_queries(std::mt19937& rng,
                   const Scalar  span,
                   const size_t  n_queries)
 {
-  (void)rng;
-  (void)tree;
-  (void)span;
-  (void)n_queries;
-
   QueryMetrics                           metrics{};
   std::uniform_real_distribution<Scalar> dist{0, 1};
   const auto                             query_span{span / 2};
@@ -127,9 +122,8 @@ benchmark_queries(std::mt19937& rng,
 
     const auto iter_dur =
       std::chrono::duration<double>(t_iter_end - t_iter_start);
-    metrics.iter_times.update(
-      iter_dur.count()); // / std::max(1.0, double(n_results)));
 
+    metrics.iter_times.update(iter_dur.count());
     metrics.result_counts.update(static_cast<double>(n_results));
   }
 
@@ -263,7 +257,6 @@ int
 run(const Parameters& params, const Args& args)
 {
   switch (params.page_size) {
-  // case 128: return run<128>(params, args);
   case 256:
     return run<256>(params, args);
   case 512:

@@ -72,7 +72,6 @@ private:
 
 struct QueryMetrics {
   Distribution<double> iter_times;
-  // Distribution<double> visit_times;
   Distribution<double> checked_dirs;
   Distribution<double> checked_dats;
   Distribution<double> result_counts;
@@ -103,7 +102,9 @@ benchmark_queries(std::mt19937& rng,
     const auto t_iter_start = std::chrono::steady_clock::now();
 #if 0
     for (const auto& node : tree.query(predicate)) {
-      (void)node;
+      volatile auto result = node;
+
+      (void)result;
       ++n_results;
     }
 #else
@@ -111,7 +112,6 @@ benchmark_queries(std::mt19937& rng,
       volatile auto result = node;
 
       (void)result;
-
       ++n_results;
     });
 #endif
@@ -119,18 +119,8 @@ benchmark_queries(std::mt19937& rng,
 
     const auto iter_dur =
       std::chrono::duration<double>(t_iter_end - t_iter_start);
-    metrics.iter_times.update(
-      iter_dur.count()); // / std::max(1.0, double(n_results)));
 
-    // const auto t_visit_start = std::chrono::steady_clock::now();
-    // tree.fast_query(predicate, [&n_results](const auto&) { ++n_results; });
-    // const auto t_visit_end = std::chrono::steady_clock::now();
-
-    // const auto visit_dur =
-    //     std::chrono::duration<double>(t_visit_end - t_visit_start);
-    // metrics.visit_times.update(
-    //     visit_dur.count()); // / std::max(1.0, double(n_results)));
-
+    metrics.iter_times.update(iter_dur.count());
     metrics.result_counts.update(static_cast<double>(n_results));
     metrics.checked_dirs.update(static_cast<double>(counts.n_checked_dirs));
     metrics.checked_dats.update(static_cast<double>(counts.n_checked_dats));
@@ -254,7 +244,6 @@ int
 run(const Parameters& params)
 {
   switch (params.page_size) {
-  // case 128: return run<Insertion, Split, 128>(params);
   case 256:
     return run<Insertion, Split, placement, 256>(params);
   case 512:
