@@ -84,9 +84,14 @@ public:
       deposit.pop_back();
 
       const auto& key     = entry_key(child);
-      auto        chooser = make_side_chooser(seeds, lhs.key, rhs.key, key);
-      const Side  side    = chooser.choose_side();
-      const auto  outcome = chooser.outcome(side);
+      const auto  n_left  = entry_num_children(lhs);
+      const auto  n_right = entry_num_children(rhs);
+
+      auto chooser =
+        make_side_chooser(seeds, lhs.key, n_left, rhs.key, n_right, key);
+
+      const Side side    = chooser.choose_side();
+      const auto outcome = chooser.outcome(side);
 
       // Distribute the child to the chosen side and update its volume
       if (side == Side::left) {

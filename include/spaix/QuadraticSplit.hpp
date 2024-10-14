@@ -137,8 +137,12 @@ private:
     Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
 
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
-      const auto& key     = entry_key(deposit[i]);
-      auto        chooser = make_side_chooser(seeds, lhs.key, rhs.key, key);
+      auto chooser = make_side_chooser(seeds,
+                                       lhs.key,
+                                       entry_num_children(lhs),
+                                       rhs.key,
+                                       entry_num_children(rhs),
+                                       entry_key(deposit[i]));
 
       const auto preference = chooser.preference();
       if (preference >= best_preference) {

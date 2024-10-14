@@ -26,14 +26,18 @@ public:
     DirKey key;
   };
 
-  SideChooser(const DirKey&   lhs_key,
-              const Volume    lhs_volume,
-              const DirKey&   rhs_key,
-              const Volume    rhs_volume,
-              const ChildKey& child_key) noexcept
+  SideChooser(const DirKey&    lhs_key,
+              const Volume     lhs_volume,
+              const ChildCount lhs_n_children,
+              const DirKey&    rhs_key,
+              const Volume     rhs_volume,
+              const ChildCount rhs_n_children,
+              const ChildKey&  child_key) noexcept
     : _l_key{lhs_key | child_key}
     , _r_key{rhs_key | child_key}
     , _child_key{child_key}
+    , _l_n_children{lhs_n_children}
+    , _r_n_children{rhs_n_children}
     , _l_volume{volume(_l_key)}
     , _r_volume{volume(_r_key)}
     , _d_l_volume{_l_volume - lhs_volume}
@@ -53,7 +57,7 @@ public:
            : (_d_r_volume < _d_l_volume) ? Side::right
            : (_l_volume < _r_volume)     ? Side::left
            : (_r_volume < _l_volume)     ? Side::right
-                                         : tie_side(_l_key, _r_key, _child_key);
+                                         : tie_side();
   }
 
   /// Return the outcome (volume and key) of adding the child to the given side
@@ -72,37 +76,48 @@ private:
   }
 
   /// Choose a side to break a tie when the volume comparisons fail
-  Side tie_side(const DirKey&   lhs_key,
-                const DirKey&   rhs_key,
-                const ChildKey& child_key) noexcept
+  Side tie_side() noexcept
   {
-    const auto l_expansion = spaix::expansion(lhs_key, child_key);
-    const auto r_expansion = spaix::expansion(rhs_key, child_key);
+    const auto l_expansion = spaix::expansion(_l_key, _child_key);
+    const auto r_expansion = spaix::expansion(_r_key, _child_key);
 
-    return (l_expansion < r_expansion)   ? Side::left
-           : (r_expansion < l_expansion) ? Side::right
-           : ((++_tie_phase & 1U) == 0U) ? Side::left
-                                         : Side::right;
+    // Try expansion, then child count, then a flip-flop to avoid bias
+    return (l_expansion < r_expansion)       ? Side::left
+           : (r_expansion < l_expansion)     ? Side::right
+           : (_l_n_children < _r_n_children) ? Side::left
+           : (_r_n_children < _l_n_children) ? Side::right
+           : ((++_tie_phase & 1U) == 0U)     ? Side::left
+                                             : Side::right;
   }
 
-  DirKey   _l_key;
-  DirKey   _r_key;
-  ChildKey _child_key;
-  Volume   _l_volume;
-  Volume   _r_volume;
-  Volume   _d_l_volume;
-  Volume   _d_r_volume;
-  unsigned _tie_phase{};
+  DirKey     _l_key;
+  DirKey     _r_key;
+  ChildKey   _child_key;
+  ChildCount _l_n_children;
+  ChildCount _r_n_children;
+  Volume     _l_volume;
+  Volume     _r_volume;
+  Volume     _d_l_volume;
+  Volume     _d_r_volume;
+  unsigned   _tie_phase{};
 };
 
 template<class Volume, class DirKey, class ChildKey>
 SideChooser<DirKey, ChildKey>
 make_side_chooser(const SplitSeeds<Volume>& seeds,
                   const DirKey&             lhs_key,
+                  const ChildCount          lhs_n_children,
                   const DirKey&             rhs_key,
+                  const ChildCount          rhs_n_children,
                   const ChildKey&           child_key) noexcept
 {
-  return {lhs_key, seeds.lhs_volume, rhs_key, seeds.rhs_volume, child_key};
+  return {lhs_key,
+          seeds.lhs_volume,
+          lhs_n_children,
+          rhs_key,
+          seeds.rhs_volume,
+          rhs_n_children,
+          child_key};
 }
 
 } // namespace spaix

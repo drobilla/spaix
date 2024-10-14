@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
@@ -222,6 +222,20 @@ const auto*
 entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return entry.get();
+}
+
+template<class Key, class Node>
+ChildCount
+entry_num_children(const NodePointerEntry<Key, Node>& entry) noexcept
+{
+  return entry.node->num_children();
+}
+
+template<class Key, class Data>
+ChildCount
+entry_num_children(const DataNode<Key, Data>&) noexcept
+{
+  return 0U;
 }
 
 } // namespace spaix
