@@ -34,8 +34,6 @@ public:
     : _l_key{lhs_key | child_key}
     , _r_key{rhs_key | child_key}
     , _child_key{child_key}
-    , _lhs_volume{lhs_volume}
-    , _rhs_volume{rhs_volume}
     , _l_volume{volume(_l_key)}
     , _r_volume{volume(_r_key)}
     , _d_l_volume{_l_volume - lhs_volume}
@@ -53,8 +51,8 @@ public:
   {
     return (_d_l_volume < _d_r_volume)   ? Side::left
            : (_d_r_volume < _d_l_volume) ? Side::right
-           : (_lhs_volume < _rhs_volume) ? Side::left
-           : (_rhs_volume < _lhs_volume) ? Side::right
+           : (_l_volume < _r_volume)     ? Side::left
+           : (_r_volume < _l_volume)     ? Side::right
                                          : tie_side(_l_key, _r_key, _child_key);
   }
 
@@ -90,8 +88,6 @@ private:
   DirKey   _l_key;
   DirKey   _r_key;
   ChildKey _child_key;
-  Volume   _lhs_volume;
-  Volume   _rhs_volume;
   Volume   _l_volume;
   Volume   _r_volume;
   Volume   _d_l_volume;
