@@ -51,23 +51,18 @@ max_tree_height(const ChildCount min_fanout) noexcept
   constexpr auto dir_size    = sizeof(DirectoryNodeType);
   constexpr auto dat_size    = sizeof(DataNodeType);
 
-  switch (placement) {
-  case DataPlacement::inlined: {
+  if constexpr (placement == DataPlacement::inlined) {
     const auto n_most_dirs = total_space / dir_size;
-
     return log_b(n_most_dirs, size_t{min_fanout});
   }
 
-  case DataPlacement::separate: {
-    const auto n_most_dats         = total_space / dat_size;
-    const auto n_most_dirs         = log_b(n_most_dats, size_t{min_fanout});
-    const auto needed_dir_space    = n_most_dirs * dir_size;
-    const auto available_dat_space = total_space - needed_dir_space;
-    const auto max_n_dats          = available_dat_space / dat_size;
+  const auto n_most_dats         = total_space / dat_size;
+  const auto n_most_dirs         = log_b(n_most_dats, size_t{min_fanout});
+  const auto needed_dir_space    = n_most_dirs * dir_size;
+  const auto available_dat_space = total_space - needed_dir_space;
+  const auto max_n_dats          = available_dat_space / dat_size;
 
-    return log_b(max_n_dats, size_t{min_fanout});
-  }
-  }
+  return log_b(max_n_dats, size_t{min_fanout});
 }
 
 } // namespace spaix

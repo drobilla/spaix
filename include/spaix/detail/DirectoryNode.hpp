@@ -74,25 +74,19 @@ public:
   explicit DirectoryNode(const NodeType t)
     : _child_type{t}
   {
-    switch (_child_type) {
-    case NodeType::directory:
+    if (_child_type == NodeType::directory) {
       new (&_dir_children) DirChildren();
-      break;
-    case NodeType::data:
+    } else {
       new (&_dat_children) DatChildren();
-      break;
     }
   }
 
   ~DirectoryNode()
   {
-    switch (_child_type) {
-    case NodeType::directory:
+    if (_child_type == NodeType::directory) {
       _dir_children.~DirChildren();
-      break;
-    case NodeType::data:
+    } else {
       _dat_children.~DatChildren();
-      break;
     }
   }
 
