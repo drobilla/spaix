@@ -174,7 +174,8 @@ RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                          Entry                                    entry,
                          const NodeType                           type)
 {
-  constexpr auto max_fanout = fanout - (fanout / Conf::min_fill_divisor);
+  constexpr auto max_fanout =
+    fanout - (fanout * Conf::MinFillRatio::num / Conf::MinFillRatio::den);
 
   // Make an array of all nodes to deposit
   StaticVector<Entry, ChildCount, fanout + 1> deposit;

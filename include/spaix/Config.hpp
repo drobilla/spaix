@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_CONFIG_HPP
@@ -10,8 +10,11 @@
 
 #include <cstddef>
 #include <limits>
+#include <ratio>
 
 namespace spaix {
+
+using DefaultMinFillRatio = std::ratio<3, 10>;
 
 /**
    A tree structure with specific fanouts.
@@ -91,32 +94,37 @@ struct PageStructure {
    @tparam InsertionAlgorithm Insert position selection algorithm, generally
    spaix::LinearInsertion;
 
-   @tparam minimum_fill_divisor Minimum fill divisor when splitting nodes.  The
-   maximum fanout divided by this is the minimum number of children that a
-   split node will receive.  For example, the default value of 3 means that
-   split nodes must have at least a third of the maximum fanout.
+   @tparam SplitMinFillRatio Minimum fill ratio when splitting nodes.  The
+   maximum fanout multiplied by this is the minimum number of children that a
+   split node will receive.  For example, the default value of 3/10 means that
+   split nodes must have at least 3/10th of the maximum fanout.
 */
 template<class TreeStructure,
          class SplitAlgorithm,
          class InsertionAlgorithm,
-         unsigned minimum_fill_divisor = 3U>
+         class SplitMinFillRatio = DefaultMinFillRatio>
 struct Config {
-  using Structure = TreeStructure;
-  using Split     = SplitAlgorithm;
-  using Insertion = InsertionAlgorithm;
+  using Structure    = TreeStructure;
+  using Split        = SplitAlgorithm;
+  using Insertion    = InsertionAlgorithm;
+  using MinFillRatio = typename SplitMinFillRatio::type;
 
-  static constexpr const auto placement        = Structure::placement;
-  static constexpr auto       dir_fanout       = Structure::dir_fanout;
-  static constexpr auto       dat_fanout       = Structure::dat_fanout;
-  static constexpr const auto min_fill_divisor = minimum_fill_divisor;
-  static constexpr auto       min_dir_fanout   = dir_fanout / min_fill_divisor;
-  static constexpr auto       min_dat_fanout   = dat_fanout / min_fill_divisor;
+  static_assert(MinFillRatio::num < MinFillRatio::den);
+
+  static constexpr const auto placement  = Structure::placement;
+  static constexpr auto       dir_fanout = Structure::dir_fanout;
+  static constexpr auto       dat_fanout = Structure::dat_fanout;
+
+  static constexpr auto min_dir_fanout =
+    dir_fanout * MinFillRatio::num / MinFillRatio::den;
+
+  static constexpr auto min_dat_fanout =
+    dat_fanout * MinFillRatio::num / MinFillRatio::den;
 
   static_assert(dir_fanout > 1);
   static_assert(dat_fanout > 1);
-  static_assert(min_fill_divisor > 1);
-  static_assert(min_dir_fanout > 1);
-  static_assert(min_dat_fanout > 1);
+  static_assert(min_dir_fanout >= 1);
+  static_assert(min_dat_fanout >= 1);
 };
 
 } // namespace spaix

@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <iostream>
 #include <random>
+#include <ratio>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -37,7 +38,7 @@ using Rect2      = spaix::Rect<Scalar, Scalar>;
 template<class T>
 using Distribution = spaix::test::Distribution<T>;
 
-constexpr unsigned min_fill_divisor = 3;
+using MinFillRatio = std::ratio<3, 10>;
 
 struct Counts {
   size_t n_checked_dirs = 0U;
@@ -243,7 +244,7 @@ run(const Parameters& params)
     spaix::PageStructure<Rect2, Rect2, Data, page_size, placement>,
     Split,
     Insertion,
-    min_fill_divisor>;
+    MinFillRatio>;
 
   return run<spaix::RTree<Rect2, Rect2, Data, Conf>>(params, std::cout);
 }
