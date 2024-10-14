@@ -1,15 +1,17 @@
-# Copyright 2019-2022 David Robillard <d@drobilla.net>
+# Copyright 2019-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 spaix_test_dep = declare_dependency(
   include_directories: include_directories('include'),
 )
 
-if not meson.is_subproject() and get_option('lint')
-  # Check project metadata
-  autoship = find_program('autoship', required: false)
-  if autoship.found()
-    test('autoship', autoship, args: ['test', spaix_src_root], suite: 'data')
+if get_option('lint')
+  if not meson.is_subproject()
+    # Check project metadata
+    autoship = find_program('autoship', required: false)
+    if autoship.found()
+      test('autoship', autoship, args: ['test', spaix_src_root], suite: 'data')
+    endif
   endif
 
   # Check licensing metadata
@@ -21,6 +23,21 @@ if not meson.is_subproject() and get_option('lint')
       args: ['--root', spaix_src_root, 'lint'],
       suite: 'data',
     )
+  endif
+
+  # Check scripts for errors with pylint
+  pylint = find_program('pylint', required: false)
+  if pylint.found()
+    pymod = import('python')
+    plot_py = pymod.find_installation(
+      'python3',
+      modules: ['matplotlib', 'pandas'],
+      required: false,
+    )
+
+    if plot_py.found()
+      test('pylint', pylint, args: files('../scripts/benchmark.py'), suite: 'scripts')
+    endif
   endif
 endif
 

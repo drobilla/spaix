@@ -1,20 +1,28 @@
 #!/usr/bin/env python
 
-# Copyright 2020 David Robillard <d@drobilla.net>
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
-import optparse
-import pandas
-import subprocess
-import sys
-import matplotlib
+"""Benchmark R-tree variants."""
+
 import itertools
 import math
+import argparse
 import os
+import subprocess
+import sys
+
+from collections import namedtuple
+
+import matplotlib
+import pandas
+
+
+FIG_HEIGHT = 4.0
 
 
 def get_dashes():
-    "Generator for plot line dash patterns"
+    """Generator for plot line dash patterns."""
     dash = 2
     space = dot = 1
 
@@ -27,73 +35,79 @@ def get_dashes():
         yield (0, (dash, space) + (dot, space) * (i - 1))
 
 
-class DataSource:
-    def __init__(self, path, label):
-        self.path = path
-        self.label = label
-        self.data = pandas.read_csv(path, sep="\t")
+DataSource = namedtuple("DataSource", "path label data")
+PlotColumn = namedtuple("PlotColumn", "name label")
+PlotScale = namedtuple("PlotScale", "show_error max_value divisor_col")
+
+
+def read_tsv(path, label):
+    """Read a TSV file with pandas and return a DataSource."""
+    return DataSource(path, label, pandas.read_csv(path, sep="\t"))
+
+
+def get_y_data(source, y_col, y_scale):
+    """Return the data for a source scaled if necessary."""
+
+    y_data = source.data[y_col.name]
+
+    if y_scale.divisor_col is not None:
+        y_data = y_data / source.data[y_scale.divisor_col]
+
+    return y_data
+
+
+def get_y_max(sources, y_col, y_scale):
+    """Return the maximum y value in all plot sources for axis scaling."""
+    y_max = y_scale.max_value
+    if y_max is None:
+        y_max = 0.0
+        for source in sources:
+            y_max = max(y_max, get_y_data(source, y_col, y_scale).max())
+
+    return y_max * 1.01
 
 
 def plot(
     sources,
     out_filename,
     x_col,
-    x_label,
     y_col,
-    y_label,
-    show_error=True,
-    y_max=None,
-    y_divisor_col=None,
+    y_scale=PlotScale(False, None, None),
 ):
-    """Plot results"""
+    """Plot results."""
 
     matplotlib.use("agg")
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # pylint: disable=import-outside-toplevel
 
-    fig_height = 4.0
     dashes = get_dashes()
     markers = itertools.cycle(["o", "s", "v", "D", "*", "p", "P", "h", "X"])
 
     plt.clf()
-    fig = plt.figure(figsize=(fig_height * math.sqrt(2), fig_height))
-    ax = fig.add_subplot(111)
+    fig = plt.figure(figsize=(FIG_HEIGHT * math.sqrt(2), FIG_HEIGHT))
+    ax = fig.add_subplot(111)  # pylint: disable=invalid-name
 
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
+    ax.set_xlabel(x_col.label)
+    ax.set_ylabel(y_col.label)
 
-    min_col = y_col + "_min" if show_error else y_col
-    max_col = y_col + "_max" if show_error else y_col
+    min_col = y_col.name + "_min" if y_scale.show_error else y_col.name
+    max_col = y_col.name + "_max" if y_scale.show_error else y_col.name
 
-    def get_y_data(source):
-        y_data = source.data[y_col]
-        if y_divisor_col is not None:
-            y_data = y_data / source.data[y_divisor_col]
-
-        return y_data
-
-    if y_max is None:
-        y_max = 0.0
-        for source in sources:
-            y_max = max(y_max, get_y_data(source).max())
-
-    ax.set_ylim([0.0, y_max * 1.01])
+    ax.set_ylim([0.0, get_y_max(sources, y_col, y_scale)])
     ax.grid(linewidth=0.25, linestyle=":", color="0", dashes=[0.2, 1.6])
     ax.ticklabel_format(style="sci", scilimits=(4, 0), useMathText=True)
     ax.tick_params(axis="both", width=0.75)
 
     for source in sources:
-        y_data = get_y_data(source)
-
         yerr = None
-        if show_error:
+        if y_scale.show_error:
             yerr = [
-                source.data[y_col] - source.data[min_col],
-                source.data[max_col] - source.data[y_col],
+                source.data[y_col.name] - source.data[min_col],
+                source.data[max_col] - source.data[y_col.name],
             ]
 
         ax.errorbar(
-            source.data[x_col],
-            y_data,
+            source.data[x_col.name],
+            get_y_data(source, y_col, y_scale),
             yerr=yerr,
             label=source.label,
             marker=next(markers),
@@ -108,143 +122,137 @@ def plot(
     plt.legend()
     plt.savefig(out_filename, bbox_inches="tight", pad_inches=0.025)
     plt.close()
-    sys.stderr.write("Wrote {}\n".format(out_filename))
+    sys.stderr.write(f"Wrote {out_filename}\n")
 
 
 def bench_name(prog):
+    """Return a reasonable base name for a benchmark row."""
+
     name = os.path.basename(prog)
     if name.startswith("bench_"):
         name = name[6:]
     if name.endswith("_rtree"):
         name = name[0:-6]
 
-    # print("{} => {}".format(prog, name))
     return name
 
 
-def tsv_path(prog, insert, split):
-    # print("tsv path {} {} {} => {}".format(prog, insert, split, os.path.join(options.dir,
-    #                     "{}_insert_{}_split_{}.tsv".format(
-    #                         bench_name(prog), insert, split))))
+def tsv_path(options, prog, insert, split):
+    """Return the path of the TSV file for a given benchmark run."""
 
     return os.path.join(
         options.dir,
-        "{}_insert_{}_split_{}.tsv".format(bench_name(prog), insert, split),
+        f"{bench_name(prog)}_insert_{insert}_split_{split}.tsv".format(),
     )
 
 
 def run(script_opts, bench_opts, insert, split):
-    "Run one benchmark and return the path to the output file"
+    """Run one benchmark and return the path to the output file."""
+
     for prog in script_opts.program:
-        out_path = tsv_path(prog, insert, split)
-        with open(out_path, "w") as out:
+        out_path = tsv_path(script_opts, prog, insert, split)
+        with open(out_path, "w", encoding="utf-8") as out:
             alg_opts = ["--insert", insert, "--split", split]
             subprocess.check_call([prog] + bench_opts + alg_opts, stdout=out)
 
-        sys.stderr.write("Wrote {}\n".format(out_path))
+        sys.stderr.write(f"Wrote {out_path}\n")
 
 
-if __name__ == "__main__":
-    opt = optparse.OptionParser(
-        usage="%prog [OPTION]...", description="Benchmark R-tree variants\n"
+def main(argv):
+    """Run the command-line utility."""
+
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [OPTION]...",
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    opt.add_option(
-        "--dir", type="string", default=".", help="path to output directory"
-    )
-    opt.add_option(
+    parser.add_argument("--dir", default=".", help="path to output directory")
+    parser.add_argument(
         "--no-error", action="store_true", help="do not show error bars"
     )
-    opt.add_option(
+    parser.add_argument(
         "--no-run", action="store_true", help="do not run benchmarks"
     )
-    opt.add_option(
+    parser.add_argument(
         "--no-plot", action="store_true", help="do not plot benchmarks"
     )
-    opt.add_option(
+    parser.add_argument(
         "--page-size",
-        type="int",
+        type=int,
         default=512,
         help="page size for directory nodes",
     )
-    opt.add_option(
+    parser.add_argument(
         "--inline", action="store_true", help="inline data nodes in parents"
     )
-    opt.add_option(
+    parser.add_argument(
         "--program",
-        type="string",
         default=["test/benchmark/bench_spaix_rtree"],
         action="append",
         help="path to benchmarking program",
     )
-    opt.add_option(
-        "--queries", type="int", default=32, help="number of queries per step"
+    parser.add_argument(
+        "--queries", type=int, default=32, help="number of queries per step"
     )
-    opt.add_option(
-        "--seed", type="int", default=5489, help="random number generator seed"
+    parser.add_argument(
+        "--seed", type=int, default=5489, help="random number generator seed"
     )
-    opt.add_option(
+    parser.add_argument(
         "--size",
-        type="int",
+        type=int,
         default=1000000,
         help="maximum number of elements",
     )
-    opt.add_option(
-        "--span", type="float", default=10000000.0, help="dimension span"
+    parser.add_argument(
+        "--span", type=float, default=10000000.0, help="dimension span"
     )
-    opt.add_option(
-        "--steps", type="int", default=10, help="number of benchmarking steps"
+    parser.add_argument(
+        "--steps", type=int, default=10, help="number of benchmarking steps"
     )
 
-    (options, args) = opt.parse_args()
-    if len(args):
-        opt.print_usage()
-        sys.exit(1)
-
-    if len(options.program) > 1:
-        options.program = options.program[1:]  # Remove default
+    args = parser.parse_args(argv[1:])
+    if len(args.program) > 1:
+        args.program = args.program[1:]  # Remove default
 
     bench_opts = [
         "--page-size",
-        str(options.page_size),
+        str(args.page_size),
         "--placement",
-        "inline" if options.inline else "separate",
+        "inline" if args.inline else "separate",
         "--queries",
-        str(options.queries),
+        str(args.queries),
         "--seed",
-        str(options.seed),
+        str(args.seed),
         "--size",
-        str(options.size),
+        str(args.size),
         "--span",
-        str(options.span),
+        str(args.span),
         "--steps",
-        str(options.steps),
+        str(args.steps),
     ]
 
-    if not options.no_run:
+    if not args.no_run:
         for insert in ["linear"]:
             for split in ["linear", "quadratic"]:
-                run(options, bench_opts, insert, split)
+                run(args, bench_opts, insert, split)
 
-    def mathify(name):
-        return name  # "$m$" if name == "linear" else "$m^2$"
-
-    if not options.no_plot:
+    if not args.no_plot:
         sources = []
         for insert in ["linear"]:
             for split in ["linear", "quadratic"]:
-                for prog in options.program:
-                    path = tsv_path(prog, insert, split)
+                for prog in args.program:
+                    path = tsv_path(args, prog, insert, split)
                     if os.path.exists(path) and os.path.getsize(path) > 0:
-                        label = "{} {}".format(bench_name(prog), split)
-                        sources += [DataSource(path, label)]
+                        label = f"{bench_name(prog)} {split}"
+                        sources += [read_tsv(path, label)]
 
         def max_value(cols):
-            """Return the maximum value in the given column in all sources"""
+            """Return the maximum value in the given column in all sources."""
             result = 0.0
             for source in sources:
                 for col in cols:
-                    if options.no_error or col.endswith("_max"):
+                    if args.no_error or col.endswith("_max"):
                         result = max(result, source.data[col].max())
                     else:
                         result = max(result, source.data[col + "_max"].max())
@@ -253,60 +261,46 @@ if __name__ == "__main__":
 
         plot(
             sources,
-            os.path.join(options.dir, "insert.svg"),
-            "n",
-            "Size",
-            "t_ins",
-            "Insert time (s)",
-            not options.no_error,
-            max_value(["t_ins"]),
+            os.path.join(args.dir, "insert.svg"),
+            PlotColumn("n", "Size"),
+            PlotColumn("t_ins", "Insert time (s)"),
+            PlotScale(not args.no_error, max_value(["t_ins"]), None),
         )
 
         plot(
             sources,
-            os.path.join(options.dir, "throughput.svg"),
-            "n",
-            "Size",
-            "n",
-            "Insert throughput (/s)",
-            False,
-            y_divisor_col="elapsed",
+            os.path.join(args.dir, "throughput.svg"),
+            PlotColumn("n", "Size"),
+            PlotColumn("n", "Insert throughput (/s)"),
+            PlotScale(False, None, "elapsed"),
         )
 
         plot(
             sources,
-            os.path.join(options.dir, "iter.svg"),
-            "n",
-            "Size",
-            "t_iter",
-            "Range query time (s)",
-            not options.no_error,
+            os.path.join(args.dir, "iter.svg"),
+            PlotColumn("n", "Size"),
+            PlotColumn("t_iter", "Range query time (s)"),
+            PlotScale(not args.no_error, None, None),
         )
 
         plot(
             sources,
-            os.path.join(options.dir, "q_dirs.svg"),
-            "n",
-            "Size",
-            "q_dirs",
-            "Directory nodes searched",
-            not options.no_error,
-            max_value(["q_dirs_max"]),
+            os.path.join(args.dir, "q_dirs.svg"),
+            PlotColumn("n", "Size"),
+            PlotColumn("q_dirs", "Directory nodes searched"),
+            PlotScale(not args.no_error, max_value(["q_dirs_max"]), None),
         )
 
         plot(
             sources,
-            os.path.join(options.dir, "q_dats.svg"),
-            "n",
-            "Size",
-            "q_dats",
-            "Leaf nodes searched",
-            not options.no_error,
-            max_value(["q_dats_max"]),
+            os.path.join(args.dir, "q_dats.svg"),
+            PlotColumn("n", "Size"),
+            PlotColumn("q_dats", "Leaf nodes searched"),
+            PlotScale(not args.no_error, max_value(["q_dats_max"]), None),
         )
 
-        html_path = os.path.join(options.dir, "benchmarks.html")
-        with open(html_path, "w") as html:
+        html_path = os.path.join(args.dir, "benchmarks.html")
+        with open(html_path, "w", encoding="utf-8") as html:
             html.write(
                 """<!DOCTYPE html>
 <html lang="en">
@@ -322,4 +316,10 @@ if __name__ == "__main__":
 </html>
 """
             )
-            sys.stderr.write("Wrote {}\n".format(html_path))
+            sys.stderr.write(f"Wrote {html_path}\n")
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
