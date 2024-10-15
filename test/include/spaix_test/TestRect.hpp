@@ -27,6 +27,7 @@ operator""_xc(const unsigned long long value)
   return XCoord{static_cast<int>(value)};
 }
 
+// NOLINTNEXTLINE(google-runtime-int])
 constexpr YCoord
 operator""_yc(const long double value)
 {

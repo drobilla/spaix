@@ -148,9 +148,6 @@ public:
   template<typename DirVisitor, typename DatVisitor>
   void visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const;
 
-  template<typename DirVisitor>
-  void visit(DirVisitor&& visit_dir) const;
-
   using EndIterator = DataIterator<const DirNode, const DatNode, max_height()>;
 
   [[nodiscard]] const_iterator begin() const { return {_root, {}}; }

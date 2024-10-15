@@ -264,20 +264,6 @@ RTree<B, K, D, C>::visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const
                           path);
 }
 
-template<class B, class K, class D, class C>
-template<typename DirVisitor>
-void
-RTree<B, K, D, C>::visit(DirVisitor&& visit_dir) const
-{
-  NodePath path;
-  path.emplace_back(ChildIndex{});
-  detail::visit_dir_entry(
-    _root,
-    std::forward<DirVisitor>(visit_dir),
-    [](auto, auto, auto) { return VisitStatus::proceed; },
-    path);
-}
-
 } // namespace spaix
 
 #endif // SPAIX_RTREE_IPP

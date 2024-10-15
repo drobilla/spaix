@@ -138,31 +138,28 @@ test_visit(const Tree& tree)
 
   std::vector<NodePath> top_paths;
 
-  // Check that structure visitation ends when visitors return false
-  tree.visit([&](const NodePath& path, const DirKey&, const size_t) {
-    CHECK(path.size() <= 2);
-    top_paths.emplace_back(path);
-    return path.size() < 2 ? spaix::VisitStatus::proceed
-                           : spaix::VisitStatus::finish;
-  });
+  // Check that visitation can be stopped at directories
+  tree.visit(
+    [&](const NodePath& path, const DirKey&, const size_t) {
+      CHECK(path.size() <= 2);
+      top_paths.emplace_back(path);
+      return path.size() < 2 ? spaix::VisitStatus::proceed
+                             : spaix::VisitStatus::finish;
+    },
+    [&](const NodePath&, const typename Tree::Key&, const Data&) {
+      return spaix::VisitStatus::proceed;
+    });
 
   for (const auto& path : top_paths) {
     CHECK(path.size() <= 2);
   }
 
-  // Visit every directory
-  size_t n_dirs = 0;
-  tree.visit([&](const NodePath&, const DirKey&, const size_t) {
-    ++n_dirs;
-    return spaix::VisitStatus::proceed;
-  });
-
-  CHECK(n_dirs >= top_paths.size());
-
-  // Visit every leaf
+  // Check that visitation can be stopped at leaves
+  size_t n_dirs   = 0;
   size_t n_leaves = 0;
   tree.visit(
     [&](const NodePath&, const DirKey&, const size_t) {
+      ++n_dirs;
       return spaix::VisitStatus::proceed;
     },
     [&](const NodePath&, const typename Tree::Key&, const Data&) {
@@ -170,6 +167,7 @@ test_visit(const Tree& tree)
                                              : spaix::VisitStatus::proceed;
     });
 
+  CHECK(n_dirs >= top_paths.size());
   CHECK(n_leaves == tree.size() / 2);
 }
 
