@@ -43,8 +43,8 @@ RTree<B, K, D, C>::insert(const Key& key, const Data& data)
 
 template<class B, class K, class D, class C>
 template<class S>
-[[nodiscard]] TreeRange<typename RTree<B, K, D, C>::template ConstSearcher<S>>
-RTree<B, K, D, C>::query(S search) const
+auto
+RTree<B, K, D, C>::query(S search) const -> TreeRange<ConstSearcher<S>>
 {
   if (empty()) {
     return {{{Box{}, nullptr}, search}, {{Box{}, nullptr}, search}};
@@ -60,8 +60,8 @@ RTree<B, K, D, C>::query(S search) const
 
 template<class B, class K, class D, class C>
 template<class Children>
-typename RTree<B, K, D, C>::Box
-RTree<B, K, D, C>::parent_key(const Children& children)
+auto
+RTree<B, K, D, C>::parent_key(const Children& children) -> Box
 {
   return std::accumulate(
     children.begin(),
@@ -71,8 +71,8 @@ RTree<B, K, D, C>::parent_key(const Children& children)
 }
 
 template<class B, class K, class D, class C>
-typename RTree<B, K, D, C>::Box
-RTree<B, K, D, C>::ideal_key(const DirNode& node)
+auto
+RTree<B, K, D, C>::ideal_key(const DirNode& node) -> Box
 {
   if (node.child_type() == NodeType::directory) {
     return parent_key(node.dir_children());
@@ -82,11 +82,11 @@ RTree<B, K, D, C>::ideal_key(const DirNode& node)
 }
 
 template<class B, class K, class D, class C>
-typename RTree<B, K, D, C>::DirNodePair
+auto
 RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
                               const Box&  new_parent_key,
                               const Key&  key,
-                              const Data& data)
+                              const Data& data) -> DirNodePair
 {
   auto& parent = *parent_entry.node;
   if (parent.child_type() == NodeType::directory) { // Recursing downwards
@@ -148,10 +148,10 @@ RTree<B, K, D, C>::fast_query_rec(const DirNode&   node,
 /// Create a new parent seeded with a child
 template<class B, class K, class D, class C>
 template<class Entry, ChildCount count>
-typename RTree<B, K, D, C>::DirEntry
+auto
 RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                               ChildIndex                              index,
-                              NodeType child_type)
+                              NodeType child_type) -> DirEntry
 {
   auto* const iter{deposit.begin() + index};
   const Box   key{entry_key(*iter)};
@@ -166,10 +166,10 @@ RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
 /// Split `nodes` plus `node` in two and return the resulting sides
 template<class B, class K, class D, class C>
 template<class Entry, ChildCount fanout>
-typename RTree<B, K, D, C>::DirNodePair
+auto
 RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                          Entry                                    entry,
-                         const NodeType                           type)
+                         const NodeType type) -> DirNodePair
 {
   constexpr auto max_fanout =
     fanout - (fanout * Conf::MinFillRatio::num / Conf::MinFillRatio::den);

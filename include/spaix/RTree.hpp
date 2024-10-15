@@ -111,7 +111,7 @@ public:
      @endcode
   */
   template<class S>
-  TreeRange<ConstSearcher<S>> query(S search) const;
+  [[nodiscard]] TreeRange<ConstSearcher<S>> query(S search) const;
 
   template<class Predicate, class Visitor>
   void fast_query(const Predicate& predicate, const Visitor& visitor) const
