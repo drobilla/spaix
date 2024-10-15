@@ -1,10 +1,9 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_RTREE_HPP
 #define SPAIX_RTREE_HPP
 
-#include "spaix/DataIterator.hpp"
 #include "spaix/DataNode.hpp"
 #include "spaix/Iterator.hpp"
 #include "spaix/StaticVector.hpp" // IWYU pragma: export
@@ -76,22 +75,18 @@ public:
   using value_type  = DataNode<K, D>;
   using node_type   = DatNode;
 
-  using NodePath = StaticVector<ChildIndex, ChildCount, max_height()>;
+  using NodePath     = StaticVector<ChildIndex, ChildCount, max_height()>;
+  using end_iterator = typename iterator::Base;
 
-  RTree() = default;
+  RTree(Insertion insertion, Split split);
 
-  RTree(Insertion insertion, Split split)
-    : _insertion{std::move(insertion)}
-    , _split{std::move(split)}
-  {}
+  RTree()  = default;
+  ~RTree() = default;
 
-  RTree(const RTree&)            = delete;
-  RTree& operator=(const RTree&) = delete;
-
+  RTree(const RTree&)                = delete;
+  RTree& operator=(const RTree&)     = delete;
   RTree(RTree&&) noexcept            = default;
   RTree& operator=(RTree&&) noexcept = default;
-
-  ~RTree() = default;
 
   /// Insert a new item with the given `key` and `data`
   void insert(const Key& key, const Data& data);
@@ -113,13 +108,9 @@ public:
   template<class S>
   [[nodiscard]] TreeRange<ConstSearcher<S>> query(S search) const;
 
+  /// Visit every entry in the tree that matches a predicate
   template<class Predicate, class Visitor>
-  void fast_query(const Predicate& predicate, const Visitor& visitor) const
-  {
-    if (_root.node && predicate.directory(_root.key)) {
-      fast_query_rec(*_root.node, predicate, visitor);
-    }
-  }
+  void fast_query(const Predicate& predicate, const Visitor& visitor) const;
 
   /// Remove all items from the tree
   void clear() { _root = {Box{}, nullptr}; }
@@ -148,12 +139,10 @@ public:
   template<typename DirVisitor, typename DatVisitor>
   void visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const;
 
-  using EndIterator = DataIterator<const DirNode, const DatNode, max_height()>;
-
   [[nodiscard]] const_iterator begin() const { return {_root, {}}; }
-  [[nodiscard]] EndIterator    end() const { return EndIterator::make_end(); }
+  [[nodiscard]] end_iterator   end() const { return iterator::make_end(); }
   [[nodiscard]] const_iterator cbegin() const { return begin(); }
-  [[nodiscard]] EndIterator    cend() const { return EndIterator::make_end(); }
+  [[nodiscard]] end_iterator   cend() const { return iterator::make_end(); }
   [[nodiscard]] iterator       begin() { return {_root, {}}; }
 
 private:

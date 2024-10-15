@@ -19,6 +19,12 @@
 namespace spaix {
 
 template<class B, class K, class D, class C>
+RTree<B, K, D, C>::RTree(Insertion insertion, Split split)
+  : _insertion{std::move(insertion)}
+  , _split{std::move(split)}
+{}
+
+template<class B, class K, class D, class C>
 void
 RTree<B, K, D, C>::insert(const Key& key, const Data& data)
 {
@@ -121,6 +127,17 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
   }
 
   return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
+}
+
+template<class B, class K, class D, class C>
+template<class Predicate, class Visitor>
+void
+RTree<B, K, D, C>::fast_query(const Predicate& predicate,
+                              const Visitor&   visitor) const
+{
+  if (_root.node && predicate.directory(_root.key)) {
+    fast_query_rec(*_root.node, predicate, visitor);
+  }
 }
 
 template<class B, class K, class D, class C>
