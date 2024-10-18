@@ -1,4 +1,4 @@
-# Copyright 2021-2022 David Robillard <d@drobilla.net>
+# Copyright 2021-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 default:
@@ -49,6 +49,14 @@ fedora:
 
 # Linux Platforms
 
+arm32:
+  image: lv2plugin/debian-arm32
+  script:
+    - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true
+    - ninja -C build test
+    - meson configure -Dbuildtype=release build
+    - ninja -C build test
+
 arm64:
   image: lv2plugin/debian-arm64
   script:
@@ -56,6 +64,24 @@ arm64:
     - ninja -C build test
     - meson configure -Dbuildtype=release build
     - ninja -C build test
+
+x32:
+  image: lv2plugin/debian-x32
+  script:
+    - meson setup build --cross-file=/usr/share/meson/cross/i686-linux-gnu.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true
+    - ninja -C build test
+    - meson configure -Dbuildtype=release build
+    - ninja -C build test
+
+mingw32:
+  image: lv2plugin/debian-mingw32
+  script:
+    - meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dc_args="-static-libgcc" -Dc_link_args="-static-libgcc" -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true
+    - ninja -C build test
+    - meson configure -Dbuildtype=release build
+    - ninja -C build test
+  variables:
+    WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
 
 mingw64:
   image: lv2plugin/debian-mingw64

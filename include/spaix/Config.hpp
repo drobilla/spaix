@@ -5,14 +5,18 @@
 #define SPAIX_CONFIG_HPP
 
 #include "spaix/DataNode.hpp"
-#include "spaix/DataPlacement.hpp"
+#include "spaix/detail/DatEntryType.hpp"
+#include "spaix/detail/NodePointerEntry.hpp"
 #include "spaix/types.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <limits>
 #include <ratio>
 
 namespace spaix {
+
+enum class DataPlacement : unsigned char;
 
 using DefaultMinFillRatio = std::ratio<3, 10>;
 
@@ -64,18 +68,20 @@ template<class B,
 struct PageStructure {
   static constexpr auto placement = data_placement;
 
-  static constexpr auto dir_entry_size = sizeof(B) + sizeof(void*);
-  static constexpr auto dat_entry_size = placement == DataPlacement::inlined
-                                           ? sizeof(DataNode<K, D>)
-                                           : sizeof(void*);
+  using DatEntry = typename DatEntryType<DataNode<K, D>, placement>::Type;
 
-  static constexpr auto overhead    = sizeof(NodeType) + sizeof(ChildCount);
+  static constexpr auto dir_entry_size = sizeof(NodePointerEntry<B, void>);
+  static constexpr auto dat_entry_size = sizeof(DatEntry);
+  static constexpr auto max_entry_size =
+    std::max(dir_entry_size, dat_entry_size);
+
+  static constexpr auto overhead    = 3 * sizeof(size_t);
   static constexpr auto entry_space = page_size - overhead;
   static constexpr auto dir_fanout  = entry_space / dir_entry_size;
   static constexpr auto dat_fanout  = entry_space / dat_entry_size;
 
   // Bounds used for static assertions
-  static constexpr auto min_dir_node_size = page_size - dir_entry_size;
+  static constexpr auto min_dir_node_size = page_size - max_entry_size;
   static constexpr auto max_dir_node_size = page_size;
 };
 

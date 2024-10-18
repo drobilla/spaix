@@ -4,8 +4,9 @@
 #ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
 #define SPAIX_DETAIL_DIRECTORYNODE_HPP
 
-#include "spaix/DataPlacement.hpp"
 #include "spaix/StaticVector.hpp"
+#include "spaix/detail/DatEntryType.hpp"
+#include "spaix/detail/NodePointerEntry.hpp"
 #include "spaix/types.hpp"
 
 #include <cassert>
@@ -17,41 +18,6 @@ namespace spaix {
 
 template<class Key, class Data>
 struct DataNode;
-
-template<class ChildKey, class ChildNode>
-struct NodePointerEntry {
-  using Key  = ChildKey;
-  using Node = ChildNode;
-
-  Key                   key{};
-  std::unique_ptr<Node> node{};
-};
-
-template<class DatNode, DataPlacement placement>
-struct DatEntryType;
-
-template<class DatNode>
-struct DatEntryType<DatNode, DataPlacement::inlined> {
-  using Type = DatNode;
-
-  template<class Key, class Data>
-  static Type make(Key key, Data data)
-  {
-    return DatNode{std::move(key), std::move(data)};
-  }
-};
-
-template<class DatNode>
-struct DatEntryType<DatNode, DataPlacement::separate> {
-  using Type = std::unique_ptr<DatNode>;
-
-  template<class Key, class Data>
-  static Type make(Key key, Data data)
-  {
-    return std::unique_ptr<DatNode>(
-      new DatNode{std::move(key), std::move(data)});
-  }
-};
 
 template<class Box, class DatNode, class Structure>
 struct DirectoryNode {
