@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "spaix_test/check.hpp"
@@ -229,17 +229,12 @@ test_tree(const unsigned span, const unsigned n_queries)
   }
   CHECK(n_nodes == tree.size());
 
-  unsigned count = 0;
-
   // Test a query that is in the tree bounds, but has no matches
   const auto mid = static_cast<float>(span) / 2.0f;
   const auto no_matches_query =
     Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
-  for (const auto& node : tree.query(spaix::search::within(no_matches_query))) {
-    ++count;
-    (void)node;
-  }
-  CHECK((count == 0));
+  auto no_results = tree.query(spaix::search::within(no_matches_query));
+  CHECK(!std::distance(no_results.begin(), no_results.end()));
 
   for (auto i = 0U; i < n_queries; ++i) {
     const auto x0     = dist(rng);
@@ -258,6 +253,7 @@ test_tree(const unsigned span, const unsigned n_queries)
            {static_cast<Scalar>(y_low), static_cast<Scalar>(y_high)}};
 
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
+    auto       count          = 0U;
 
     const auto verify = [&](const auto& node) {
       CHECK((spaix::range<0>(node.key).lower >= static_cast<float>(x_low)));
@@ -269,7 +265,6 @@ test_tree(const unsigned span, const unsigned n_queries)
     };
 
     // Fast visitor query
-    count = 0;
     tree.fast_query(spaix::search::within(query), verify);
     CHECK((count == expected_count));
 

@@ -56,6 +56,10 @@ test_rect()
   STATIC_CHECK((span<0>(rect) == 2));
   STATIC_CHECK((span<1>(rect) == 3.0f));
 
+  // Empty ranges
+  STATIC_CHECK(
+    (span<0>(make_rect(XRange{2_xc, 1_xc}, YRange{1.0_yc, 2.0_yc})) == 0));
+
   // Printing
   std::ostringstream ss;
   ss << make_rect(make_dim_range(1, 2), make_dim_range(3, 4));

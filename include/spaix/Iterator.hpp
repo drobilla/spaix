@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_ITERATOR_HPP
@@ -79,25 +79,21 @@ private:
   static ChildIndex leftmost_child(const DirNode&   dir,
                                    const Predicate& predicate)
   {
-    switch (dir.child_type()) {
-    case NodeType::directory:
+    if (dir.child_type() == NodeType::directory) {
       for (ChildIndex i = 0U; i < dir.dir_children().size(); ++i) {
         if (predicate.directory(dir.dir_children()[i].key)) {
           return i;
         }
       }
       return dir.dir_children().size();
-
-    case NodeType::data:
-      for (ChildIndex i = 0U; i < dir.dat_children().size(); ++i) {
-        if (predicate.leaf(entry_key(dir.dat_children()[i]))) {
-          return i;
-        }
-      }
-      return dir.dat_children().size();
     }
 
-    return 0; // Unreached
+    for (ChildIndex i = 0U; i < dir.dat_children().size(); ++i) {
+      if (predicate.leaf(entry_key(dir.dat_children()[i]))) {
+        return i;
+      }
+    }
+    return dir.dat_children().size();
   }
 
   /// Move right until we reach a good leaf or the end of the parent

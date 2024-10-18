@@ -1,23 +1,22 @@
-# Copyright 2019-2022 David Robillard <d@drobilla.net>
+# Copyright 2019-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 tests = [
-  'test_Point',
-  'test_RTree',
-  'test_Rect',
-  'test_contains',
-  'test_expansion',
-  'test_intersects',
-  'test_union',
-  'test_volume',
+  'Point',
+  'Rect',
+  'contains',
+  'expansion',
+  'intersects',
+  'union',
+  'volume',
 ]
 
 foreach test : tests
   test(
     test,
     executable(
-      test,
-      test + '.cpp',
+      'test_@0@'.format(test),
+      'test_@0@.cpp'.format(test),
       cpp_args: cpp_suppressions,
       dependencies: [spaix_dep, spaix_test_dep],
     ),
@@ -25,3 +24,18 @@ foreach test : tests
   )
 endforeach
 
+test_RTree = executable(
+  'test_RTree',
+  'test_RTree.cpp',
+  cpp_args: cpp_suppressions,
+  dependencies: [spaix_dep, spaix_test_dep],
+)
+
+test('RTree', test_RTree, suite: 'unit')
+test(
+  'bad_args',
+  test_RTree,
+  args: ['--unknown'],
+  should_fail: true,
+  suite: 'unit',
+)
