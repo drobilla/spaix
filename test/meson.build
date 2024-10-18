@@ -36,7 +36,12 @@ if get_option('lint')
     )
 
     if plot_py.found()
-      test('pylint', pylint, args: files('../scripts/benchmark.py'), suite: 'scripts')
+      test(
+        'pylint',
+        pylint,
+        args: files('../scripts/benchmark.py'),
+        suite: 'scripts',
+      )
     endif
   endif
 endif
