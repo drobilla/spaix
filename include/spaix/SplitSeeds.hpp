@@ -4,7 +4,7 @@
 #ifndef SPAIX_SPLITSEEDS_HPP
 #define SPAIX_SPLITSEEDS_HPP
 
-#include "spaix/types.hpp"
+#include <spaix/types.hpp>
 
 namespace spaix {
 

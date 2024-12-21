@@ -4,9 +4,9 @@
 #ifndef SPAIX_EXPANSION_HPP
 #define SPAIX_EXPANSION_HPP
 
-#include "spaix/Point.hpp"
-#include "spaix/Rect.hpp"
-#include "spaix/detail/meta.hpp"
+#include <spaix/Point.hpp>
+#include <spaix/Rect.hpp>
+#include <spaix/detail/meta.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -1,12 +1,12 @@
 // Copyright 2013-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "spaix_test/BenchParameters.hpp"
-#include "spaix_test/Distribution.hpp"
-#include "spaix_test/options.hpp"
-#include "spaix_test/write_row.hpp"
+#include <spaix_test/BenchParameters.hpp>
+#include <spaix_test/Distribution.hpp>
+#include <spaix_test/options.hpp>
+#include <spaix_test/write_row.hpp>
 
-#include "spaix/types.hpp"
+#include <spaix/types.hpp>
 
 #ifdef __clang__
 _Pragma("clang diagnostic push")

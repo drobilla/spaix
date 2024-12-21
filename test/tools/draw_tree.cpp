@@ -4,16 +4,16 @@
 #include "draw_dot.hpp"
 #include "draw_svg.hpp"
 
-#include "spaix_test/options.hpp"
+#include <spaix_test/options.hpp>
 
-#include "spaix/Config.hpp"
-#include "spaix/DataPlacement.hpp"
-#include "spaix/LinearInsertion.hpp" // IWYU pragma: keep
-#include "spaix/LinearSplit.hpp"     // IWYU pragma: keep
-#include "spaix/Point.hpp"
-#include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
-#include "spaix/RTree.hpp"
-#include "spaix/Rect.hpp"
+#include <spaix/Config.hpp>
+#include <spaix/DataPlacement.hpp>
+#include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
+#include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
+#include <spaix/Point.hpp>
+#include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
+#include <spaix/RTree.hpp>
+#include <spaix/Rect.hpp>
 
 #include <cmath>
 #include <cstdint>

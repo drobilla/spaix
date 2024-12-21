@@ -3,11 +3,11 @@
 
 #undef NDEBUG
 
-#include "spaix_test/TestRect.hpp"
-#include "spaix_test/check.hpp"
+#include <spaix_test/TestRect.hpp>
+#include <spaix_test/check.hpp>
 
-#include "spaix/Point.hpp"
-#include "spaix/types.hpp"
+#include <spaix/Point.hpp>
+#include <spaix/types.hpp>
 
 #include <sstream>
 #include <string>

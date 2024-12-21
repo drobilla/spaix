@@ -4,9 +4,9 @@
 #ifndef SPAIX_DATAITERATOR_HPP
 #define SPAIX_DATAITERATOR_HPP
 
-#include "spaix/StaticVector.hpp"
-#include "spaix/detail/DirectoryNode.hpp"
-#include "spaix/types.hpp"
+#include <spaix/StaticVector.hpp>
+#include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/types.hpp>
 
 #include <cassert>
 #include <cstddef>

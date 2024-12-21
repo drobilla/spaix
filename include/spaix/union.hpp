@@ -4,10 +4,10 @@
 #ifndef SPAIX_UNION_HPP
 #define SPAIX_UNION_HPP
 
-#include "spaix/Point.hpp"
-#include "spaix/Rect.hpp"
-#include "spaix/detail/meta.hpp"
-#include "spaix/types.hpp"
+#include <spaix/Point.hpp>
+#include <spaix/Rect.hpp>
+#include <spaix/detail/meta.hpp>
+#include <spaix/types.hpp>
 
 #include <algorithm>
 #include <cstddef>

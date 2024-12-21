@@ -4,11 +4,11 @@
 #ifndef SPAIX_TEST_TESTRECT_HPP
 #define SPAIX_TEST_TESTRECT_HPP
 
-#include "Scalar.hpp" // IWYU pragma: export
+#include <spaix_test/Scalar.hpp>
 
-#include "spaix/Point.hpp"
-#include "spaix/Rect.hpp"
-#include "spaix/types.hpp"
+#include <spaix/Point.hpp>
+#include <spaix/Rect.hpp>
+#include <spaix/types.hpp>
 
 namespace spaix::test {
 

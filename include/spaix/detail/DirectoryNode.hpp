@@ -4,10 +4,10 @@
 #ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
 #define SPAIX_DETAIL_DIRECTORYNODE_HPP
 
-#include "spaix/StaticVector.hpp"
-#include "spaix/detail/DatEntryType.hpp"
-#include "spaix/detail/NodePointerEntry.hpp"
-#include "spaix/types.hpp"
+#include <spaix/StaticVector.hpp>
+#include <spaix/detail/DatEntryType.hpp>
+#include <spaix/detail/NodePointerEntry.hpp>
+#include <spaix/types.hpp>
 
 #include <cassert>
 #include <memory>

@@ -4,8 +4,8 @@
 #ifndef SPAIX_DRAW_DOT_HPP
 #define SPAIX_DRAW_DOT_HPP
 
-#include "spaix/RTree.hpp"
-#include "spaix/types.hpp"
+#include <spaix/RTree.hpp>
+#include <spaix/types.hpp>
 
 #include <cstddef>
 #include <sstream>

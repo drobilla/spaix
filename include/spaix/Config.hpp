@@ -4,10 +4,10 @@
 #ifndef SPAIX_CONFIG_HPP
 #define SPAIX_CONFIG_HPP
 
-#include "spaix/DataNode.hpp"
-#include "spaix/detail/DatEntryType.hpp"
-#include "spaix/detail/NodePointerEntry.hpp"
-#include "spaix/types.hpp"
+#include <spaix/DataNode.hpp>
+#include <spaix/detail/DatEntryType.hpp>
+#include <spaix/detail/NodePointerEntry.hpp>
+#include <spaix/types.hpp>
 
 #include <algorithm>
 #include <cstddef>

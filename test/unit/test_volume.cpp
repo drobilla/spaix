@@ -3,10 +3,10 @@
 
 #undef NDEBUG
 
-#include "spaix_test/TestRect.hpp"
-#include "spaix_test/check.hpp"
+#include <spaix_test/TestRect.hpp>
+#include <spaix_test/check.hpp>
 
-#include "spaix/volume.hpp"
+#include <spaix/volume.hpp>
 
 namespace spaix::test {
 namespace {

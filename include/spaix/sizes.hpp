@@ -4,8 +4,8 @@
 #ifndef SPAIX_SIZES_HPP
 #define SPAIX_SIZES_HPP
 
-#include "spaix/DataPlacement.hpp"
-#include "spaix/types.hpp"
+#include <spaix/DataPlacement.hpp>
+#include <spaix/types.hpp>
 
 #include <cstddef>
 #include <limits>

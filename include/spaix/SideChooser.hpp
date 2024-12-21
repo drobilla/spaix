@@ -4,9 +4,9 @@
 #ifndef SPAIX_SIDECHOOSER_HPP
 #define SPAIX_SIDECHOOSER_HPP
 
-#include "spaix/expansion.hpp"
-#include "spaix/types.hpp"
-#include "spaix/volume.hpp"
+#include <spaix/expansion.hpp>
+#include <spaix/types.hpp>
+#include <spaix/volume.hpp>
 
 #include <utility>
 

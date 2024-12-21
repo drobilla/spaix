@@ -4,8 +4,8 @@
 #ifndef SPAIX_POINT_HPP
 #define SPAIX_POINT_HPP
 
-#include "spaix/detail/meta.hpp"
-#include "spaix/types.hpp"
+#include <spaix/detail/meta.hpp>
+#include <spaix/types.hpp>
 
 #include <cstddef>
 #include <iosfwd>

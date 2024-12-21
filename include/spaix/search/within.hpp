@@ -4,8 +4,8 @@
 #ifndef SPAIX_SEARCH_WITHIN_HPP
 #define SPAIX_SEARCH_WITHIN_HPP
 
-#include "spaix/contains.hpp"
-#include "spaix/intersects.hpp"
+#include <spaix/contains.hpp>
+#include <spaix/intersects.hpp>
 
 #include <type_traits>
 #include <utility>

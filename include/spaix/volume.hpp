@@ -4,9 +4,9 @@
 #ifndef SPAIX_VOLUME_HPP
 #define SPAIX_VOLUME_HPP
 
-#include "spaix/Point.hpp"
-#include "spaix/Rect.hpp"
-#include "spaix/detail/meta.hpp"
+#include <spaix/Point.hpp>
+#include <spaix/Rect.hpp>
+#include <spaix/detail/meta.hpp>
 
 #include <cstddef>
 #include <utility>

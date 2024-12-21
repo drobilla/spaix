@@ -4,7 +4,7 @@
 #ifndef SPAIX_DETAIL_DATENTRYTYPE_HPP
 #define SPAIX_DETAIL_DATENTRYTYPE_HPP
 
-#include "spaix/DataPlacement.hpp"
+#include <spaix/DataPlacement.hpp>
 
 #include <memory>
 

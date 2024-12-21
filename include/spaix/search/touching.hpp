@@ -4,7 +4,7 @@
 #ifndef SPAIX_SEARCH_TOUCHING_HPP
 #define SPAIX_SEARCH_TOUCHING_HPP
 
-#include "spaix/intersects.hpp"
+#include <spaix/intersects.hpp>
 
 #include <type_traits>
 #include <utility>

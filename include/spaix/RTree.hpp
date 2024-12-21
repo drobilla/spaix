@@ -4,17 +4,19 @@
 #ifndef SPAIX_RTREE_HPP
 #define SPAIX_RTREE_HPP
 
-#include "spaix/DataNode.hpp"
-#include "spaix/Iterator.hpp"
-#include "spaix/StaticVector.hpp" // IWYU pragma: export
-#include "spaix/TreeRange.hpp"
-#include "spaix/detail/DirectoryNode.hpp" // IWYU pragma: export
-#include "spaix/search/everything.hpp"    // IWYU pragma: keep
-#include "spaix/sizes.hpp"
-#include "spaix/types.hpp"
+#include <spaix/DataNode.hpp>
+#include <spaix/Iterator.hpp>
+#include <spaix/StaticVector.hpp>
+#include <spaix/TreeRange.hpp>
+#include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/search/everything.hpp>
+#include <spaix/sizes.hpp>
+#include <spaix/types.hpp>
 
 #include <array>
 #include <cstddef>
+
+// IWYU pragma: no_include "spaix/RTree.ipp"
 
 namespace spaix {
 
@@ -187,6 +189,6 @@ private:
 
 } // namespace spaix
 
-#include "spaix/RTree.ipp" // IWYU pragma: export
+#include <spaix/RTree.ipp> // IWYU pragma: export
 
 #endif // SPAIX_RTREE_HPP

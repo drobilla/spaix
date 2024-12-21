@@ -1,19 +1,20 @@
 // Copyright 2013-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "spaix_test/check.hpp"
-#include "spaix_test/options.hpp"
+#include <spaix_test/check.hpp>
+#include <spaix_test/options.hpp>
 
-#include "spaix/Config.hpp"
-#include "spaix/DataPlacement.hpp"
-#include "spaix/LinearInsertion.hpp" // IWYU pragma: keep
-#include "spaix/LinearSplit.hpp"     // IWYU pragma: keep
-#include "spaix/Point.hpp"
-#include "spaix/QuadraticSplit.hpp" // IWYU pragma: keep
-#include "spaix/RTree.hpp"
-#include "spaix/Rect.hpp"
-#include "spaix/contains.hpp"
-#include "spaix/search/within.hpp"
+#include <spaix/Config.hpp>
+#include <spaix/DataPlacement.hpp>
+#include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
+#include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
+#include <spaix/Point.hpp>
+#include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
+#include <spaix/RTree.hpp>
+#include <spaix/Rect.hpp>
+#include <spaix/StaticVector.hpp>
+#include <spaix/contains.hpp>
+#include <spaix/search/within.hpp>
 
 #include <algorithm>
 #include <ctime>

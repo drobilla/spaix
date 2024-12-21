@@ -4,11 +4,11 @@
 #ifndef SPAIX_RTREE_IPP
 #define SPAIX_RTREE_IPP
 
-#include "spaix/StaticVector.hpp"
-#include "spaix/TreeRange.hpp"
-#include "spaix/detail/DirectoryNode.hpp"
-#include "spaix/types.hpp"
-#include "spaix/union.hpp" // IWYU pragma: keep
+#include <spaix/StaticVector.hpp>
+#include <spaix/TreeRange.hpp>
+#include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/types.hpp>
+#include <spaix/union.hpp>
 
 #include <algorithm>
 #include <cassert>
