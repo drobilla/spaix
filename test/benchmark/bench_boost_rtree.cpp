@@ -38,7 +38,9 @@ _Pragma("clang diagnostic ignored \"-Wzero-as-null-pointer-constant\"")
 #endif
 
 #include <boost/geometry.hpp>
+#include <boost/geometry/core/coordinate_dimension.hpp>
 #include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/index/rtree.hpp>
 
