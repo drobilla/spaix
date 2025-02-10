@@ -90,9 +90,9 @@ benchmark_queries(std::mt19937& rng,
 
   for (size_t i = 0; i < n_queries; ++i) {
     const auto x0 = dist(rng) * query_span;
-    const auto x1 = x0 + dist(rng) * query_span;
+    const auto x1 = x0 + (dist(rng) * query_span);
     const auto y0 = dist(rng) * query_span;
-    const auto y1 = y0 + dist(rng) * query_span;
+    const auto y1 = y0 + (dist(rng) * query_span);
 
     size_t n_results = 0U;
     Counts counts    = {0U, 0U};

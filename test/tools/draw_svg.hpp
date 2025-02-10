@@ -51,7 +51,7 @@ template<size_t axis, class Key, class DirKey>
 inline double
 coord(const Key& key, const DirKey& bounds, const double scale)
 {
-  return (range<axis>(key).lower - range<axis>(bounds).lower) * scale + pad;
+  return ((range<axis>(key).lower - range<axis>(bounds).lower) * scale) + pad;
 }
 
 template<class T>
