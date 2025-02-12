@@ -1,4 +1,4 @@
-# Copyright 2019-2024 David Robillard <d@drobilla.net>
+# Copyright 2019-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 project(
@@ -144,7 +144,7 @@ spaix_dep = declare_dependency(
   include_directories: include_directories('include'),
 )
 
-# Generage pkg-config file for external dependants
+# Generate pkg-config file for external dependants
 pkg.generate(
   name: 'Spaix',
   description: 'C++ spatial indexing library',
