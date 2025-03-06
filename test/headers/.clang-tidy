@@ -1,4 +1,4 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 Checks: >
@@ -9,7 +9,6 @@ Checks: >
   -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-type-union-access,
-  -cppcoreguidelines-rvalue-reference-param-not-moved,
   -fuchsia-overloaded-operator,
   -fuchsia-trailing-return,
   -llvmlibc-*,
@@ -19,9 +18,9 @@ Checks: >
   -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,
 CheckOptions:
-  - key:   readability-magic-numbers.IgnoreTypeAliases
-    value: true
   - key:   cppcoreguidelines-avoid-magic-numbers.IgnoreTypeAliases
+    value: true
+  - key:   readability-magic-numbers.IgnoreTypeAliases
     value: true
 FormatStyle: file
 HeaderFilterRegex: '.*\.[hi]pp$'
