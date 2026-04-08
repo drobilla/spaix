@@ -1,8 +1,9 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 Checks: >
   -*-magic-numbers,
+  -bugprone-std-namespace-modification,
   -bugprone-switch-missing-default-case,
   -cert-dcl58-cpp,
   -clang-diagnostic-unused-function,
@@ -11,6 +12,8 @@ Checks: >
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -fuchsia-default-arguments-calls,
+  -google-runtime-float,
+  -llvm-prefer-static-over-anonymous-namespace,
   -misc-non-private-member-variables-in-classes,
   -readability-implicit-bool-conversion,
 InheritParentConfig: true

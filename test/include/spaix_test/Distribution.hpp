@@ -24,7 +24,7 @@ public:
     } else {
       _min  = min(_min, x);
       _max  = max(_max, x);
-      _mean = _mean + (x - _mean) / T(_n + 1);
+      _mean = _mean + ((x - _mean) / T(_n + 1));
     }
 
     ++_n;

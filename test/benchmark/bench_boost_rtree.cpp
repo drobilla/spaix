@@ -239,7 +239,7 @@ run(const Parameters& params, const Args& args)
   static constexpr auto dir_fanout     = entry_space / dir_entry_size;
 
   constexpr auto max_fill = dir_fanout;
-  constexpr auto min_fill = std::max(size_t(1), max_fill / min_fill_divisor);
+  constexpr auto min_fill = std::max(size_t{1}, max_fill / min_fill_divisor);
 
   const auto split = args.at("split");
   if (split == "linear") {

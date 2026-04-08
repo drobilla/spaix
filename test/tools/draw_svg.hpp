@@ -31,7 +31,7 @@ color(const NodePath& path, const double alpha)
   std::array<uint32_t, 3U> components{};
   unsigned                 c = 0U;
   for (const ChildIndex index : path) {
-    components[c] += ((static_cast<uint32_t>(index) * u8max) / ((fanout - 1U)));
+    components[c] += ((static_cast<uint32_t>(index) * u8max) / (fanout - 1U));
     c = (c + 1) % 3;
   }
 
