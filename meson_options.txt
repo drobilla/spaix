@@ -1,37 +1,8 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
-option(
-  'benchmarks',
-  type: 'feature',
-  yield: true,
-  description: 'Build benchmarks',
-)
-
-option(
-  'boost',
-  type: 'feature',
-  description: 'Build boost benchmarking program',
-)
-
-option(
-  'lint',
-  type: 'boolean',
-  value: false,
-  yield: true,
-  description: 'Run code quality checks',
-)
-
-option(
-  'tests',
-  type: 'feature',
-  yield: true,
-  description: 'Build tests',
-)
-
-option(
-  'tools',
-  type: 'boolean',
-  yield: true,
-  description: 'Build command line tools',
-)
+option('benchmarks', type: 'feature', description: 'Build benchmarks')
+option('boost', type: 'feature', description: 'Build boost benchmark')
+option('lint', type: 'boolean', value: false, description: 'Test code quality')
+option('tests', type: 'feature', description: 'Build tests')
+option('tools', type: 'boolean', description: 'Build test command-line tools')
