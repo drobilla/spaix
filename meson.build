@@ -63,17 +63,19 @@ spaix_dep = declare_dependency(
 # Override pkg-config dependency for internal meson dependants
 meson.override_dependency(versioned_name, spaix_dep)
 
-# Generate pkg-config file for external dependants
-pkg.generate(
-  name: 'Spaix',
-  description: 'C++ spatial indexing library',
-  filebase: versioned_name,
-  subdirs: [versioned_name],
-  version: meson.project_version(),
-)
+if not get_option('install').disabled()
+  # Generate pkg-config file for external dependants
+  pkg.generate(
+    name: 'Spaix',
+    description: 'C++ spatial indexing library',
+    filebase: versioned_name,
+    subdirs: [versioned_name],
+    version: meson.project_version(),
+  )
 
-# Install headers to a versioned include directory
-install_headers(headers, subdir: versioned_name + '/spaix')
+  # Install headers to a versioned include directory
+  install_headers(headers, subdir: versioned_name + '/spaix')
+endif
 
 #########
 # Tests #
