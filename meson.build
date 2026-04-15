@@ -1,4 +1,4 @@
-# Copyright 2019-2025 David Robillard <d@drobilla.net>
+# Copyright 2019-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 project(
@@ -6,7 +6,7 @@ project(
   ['cpp'],
   version: '0.0.0',
   license: 'GPLv3+',
-  meson_version: '>= 0.52.0',
+  meson_version: '>= 0.54.0',
   default_options: [
     'b_ndebug=if-release',
     'buildtype=release',
@@ -143,6 +143,9 @@ headers = files(
 spaix_dep = declare_dependency(
   include_directories: include_directories('include'),
 )
+
+# Override pkg-config dependency for internal meson dependants
+meson.override_dependency(versioned_name, spaix_dep)
 
 # Generate pkg-config file for external dependants
 pkg.generate(
