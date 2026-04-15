@@ -1,5 +1,14 @@
-# Copyright 2019-2022 David Robillard <d@drobilla.net>
+# Copyright 2019-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
+
+boost_dep = disabler()
+if not get_option('boost').disabled()
+  boost_dep = dependency(
+    'boost',
+    include_type: 'system',
+    required: get_option('boost')
+  )
+endif
 
 bench_exe = executable(
   'bench_spaix_rtree',
