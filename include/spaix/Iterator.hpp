@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_ITERATOR_HPP
@@ -24,8 +24,6 @@ class Iterator : public DataIterator<DirNode, DatNode, max_height>
 public:
   using Base     = DataIterator<DirNode, DatNode, max_height>;
   using DirEntry = typename DirNode::DirEntry;
-  using DirKey   = typename DirNode::DirKey;
-  using Frame    = typename Base::Frame;
 
   Iterator(const DataIterator<DirNode, DatNode, max_height>& base,
            Predicate                                         predicate)
@@ -41,9 +39,9 @@ public:
     if (root && _predicate.directory(root_entry.key)) {
       const ChildIndex root_child_index = leftmost_child(*root, _predicate);
       if (root_child_index < root->num_children()) {
-        Base::stack().emplace_back(Frame{root.get(), root_child_index});
+        this->push_frame(root.get(), root_child_index);
         if (move_down_left() == Status::reached_end) {
-          Base::stack().clear();
+          this->clear();
         }
       }
     }
@@ -61,10 +59,9 @@ public:
   }
 
 private:
-  using Base::back;
+  using Base::empty;
   using Base::index;
   using Base::node;
-  using Base::stack;
 
   enum class Status : unsigned char {
     success,
@@ -101,7 +98,7 @@ private:
   {
     assert(node()->child_type() == NodeType::data);
     do {
-      ++back().index;
+      Base::increment_leaf();
     } while (index() < node()->dat_children().size() &&
              !_predicate.leaf(entry_key(node()->dat_children()[index()])));
 
@@ -114,7 +111,7 @@ private:
   {
     assert(node()->child_type() == NodeType::directory);
     do {
-      ++back().index;
+      Base::increment_leaf();
     } while (index() < node()->dir_children().size() &&
              !_predicate.directory(node()->dir_children()[index()].key));
   }
@@ -122,9 +119,9 @@ private:
   /// Move up/right until we reach a node we are not at the end of yet
   [[nodiscard]] Status move_up_right()
   {
-    while (!stack().empty() && index() >= node()->num_children()) {
-      stack().pop_back(); // Move up
-      if (stack().empty()) {
+    while (!empty() && index() >= node()->num_children()) {
+      Base::pop_frame(); // Move up
+      if (empty()) {
         return Status::reached_end;
       }
 
@@ -141,7 +138,7 @@ private:
       auto* const      dir         = node()->dir_children()[index()].node.get();
       const ChildIndex first_index = leftmost_child(*dir, _predicate);
 
-      stack().emplace_back(Frame{dir, first_index});
+      Base::push_frame(dir, first_index);
 
       if (first_index >= dir->num_children()) {
         // No matches in this directory node, skip to the next
