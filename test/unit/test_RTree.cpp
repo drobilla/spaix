@@ -257,11 +257,11 @@ test_tree(const unsigned span, const unsigned n_queries)
     auto       count          = 0U;
 
     const auto verify = [&](const auto& node) {
-      CHECK((spaix::range<0>(node.key).lower >= static_cast<float>(x_low)));
-      CHECK((spaix::range<0>(node.key).upper <= static_cast<float>(x_high)));
-      CHECK((spaix::range<1>(node.key).lower >= static_cast<float>(y_low)));
-      CHECK((spaix::range<1>(node.key).upper <= static_cast<float>(y_high)));
-      CHECK((contains(tree.bounds(), node.key)));
+      CHECK((spaix::range<0>(node.first).lower >= static_cast<float>(x_low)));
+      CHECK((spaix::range<0>(node.first).upper <= static_cast<float>(x_high)));
+      CHECK((spaix::range<1>(node.first).lower >= static_cast<float>(y_low)));
+      CHECK((spaix::range<1>(node.first).upper <= static_cast<float>(y_high)));
+      CHECK((contains(tree.bounds(), node.first)));
       ++count;
     };
 

@@ -4,6 +4,7 @@
 #ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
 #define SPAIX_DETAIL_DIRECTORYNODE_HPP
 
+#include <spaix/DataNode.hpp>
 #include <spaix/StaticVector.hpp>
 #include <spaix/detail/DatEntryType.hpp>
 #include <spaix/detail/NodePointerEntry.hpp>
@@ -16,9 +17,6 @@
 
 namespace spaix {
 
-template<class Key, class Data>
-struct DataNode;
-
 template<class Box, class DatNode, class Structure>
 struct DirectoryNode {
 public:
@@ -26,8 +24,8 @@ public:
   static constexpr auto dir_fanout = Structure::dir_fanout;
   static constexpr auto dat_fanout = Structure::dat_fanout;
 
-  using Key    = decltype(std::declval<DatNode>().key);
-  using Data   = decltype(std::declval<DatNode>().data);
+  using Key    = typename DatNode::first_type;
+  using Data   = typename DatNode::second_type;
   using DirKey = Box;
 
   using DirNode  = DirectoryNode<Box, DatNode, Structure>;
@@ -132,28 +130,28 @@ template<class Key, class Data>
 const auto&
 entry_key(const DataNode<Key, Data>& entry) noexcept
 {
-  return entry.key;
+  return entry.first;
 }
 
 template<class Key, class Data>
 const auto&
 entry_data(const DataNode<Key, Data>& entry) noexcept
 {
-  return entry.data;
+  return entry.second;
 }
 
 template<class Key, class Data>
 const auto&
 entry_data(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
-  return entry->data;
+  return entry->second;
 }
 
 template<class Key, class Data>
 const auto&
 entry_key(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
-  return entry->key;
+  return entry->first;
 }
 
 template<class Key, class Data>

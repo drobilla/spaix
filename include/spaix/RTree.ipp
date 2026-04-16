@@ -59,7 +59,7 @@ RTree<B, K, D, C>::query(S search) const -> TreeRange<ConstSearcher<S>>
   ConstSearcher<S> first{_root, search};
   ConstSearcher<S> last{{Box{}, nullptr}, search};
 
-  assert(first == last || search.leaf(first->key));
+  assert(first == last || search.leaf(first->first));
 
   return {std::move(first), std::move(last)};
 }
