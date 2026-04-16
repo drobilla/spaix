@@ -33,6 +33,9 @@
 #include <spaix/union.hpp>                   // IWYU pragma: keep
 #include <spaix/volume.hpp>                  // IWYU pragma: keep
 
+#ifdef __GNUC__
+__attribute__((const))
+#endif
 int
 main()
 {

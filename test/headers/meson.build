@@ -1,4 +1,4 @@
-# Copyright 2019-2024 David Robillard <d@drobilla.net>
+# Copyright 2019-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 warning_level = get_option('warning_level')
@@ -14,7 +14,7 @@ if cpp.get_id() in ['clang', 'emscripten']
 
 elif cpp.get_id() == 'gcc'
   if warning_level == 'everything'
-    header_suppressions = ['-Wno-effc++', '-Wno-suggest-attribute=const']
+    header_suppressions = ['-Wno-effc++']
   endif
 
 elif cpp.get_id() == 'msvc'
