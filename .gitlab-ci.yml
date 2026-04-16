@@ -1,4 +1,4 @@
-# Copyright 2021-2024 David Robillard <d@drobilla.net>
+# Copyright 2021-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 default:
@@ -92,6 +92,14 @@ mingw64:
     - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\8.3-win32"
+
+wasm:
+  image: lv2plugin/debian-wasm
+  script:
+    - meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddefault_library=static
+    - ninja -C build test
+    - meson configure -Dbuildtype=release build
+    - ninja -C build test
 
 # Non-Linux/Docker rows (not hosted)
 
