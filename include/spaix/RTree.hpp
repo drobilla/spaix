@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_RTREE_HPP
@@ -19,8 +19,6 @@
 // IWYU pragma: no_include "spaix/RTree.ipp"
 
 namespace spaix {
-
-enum class VisitStatus : unsigned char { proceed, finish };
 
 /**
    An R-tree which spatially indexes points or rectangles.
@@ -77,12 +75,21 @@ public:
   using value_type  = DataNode<K, D>;
   using node_type   = DatNode;
 
+  // RTree-specific types
   using NodePath     = StaticVector<ChildIndex, ChildCount, max_height()>;
   using end_iterator = typename iterator::Base;
 
+  /// Construct an RTree with a default-constructed insertion and split
+  RTree() = default;
+
+  /**
+     Construct an RTree with the given insertion and split.
+
+     The given insertion and split will be moved into the tree and used for all
+     subsequent operations, allowing stateful algorithms to be used.
+  */
   RTree(Insertion insertion, Split split);
 
-  RTree()  = default;
   ~RTree() = default;
 
   RTree(const RTree&)                = delete;
@@ -133,10 +140,10 @@ public:
      VisitStatus::finish.
 
      @param visit_dir Function called for every internal directory node, with
-     prototype VisitStatus(const NodePath&, const Box&, ChildCount)>.
+     prototype `VisitStatus (const NodePath&, const Box&, ChildCount)`.
 
      @param visit_dat Function called for every internal directory node, with
-     prototype VisitStatus(const NodePath&, const Key&, const Data&)>.
+     prototype `VisitStatus (const NodePath&, const Key&, const Data&)`.
   */
   template<typename DirVisitor, typename DatVisitor>
   void visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const;

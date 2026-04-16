@@ -15,6 +15,7 @@
 #include <spaix/StaticVector.hpp>
 #include <spaix/contains.hpp>
 #include <spaix/search/within.hpp>
+#include <spaix/types.hpp>
 
 #include <algorithm>
 #include <ctime>

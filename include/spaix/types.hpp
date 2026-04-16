@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_TYPES_HPP
@@ -17,6 +17,8 @@ enum class NodeType : unsigned char {
 };
 
 enum class Side : unsigned char { left, right };
+
+enum class VisitStatus : unsigned char { proceed, finish };
 
 /// A range in a dimension from a low value (first) to a high value (second)
 template<class T>
