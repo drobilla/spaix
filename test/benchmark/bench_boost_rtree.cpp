@@ -57,8 +57,6 @@ _Pragma("clang diagnostic pop")
 #include <string>
 #include <utility>
 
-// IWYU pragma: no_include <map>
-
 namespace {
 namespace bg  = boost::geometry;
 namespace bgi = boost::geometry::index;

@@ -4,8 +4,6 @@
 #ifndef SPAIX_TREERANGE_HPP
 #define SPAIX_TREERANGE_HPP
 
-#include <utility> // IWYU pragma: keep
-
 /**
    A range in a tree.
 
