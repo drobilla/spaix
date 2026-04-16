@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_EXPANSION_HPP
@@ -31,9 +31,7 @@ expansion_rec(const Rect<Ts...>& base,
   const auto old_span = span<last_dim>(base);
   const auto new_span = hi - lo;
 
-  using Result = decltype(new_span - old_span);
-
-  return (old_span < new_span) ? (new_span - old_span) : Result{};
+  return (new_span - old_span);
 }
 
 template<class Added, size_t dim, size_t last_dim, class... Ts>
@@ -66,14 +64,15 @@ expansion_rec(const Rect<Ts...>&            base,
 } // namespace detail
 
 /**
-   Return the volume that would be expanded by adding `rhs` to `lhs`.
+   Return the amount of "expansion" that adding `added` to `base` would cause.
 
-   This is different from simply expanding (with union) then comparing volumes,
-   because it ignores dimensions with zero span.  Specifically, it is the
-   product of all non-zero dimension spans.  This does not have an intuitive
-   geometric meaning, but it is useful as a volume-like metric that can be used
-   to compare changes to infinitesimally thin rectangles (like a bounding box
-   around a point, or several points that are aligned along some axis).
+   This is a special metric designed for tie-breaking that does something
+   useful when the span of a dimension is zero, unlike comparing the volume of
+   the union.  Specifically, it is the product of every non-zero increase in a
+   dimension's span.  This doesn't have an intuitive geometric meaning, but it
+   is useful as a volume-increase-like metric that can be used to compare
+   changes to infinitesimally thin rectangles (like a bounding box around a
+   point, or several points that are aligned along some axis).
 */
 template<class... Ts>
 constexpr auto
