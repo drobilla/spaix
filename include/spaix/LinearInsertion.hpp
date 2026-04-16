@@ -37,16 +37,16 @@ public:
     Sizes      best_sizes{max_volume, max_volume};
 
     for (ChildIndex i = 0; i < children.size(); ++i) {
-      const auto& child_key    = children[i].key;
-      const auto  child_volume = volume(child_key);
-      const auto  expanded     = child_key | key;
-      const auto  expansion    = volume(expanded) - child_volume;
+      const auto& child_key       = children[i].key;
+      const auto  child_volume    = volume(child_key);
+      const auto  new_key         = child_key | key;
+      const auto  volume_increase = volume(new_key) - child_volume;
 
-      Sizes sizes{expansion, child_volume};
+      Sizes sizes{volume_increase, child_volume};
       if (sizes < best_sizes) {
         best_sizes = std::move(sizes);
         best_index = i;
-        best_key   = expanded;
+        best_key   = new_key;
       }
     }
 

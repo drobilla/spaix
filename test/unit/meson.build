@@ -5,7 +5,6 @@ tests = [
   'Point',
   'Rect',
   'contains',
-  'expansion',
   'intersects',
   'union',
   'volume',

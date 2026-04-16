@@ -46,7 +46,6 @@ headers = files(
   'include/spaix/detail/NodePointerEntry.hpp',
   'include/spaix/detail/distribute.hpp',
   'include/spaix/detail/meta.hpp',
-  'include/spaix/expansion.hpp',
   'include/spaix/intersects.hpp',
   'include/spaix/search/everything.hpp',
   'include/spaix/search/touching.hpp',

@@ -4,7 +4,6 @@
 #ifndef SPAIX_SIDECHOOSER_HPP
 #define SPAIX_SIDECHOOSER_HPP
 
-#include <spaix/expansion.hpp>
 #include <spaix/types.hpp>
 #include <spaix/volume.hpp>
 
@@ -78,13 +77,8 @@ private:
   /// Choose a side to break a tie when the volume comparisons fail
   Side tie_side() noexcept
   {
-    const auto l_expansion = spaix::expansion(_l_key, _child_key);
-    const auto r_expansion = spaix::expansion(_r_key, _child_key);
-
-    // Try expansion, then child count, then a flip-flop to avoid bias
-    return (l_expansion < r_expansion)       ? Side::left
-           : (r_expansion < l_expansion)     ? Side::right
-           : (_l_n_children < _r_n_children) ? Side::left
+    // Try child count, then a flip-flop to avoid bias
+    return (_l_n_children < _r_n_children)   ? Side::left
            : (_r_n_children < _l_n_children) ? Side::right
            : ((++_tie_phase & 1U) == 0U)     ? Side::left
                                              : Side::right;
