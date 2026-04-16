@@ -28,9 +28,9 @@ public:
 
   static DataIterator make_end() { return DataIterator{}; }
 
-  const DatNode& operator*() const { return *operator->(); }
+  const DatNode& operator*() const noexcept { return *operator->(); }
 
-  const DatNode* operator->() const
+  const DatNode* operator->() const noexcept
   {
     assert(!empty());
     assert(back().index < back().node->num_children());
@@ -40,19 +40,21 @@ public:
   }
 
   template<class RhsDir, class RhsDat>
-  bool operator==(const DataIterator<RhsDir, RhsDat, max_height>& rhs) const
+  bool operator==(
+    const DataIterator<RhsDir, RhsDat, max_height>& rhs) const noexcept
   {
     return (empty() || rhs.empty()) ? (empty() && rhs.empty())
                                     : (operator->() == rhs.operator->());
   }
 
   template<class RhsDir, class RhsDat>
-  bool operator!=(const DataIterator<RhsDir, RhsDat, max_height>& rhs) const
+  bool operator!=(
+    const DataIterator<RhsDir, RhsDat, max_height>& rhs) const noexcept
   {
     return !operator==(rhs);
   }
 
-  [[nodiscard]] bool empty() const { return _stack.empty(); }
+  [[nodiscard]] bool empty() const noexcept { return _stack.empty(); }
 
 protected:
   DataIterator() noexcept = default;
@@ -82,13 +84,13 @@ private:
     }
   };
 
-  [[nodiscard]] Frame& back()
+  [[nodiscard]] Frame& back() noexcept
   {
     assert(!_stack.empty());
     return _stack.back();
   }
 
-  [[nodiscard]] const Frame& back() const
+  [[nodiscard]] const Frame& back() const noexcept
   {
     assert(!_stack.empty());
     return _stack.back();

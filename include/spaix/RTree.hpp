@@ -88,7 +88,7 @@ public:
      The given insertion and split will be moved into the tree and used for all
      subsequent operations, allowing stateful algorithms to be used.
   */
-  RTree(Insertion insertion, Split split);
+  RTree(Insertion insertion, Split split) noexcept;
 
   ~RTree() = default;
 
@@ -119,19 +119,23 @@ public:
 
   /// Visit every entry in the tree that matches a predicate
   template<class Predicate, class Visitor>
-  void fast_query(const Predicate& predicate, const Visitor& visitor) const;
+  void fast_query(const Predicate& predicate,
+                  const Visitor&   visitor) const noexcept;
 
   /// Remove all items from the tree
-  void clear() { _root = {Box{}, nullptr}; }
+  void clear() noexcept { _root = {Box{}, nullptr}; }
 
   /// Return the number of items in the tree
-  [[nodiscard]] size_t size() const { return _size; }
+  [[nodiscard]] size_t size() const noexcept { return _size; }
 
   /// Return true iff there are no items in the tree
-  [[nodiscard]] bool empty() const { return !_root.node; }
+  [[nodiscard]] bool empty() const noexcept { return !_root.node; }
 
   /// Return a key that encompasses all items in the tree
-  [[nodiscard]] Box bounds() const { return _root.node ? _root.key : Box{}; }
+  [[nodiscard]] Box bounds() const noexcept
+  {
+    return _root.node ? _root.key : Box{};
+  }
 
   /**
      Visit every node in the tree.
@@ -148,11 +152,19 @@ public:
   template<typename DirVisitor, typename DatVisitor>
   void visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const;
 
-  [[nodiscard]] const_iterator begin() const { return {_root, {}}; }
-  [[nodiscard]] end_iterator   end() const { return iterator::make_end(); }
-  [[nodiscard]] const_iterator cbegin() const { return begin(); }
-  [[nodiscard]] end_iterator   cend() const { return iterator::make_end(); }
-  [[nodiscard]] iterator       begin() { return {_root, {}}; }
+  [[nodiscard]] const_iterator begin() const noexcept { return {_root, {}}; }
+  [[nodiscard]] end_iterator   end() const noexcept
+  {
+    return iterator::make_end();
+  }
+
+  [[nodiscard]] const_iterator cbegin() const noexcept { return begin(); }
+  [[nodiscard]] end_iterator   cend() const noexcept
+  {
+    return iterator::make_end();
+  }
+
+  [[nodiscard]] iterator begin() noexcept { return {_root, {}}; }
 
 private:
   using DirEntry    = typename DirNode::DirEntry;
@@ -162,31 +174,31 @@ private:
   static_assert(sizeof(DirNode) >= Structure::min_dir_node_size);
 
   template<class Children>
-  static Box parent_key(const Children& children);
+  static Box parent_key(const Children& children) noexcept;
 
-  static Box ideal_key(const DirNode& node);
+  static Box ideal_key(const DirNode& node) noexcept;
 
   DirNodePair insert_rec(DirEntry&   parent_entry,
                          const Box&  new_parent_key,
                          const Key&  key,
-                         const Data& data);
+                         const Data& data) noexcept;
 
   template<class Predicate, class Visitor>
   void fast_query_rec(const DirNode&   node,
                       const Predicate& predicate,
-                      const Visitor&   visitor) const;
+                      const Visitor&   visitor) const noexcept;
 
   /// Create a new parent seeded with a child
   template<class Entry, ChildCount count>
   static DirEntry new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                              ChildIndex                              index,
-                             NodeType child_type);
+                             NodeType child_type) noexcept;
 
   /// Split `nodes` plus `node` in two and return the resulting sides
   template<class Entry, ChildCount fanout>
   DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
                     Entry                                    entry,
-                    NodeType                                 type);
+                    NodeType                                 type) noexcept;
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm

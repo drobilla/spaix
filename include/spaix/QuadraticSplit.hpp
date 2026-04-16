@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_QUADRATICSPLIT_HPP
@@ -36,7 +36,7 @@ public:
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entry, ChildCount count>
   SeedsFor<DirKey> pick_seeds(
-    const StaticVector<Entry, ChildCount, count>& deposit)
+    const StaticVector<Entry, ChildCount, count>& deposit) noexcept
   {
     using Volume = decltype(volume(std::declval<DirKey>()));
 
@@ -80,7 +80,7 @@ public:
                            Deposit&&                         deposit,
                            DirEntry&                         lhs,
                            DirEntry&                         rhs,
-                           const ChildCount                  max_fanout)
+                           const ChildCount max_fanout) noexcept
   {
     const ChildIndex n_entries = deposit.size();
     for (ChildIndex i = 0; i < n_entries; ++i) {
@@ -125,7 +125,7 @@ private:
     const SeedsFor<typename DirEntry::Key>& seeds,
     const Deposit&                          deposit,
     const DirEntry&                         lhs,
-    const DirEntry&                         rhs)
+    const DirEntry&                         rhs) noexcept
   {
     using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::DirKey;

@@ -27,12 +27,12 @@ public:
   using DirEntry = typename DirNode::DirEntry;
 
   Iterator(const DataIterator<DirNode, DatNode, max_height>& base,
-           Predicate                                         predicate)
+           Predicate                                         predicate) noexcept
     : Base{base}
     , _predicate{predicate}
   {}
 
-  Iterator(const DirEntry& root_entry, Predicate predicate)
+  Iterator(const DirEntry& root_entry, Predicate predicate) noexcept
     : Base{}
     , _predicate{std::move(predicate)}
   {
@@ -50,7 +50,7 @@ public:
     assert(this->empty() || _predicate.leaf(entry_key(this->operator*())));
   }
 
-  Iterator& operator++()
+  Iterator& operator++() noexcept
   {
     if (increment() == Status::reached_end) {
       assert(this->empty());
@@ -75,7 +75,7 @@ private:
      Returns the end index (on past the last child) if no child matches.
   */
   static ChildIndex leftmost_child(const DirNode&   dir,
-                                   const Predicate& predicate)
+                                   const Predicate& predicate) noexcept
   {
     if (dir.child_type() == NodeType::directory) {
       for (ChildIndex i = 0U; i < dir.dir_children().size(); ++i) {
@@ -95,7 +95,7 @@ private:
   }
 
   /// Move right until we reach a good leaf or the end of the parent
-  [[nodiscard]] Status move_right_leaf()
+  [[nodiscard]] Status move_right_leaf() noexcept
   {
     assert(node()->child_type() == NodeType::data);
     do {
@@ -108,7 +108,7 @@ private:
   }
 
   /// Move right until we reach a good directory or the end of the parent
-  void move_right_dir()
+  void move_right_dir() noexcept
   {
     assert(node()->child_type() == NodeType::directory);
     do {
@@ -118,7 +118,7 @@ private:
   }
 
   /// Move up/right until we reach a node we are not at the end of yet
-  [[nodiscard]] Status move_up_right()
+  [[nodiscard]] Status move_up_right() noexcept
   {
     while (!empty() && index() >= node()->num_children()) {
       Base::pop_frame(); // Move up
@@ -133,7 +133,7 @@ private:
   }
 
   /// Move down/left until we reach a potentially matching leaf
-  [[nodiscard]] Status move_down_left()
+  [[nodiscard]] Status move_down_left() noexcept
   {
     while (node()->child_type() == NodeType::directory) {
       auto* const      dir         = node()->dir_children()[index()].node.get();
@@ -152,7 +152,7 @@ private:
     return Status::success;
   }
 
-  Status increment()
+  Status increment() noexcept
   {
     if (move_right_leaf() == Status::success) {
       return Status::success; // Moved to next leaf child

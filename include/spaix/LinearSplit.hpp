@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_LINEARSPLIT_HPP
@@ -37,7 +37,7 @@ public:
 
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entries>
-  SeedsFor<DirKey> pick_seeds(const Entries& deposit)
+  SeedsFor<DirKey> pick_seeds(const Entries& deposit) noexcept
   {
     using std::max;
     using std::min;
@@ -73,7 +73,7 @@ public:
                            Deposit&&                        deposit,
                            DirNode&                         lhs,
                            DirNode&                         rhs,
-                           const ChildCount                 max_fanout)
+                           const ChildCount                 max_fanout) noexcept
   {
     using detail::distribute_child;
 
@@ -132,14 +132,14 @@ private:
   static void update_indices(const Entries&,
                              const ChildIndex,
                              std::array<ExtremeIndices, n_dims>&,
-                             Index<n_dims, n_dims>)
+                             Index<n_dims, n_dims>) noexcept
   {}
 
   template<class Entries, size_t dim, size_t n_dims>
   static void update_indices(const Entries&                      deposit,
                              const ChildIndex                    child_index,
                              std::array<ExtremeIndices, n_dims>& indices,
-                             Index<dim, n_dims>                  index)
+                             Index<dim, n_dims>                  index) noexcept
   {
     const auto& child      = deposit[child_index];
     const auto& child_key  = entry_key(child);
@@ -174,7 +174,7 @@ private:
   static void update_max_separation(const Entries&,
                                     const std::array<ExtremeIndices, n_dims>&,
                                     MaxSeparation<T>&,
-                                    Index<n_dims, n_dims>)
+                                    Index<n_dims, n_dims>) noexcept
   {}
 
   template<class Entries, class T, size_t dim, size_t n_dims>
@@ -182,7 +182,7 @@ private:
     const Entries&                            deposit,
     const std::array<ExtremeIndices, n_dims>& indices,
     MaxSeparation<T>&                         max_separation,
-    Index<dim, n_dims>                        index)
+    Index<dim, n_dims>                        index) noexcept
   {
     const auto& min_min = entry_key(deposit[indices[dim].min_min]);
     const auto& max_min = entry_key(deposit[indices[dim].max_min]);

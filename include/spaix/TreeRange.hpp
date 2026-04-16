@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_TREERANGE_HPP
@@ -16,7 +16,7 @@
 */
 template<class IteratorType>
 struct TreeRange {
-  TreeRange(IteratorType first, IteratorType last)
+  TreeRange(IteratorType first, IteratorType last) noexcept
     : _first{std::move(first)}
     , _last{std::move(last)}
   {}
@@ -29,10 +29,10 @@ struct TreeRange {
 
   ~TreeRange() = default;
 
-  [[nodiscard]] IteratorType&       begin() { return _first; }
-  [[nodiscard]] const IteratorType& end() { return _last; }
+  [[nodiscard]] IteratorType&       begin() noexcept { return _first; }
+  [[nodiscard]] const IteratorType& end() noexcept { return _last; }
 
-  [[nodiscard]] bool empty() const { return _first == _last; }
+  [[nodiscard]] bool empty() const noexcept { return _first == _last; }
 
 private:
   IteratorType _first;

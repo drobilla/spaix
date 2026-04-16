@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_LINEARINSERTION_HPP
@@ -24,7 +24,7 @@ public:
   /// Choose the best child node to insert/expand by `key`
   template<class Children, class Key>
   std::pair<ChildIndex, UnionOf<Key>> choose(const Children& children,
-                                             const Key&      key)
+                                             const Key&      key) noexcept
   {
     using Volume = decltype(volume(std::declval<Key>()));
     using DirKey = UnionOf<Key>;

@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_STATICVECTOR_HPP
@@ -43,7 +43,7 @@ public:
   StaticVector& operator=(StaticVector&)  = delete;
   StaticVector& operator=(StaticVector&&) = delete;
 
-  void pop(T* const iter)
+  void pop(T* const iter) noexcept
   {
     assert(iter < cend());
     if (iter != cend() - 1) {
@@ -59,7 +59,7 @@ public:
     pop_back();
   }
 
-  void pop_back()
+  void pop_back() noexcept
   {
     assert(!empty());
     --_size;
@@ -70,38 +70,38 @@ public:
   }
 
   template<class... Args>
-  void emplace_back(Args&&... args)
+  void emplace_back(Args&&... args) noexcept
   {
     assert(_size < Capacity);
 
     new (&_array[_size++]) T{std::forward<Args>(args)...};
   }
 
-  [[nodiscard]] bool empty() const { return _size == 0; }
+  [[nodiscard]] bool empty() const noexcept { return _size == 0; }
 
-  [[nodiscard]] const T& back() const
+  [[nodiscard]] const T& back() const noexcept
   {
     assert(_size > 0);
     return *reinterpret_cast<const T*>(&_array[_size - 1]);
   }
 
-  [[nodiscard]] T& back()
+  [[nodiscard]] T& back() noexcept
   {
     assert(_size > 0);
     return *reinterpret_cast<T*>(&_array[_size - 1]);
   }
 
-  [[nodiscard]] const T& operator[](const Size index) const
+  [[nodiscard]] const T& operator[](const Size index) const noexcept
   {
     return *reinterpret_cast<const T*>(&_array[index]);
   }
 
-  [[nodiscard]] T& operator[](const Size index)
+  [[nodiscard]] T& operator[](const Size index) noexcept
   {
     return *reinterpret_cast<T*>(&_array[index]);
   }
 
-  void clear()
+  void clear() noexcept
   {
     if constexpr (!std::is_trivially_destructible_v<T>) {
       for (Size i = 0; i < _size; ++i) {
@@ -112,22 +112,27 @@ public:
     _size = 0;
   }
 
-  [[nodiscard]] Size                  size() const { return _size; }
-  [[nodiscard]] static constexpr Size capacity() { return Capacity; }
+  [[nodiscard]] Size                  size() const noexcept { return _size; }
+  [[nodiscard]] static constexpr Size capacity() noexcept { return Capacity; }
 
-  [[nodiscard]] iterator       begin() { return reinterpret_cast<T*>(_array); }
-  [[nodiscard]] const_iterator begin() const
+  [[nodiscard]] iterator begin() noexcept
+  {
+    return reinterpret_cast<T*>(_array);
+  }
+
+  [[nodiscard]] const_iterator begin() const noexcept
   {
     return reinterpret_cast<const T*>(_array);
   }
-  [[nodiscard]] const_iterator cbegin() const
+
+  [[nodiscard]] const_iterator cbegin() const noexcept
   {
     return reinterpret_cast<const T*>(_array);
   }
 
-  [[nodiscard]] iterator       end() { return begin() + _size; }
-  [[nodiscard]] const_iterator end() const { return begin() + _size; }
-  [[nodiscard]] const_iterator cend() const { return begin() + _size; }
+  [[nodiscard]] iterator       end() noexcept { return begin() + _size; }
+  [[nodiscard]] const_iterator end() const noexcept { return begin() + _size; }
+  [[nodiscard]] const_iterator cend() const noexcept { return begin() + _size; }
 
 private:
   using Element = typename std::aligned_storage_t<sizeof(T), alignof(T)>;
@@ -137,7 +142,7 @@ private:
 };
 
 template<class T, class Size, Size capacity>
-bool
+[[nodiscard]] bool
 operator<(const spaix::StaticVector<T, Size, capacity>& lhs,
           const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
 {

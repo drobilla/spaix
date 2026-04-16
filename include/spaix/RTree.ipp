@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_RTREE_IPP
@@ -19,7 +19,7 @@
 namespace spaix {
 
 template<class B, class K, class D, class C>
-RTree<B, K, D, C>::RTree(Insertion insertion, Split split)
+RTree<B, K, D, C>::RTree(Insertion insertion, Split split) noexcept
   : _insertion{std::move(insertion)}
   , _split{std::move(split)}
 {}
@@ -67,7 +67,7 @@ RTree<B, K, D, C>::query(S search) const -> TreeRange<ConstSearcher<S>>
 template<class B, class K, class D, class C>
 template<class Children>
 auto
-RTree<B, K, D, C>::parent_key(const Children& children) -> Box
+RTree<B, K, D, C>::parent_key(const Children& children) noexcept -> Box
 {
   return std::accumulate(
     children.begin(),
@@ -78,7 +78,7 @@ RTree<B, K, D, C>::parent_key(const Children& children) -> Box
 
 template<class B, class K, class D, class C>
 auto
-RTree<B, K, D, C>::ideal_key(const DirNode& node) -> Box
+RTree<B, K, D, C>::ideal_key(const DirNode& node) noexcept -> Box
 {
   if (node.child_type() == NodeType::directory) {
     return parent_key(node.dir_children());
@@ -92,7 +92,7 @@ auto
 RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
                               const Box&  new_parent_key,
                               const Key&  key,
-                              const Data& data) -> DirNodePair
+                              const Data& data) noexcept -> DirNodePair
 {
   auto& parent = *parent_entry.node;
   if (parent.child_type() == NodeType::directory) { // Recursing downwards
@@ -133,7 +133,7 @@ template<class B, class K, class D, class C>
 template<class Predicate, class Visitor>
 void
 RTree<B, K, D, C>::fast_query(const Predicate& predicate,
-                              const Visitor&   visitor) const
+                              const Visitor&   visitor) const noexcept
 {
   if (_root.node && predicate.directory(_root.key)) {
     fast_query_rec(*_root.node, predicate, visitor);
@@ -145,7 +145,7 @@ template<class Predicate, class Visitor>
 void
 RTree<B, K, D, C>::fast_query_rec(const DirNode&   node,
                                   const Predicate& predicate,
-                                  const Visitor&   visitor) const
+                                  const Visitor&   visitor) const noexcept
 {
   if (node.child_type() == NodeType::directory) {
     for (const auto& entry : node.dir_children()) {
@@ -168,7 +168,7 @@ template<class Entry, ChildCount count>
 auto
 RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                               ChildIndex                              index,
-                              NodeType child_type) -> DirEntry
+                              NodeType child_type) noexcept -> DirEntry
 {
   auto* const iter{deposit.begin() + index};
   const Box   key{entry_key(*iter)};
@@ -186,7 +186,7 @@ template<class Entry, ChildCount fanout>
 auto
 RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
                          Entry                                    entry,
-                         const NodeType type) -> DirNodePair
+                         const NodeType type) noexcept -> DirNodePair
 {
   constexpr auto max_fanout =
     fanout - (fanout * Conf::MinFillRatio::num / Conf::MinFillRatio::den);
