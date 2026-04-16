@@ -7,6 +7,7 @@
 #include <spaix/DataPlacement.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace spaix {
 

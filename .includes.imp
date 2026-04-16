@@ -12,7 +12,6 @@
 
   { include: ["<bits/chrono.h>", "private", "<chrono>", "public" ] },
 
-  { "symbol": [ "std::equal", "private", "<algorithm>", "public" ] },
   { "symbol": [ "std::lexicographical_compare", "private", "<algorithm>", "public" ] },
   { "symbol": [ "std::move", "private", "<utility>", "public" ] },
   { "symbol": [ "std::pair", "private", "<utility>", "public" ] }
