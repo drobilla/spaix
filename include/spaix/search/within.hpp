@@ -1,41 +1,37 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_SEARCH_WITHIN_HPP
 #define SPAIX_SEARCH_WITHIN_HPP
-
-#include <spaix/contains.hpp>
-#include <spaix/intersects.hpp>
 
 #include <type_traits>
 #include <utility>
 
 namespace spaix::search {
 
-template<typename QueryKey>
-struct Within {
+template<typename Queries, typename QueryKey>
+class Within
+{
+public:
+  explicit Within(QueryKey key) noexcept
+    : _query_key{std::move(key)}
+  {}
+
   template<class DirKey>
   [[nodiscard]] constexpr bool directory(const DirKey& k) const noexcept
   {
-    return intersects(key, k);
+    return Queries::intersects(_query_key, k);
   }
 
   template<class DatKey>
   [[nodiscard]] constexpr bool leaf(const DatKey& k) const noexcept
   {
-    return contains(key, k);
+    return Queries::contains(_query_key, k);
   }
 
-  std::decay_t<QueryKey> key;
+private:
+  std::decay_t<QueryKey> _query_key;
 };
-
-/// Return a query predicate that matches items contained within a region
-template<class QueryKey>
-[[nodiscard]] Within<QueryKey>
-within(QueryKey&& key) noexcept
-{
-  return Within<QueryKey>{std::forward<QueryKey>(key)};
-}
 
 } // namespace spaix::search
 

@@ -43,6 +43,7 @@ public:
   using Structure = typename Conf::Structure; ///< Tree structure configuration
   using Insertion = typename Conf::Insertion; ///< Insertion algorithm
   using Split     = typename Conf::Split;     ///< Split algorithm
+  using Ops       = typename Insertion::Ops;  ///< Key operations
 
   using DatNode = DataNode<Key, Data>; ///< Leaf node
   using DirNode =

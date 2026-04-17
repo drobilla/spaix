@@ -20,13 +20,6 @@ struct Everything {
   }
 };
 
-/// Return a tree query predicate that matches everything
-[[nodiscard]] constexpr Everything
-everything() noexcept
-{
-  return Everything{};
-}
-
 } // namespace spaix::search
 
 #endif // SPAIX_SEARCH_EVERYTHING_HPP

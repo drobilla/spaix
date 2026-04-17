@@ -31,8 +31,10 @@ headers = files(
   'include/spaix/Iterator.hpp',
   'include/spaix/LinearInsertion.hpp',
   'include/spaix/LinearSplit.hpp',
+  'include/spaix/Operations.hpp',
   'include/spaix/Point.hpp',
   'include/spaix/QuadraticSplit.hpp',
+  'include/spaix/Queries.hpp',
   'include/spaix/RTree.hpp',
   'include/spaix/RTree.ipp',
   'include/spaix/Rect.hpp',
@@ -40,7 +42,6 @@ headers = files(
   'include/spaix/SplitSeeds.hpp',
   'include/spaix/StaticVector.hpp',
   'include/spaix/TreeRange.hpp',
-  'include/spaix/contains.hpp',
   'include/spaix/detail/DatEntryType.hpp',
   'include/spaix/detail/DirectoryNode.hpp',
   'include/spaix/detail/NodePointerEntry.hpp',
@@ -48,14 +49,11 @@ headers = files(
   'include/spaix/detail/distribute.hpp',
   'include/spaix/detail/entry.hpp',
   'include/spaix/detail/meta.hpp',
-  'include/spaix/intersects.hpp',
   'include/spaix/search/everything.hpp',
   'include/spaix/search/touching.hpp',
   'include/spaix/search/within.hpp',
   'include/spaix/sizes.hpp',
   'include/spaix/types.hpp',
-  'include/spaix/union.hpp',
-  'include/spaix/volume.hpp',
 )
 
 # Declare dependency for internal meson dependants

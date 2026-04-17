@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "draw_dot.hpp"
@@ -10,6 +10,7 @@
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
+#include <spaix/Operations.hpp>
 #include <spaix/Point.hpp>
 #include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
 #include <spaix/RTree.hpp>
@@ -30,6 +31,7 @@ using Args   = spaix::test::Arguments;
 using Scalar = double;
 using Rect2  = spaix::Rect<Scalar, Scalar>;
 using Point2 = spaix::Point<Scalar, Scalar>;
+using Ops    = spaix::Operations<Scalar, Scalar>;
 
 struct Parameters {
   explicit Parameters(const spaix::test::Arguments& args)
@@ -116,11 +118,11 @@ run(const Parameters& params, const Args& args)
 {
   const auto split = args.at("split");
   if (split == "linear") {
-    return run<Insertion, spaix::LinearSplit>(params);
+    return run<Insertion, spaix::LinearSplit<Ops, 2U>>(params);
   }
 
   if (split == "quadratic") {
-    return run<Insertion, spaix::QuadraticSplit>(params);
+    return run<Insertion, spaix::QuadraticSplit<Ops>>(params);
   }
 
   throw std::runtime_error("Unknown split algorithm '" + split + "'");
@@ -131,7 +133,7 @@ run(const Parameters& params, const Args& args)
 {
   const auto insert = args.at("insert");
   if (insert == "linear") {
-    return run<spaix::LinearInsertion>(params, args);
+    return run<spaix::LinearInsertion<Ops>>(params, args);
   }
 
   throw std::runtime_error("Unknown insert algorithm '" + insert + "'");

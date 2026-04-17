@@ -1,24 +1,21 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_SIDECHOOSER_HPP
 #define SPAIX_SIDECHOOSER_HPP
 
 #include <spaix/types.hpp>
-#include <spaix/volume.hpp>
-
-#include <utility>
 
 namespace spaix {
 
 template<typename Volume>
 struct SplitSeeds;
 
-template<class DirKey, class ChildKey>
+template<class DirKey, class ChildKey, class Ops>
 class SideChooser
 {
 public:
-  using Volume = decltype(volume(std::declval<DirKey>()));
+  using Volume = typename Ops::Volume;
 
   struct Outcome {
     Volume volume;
@@ -32,13 +29,14 @@ public:
               const Volume     rhs_volume,
               const ChildCount rhs_n_children,
               const ChildKey&  child_key) noexcept
-    : _l_key{lhs_key | child_key}
-    , _r_key{rhs_key | child_key}
+    : _l_key{Ops::unify(lhs_key, child_key)}
+    // NOLINTNEXTLINE(readability-suspicious-call-argument)
+    , _r_key{Ops::unify(rhs_key, child_key)}
     , _child_key{child_key}
     , _l_n_children{lhs_n_children}
     , _r_n_children{rhs_n_children}
-    , _l_volume{volume(_l_key)}
-    , _r_volume{volume(_r_key)}
+    , _l_volume{Ops::volume(_l_key)}
+    , _r_volume{Ops::volume(_r_key)}
     , _d_l_volume{_l_volume - lhs_volume}
     , _d_r_volume{_r_volume - rhs_volume}
   {}
@@ -96,8 +94,8 @@ private:
   unsigned   _tie_phase{};
 };
 
-template<class Volume, class DirKey, class ChildKey>
-SideChooser<DirKey, ChildKey>
+template<class Ops, class Volume, class DirKey, class ChildKey>
+SideChooser<DirKey, ChildKey, Ops>
 make_side_chooser(const SplitSeeds<Volume>& seeds,
                   const DirKey&             lhs_key,
                   const ChildCount          lhs_n_children,

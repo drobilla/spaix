@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #undef NDEBUG
@@ -21,7 +21,7 @@ namespace {
 void
 test_rect()
 {
-  constexpr auto rect = make_rect(XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc});
+  constexpr auto rect = TestRect{XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc}};
 
   STATIC_CHECK(
     (Rect<int, int>{} ==
@@ -42,9 +42,9 @@ test_rect()
                                          YRange{2.0_yc, 5.0_yc})} == rect));
 
   // Comparison
-  STATIC_CHECK((rect == make_rect(XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc})));
-  STATIC_CHECK((rect != make_rect(XRange{2_xc, 3_xc}, YRange{2.0_yc, 5.0_yc})));
-  STATIC_CHECK((rect != make_rect(XRange{1_xc, 3_xc}, YRange{4.0_yc, 5.0_yc})));
+  STATIC_CHECK((rect == TestRect{XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc}}));
+  STATIC_CHECK((rect != TestRect{XRange{2_xc, 3_xc}, YRange{2.0_yc, 5.0_yc}}));
+  STATIC_CHECK((rect != TestRect{XRange{1_xc, 3_xc}, YRange{4.0_yc, 5.0_yc}}));
 
   // Basic access
   STATIC_CHECK((ranges(rect) ==
@@ -59,11 +59,11 @@ test_rect()
 
   // Empty ranges
   STATIC_CHECK(
-    (span<0>(make_rect(XRange{2_xc, 1_xc}, YRange{1.0_yc, 2.0_yc})) == 0));
+    (span<0>(TestRect{XRange{2_xc, 1_xc}, YRange{1.0_yc, 2.0_yc}})) == 0);
 
   // Printing
   std::ostringstream ss;
-  ss << make_rect(make_dim_range(1, 2), make_dim_range(3, 4));
+  ss << TestRect{make_dim_range(1_xc, 2_xc), make_dim_range(3.0_yc, 4.0_yc)};
   CHECK((ss.str() == "[[1, 2], [3, 4]]"));
 }
 

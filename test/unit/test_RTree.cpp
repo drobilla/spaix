@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <spaix_test/check.hpp>
@@ -8,13 +8,13 @@
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
+#include <spaix/Operations.hpp>
 #include <spaix/Point.hpp>
 #include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
+#include <spaix/Queries.hpp>
 #include <spaix/RTree.hpp>
 #include <spaix/Rect.hpp>
 #include <spaix/StaticVector.hpp>
-#include <spaix/contains.hpp>
-#include <spaix/search/within.hpp>
 #include <spaix/types.hpp>
 
 #include <algorithm>
@@ -31,10 +31,12 @@
 
 namespace {
 
-using Scalar = float;
-using Rect   = spaix::Rect<float, float>;
-using Point  = spaix::Point<float, float>;
-using Data   = size_t;
+using Scalar  = float;
+using Rect    = spaix::Rect<float, float>;
+using Point   = spaix::Point<float, float>;
+using Data    = size_t;
+using Queries = spaix::Queries<float, float>;
+using Ops     = spaix::Operations<float, float>;
 
 template<class Key>
 Key
@@ -64,7 +66,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
 
   CHECK(tree.empty());
   CHECK(tree.begin() == tree.end());
-  CHECK(tree.query(spaix::search::within(everything)).empty());
+  CHECK(tree.query(Queries::Contained{everything}).empty());
 }
 
 template<class Tree>
@@ -125,7 +127,7 @@ check_node(const std::map<NodePath, Rect>& dir_keys,
   while (!parent_path.empty()) {
     const auto p = dir_keys.find(parent_path);
     CHECK(p != dir_keys.end());
-    CHECK(contains(p->second, key));
+    CHECK(Queries::contains(p->second, key));
     parent_path.pop_back();
   }
 }
@@ -234,7 +236,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   const auto mid = static_cast<float>(span) / 2.0f;
   const auto no_matches_query =
     Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
-  auto no_results = tree.query(spaix::search::within(no_matches_query));
+  auto no_results = tree.query(Queries::Contained{no_matches_query});
   CHECK(!std::distance(no_results.begin(), no_results.end()));
 
   for (auto i = 0U; i < n_queries; ++i) {
@@ -257,21 +259,21 @@ test_tree(const unsigned span, const unsigned n_queries)
     auto       count          = 0U;
 
     const auto verify = [&](const auto& node) {
-      CHECK((spaix::range<0>(node.first).lower >= static_cast<float>(x_low)));
-      CHECK((spaix::range<0>(node.first).upper <= static_cast<float>(x_high)));
-      CHECK((spaix::range<1>(node.first).lower >= static_cast<float>(y_low)));
-      CHECK((spaix::range<1>(node.first).upper <= static_cast<float>(y_high)));
-      CHECK((contains(tree.bounds(), node.first)));
+      CHECK((Ops::lower<0>(node.first) >= static_cast<float>(x_low)));
+      CHECK((Ops::upper<0>(node.first) <= static_cast<float>(x_high)));
+      CHECK((Ops::lower<1>(node.first) >= static_cast<float>(y_low)));
+      CHECK((Ops::upper<1>(node.first) <= static_cast<float>(y_high)));
+      CHECK((Queries::contains(tree.bounds(), node.first)));
       ++count;
     };
 
     // Fast visitor query
-    tree.fast_query(spaix::search::within(query), verify);
+    tree.fast_query(Queries::Contained{query}, verify);
     CHECK((count == expected_count));
 
     // Incremental query
     count = 0;
-    for (const auto& node : tree.query(spaix::search::within(query))) {
+    for (const auto& node : tree.query(Queries::Contained{query})) {
       verify(node);
     }
     CHECK((count == expected_count));
@@ -288,25 +290,28 @@ test_page_size(const unsigned span, const unsigned n_queries)
   using Structure = spaix::PageStructure<Rect, Key, Data, page_size, placement>;
 
   // Test a small tree where the root has leaf children
-  test_tree<spaix::RTree<
-    Rect,
-    Key,
-    Data,
-    spaix::Config<Structure, spaix::LinearSplit, spaix::LinearInsertion>>>(
+  test_tree<spaix::RTree<Rect,
+                         Key,
+                         Data,
+                         spaix::Config<Structure,
+                                       spaix::LinearSplit<Ops, 2U>,
+                                       spaix::LinearInsertion<Ops>>>>(
     2, n_queries);
 
-  test_tree<spaix::RTree<
-    Rect,
-    Key,
-    Data,
-    spaix::Config<Structure, spaix::LinearSplit, spaix::LinearInsertion>>>(
+  test_tree<spaix::RTree<Rect,
+                         Key,
+                         Data,
+                         spaix::Config<Structure,
+                                       spaix::LinearSplit<Ops, 2U>,
+                                       spaix::LinearInsertion<Ops>>>>(
     span, n_queries);
 
-  test_tree<spaix::RTree<
-    Rect,
-    Key,
-    Data,
-    spaix::Config<Structure, spaix::QuadraticSplit, spaix::LinearInsertion>>>(
+  test_tree<spaix::RTree<Rect,
+                         Key,
+                         Data,
+                         spaix::Config<Structure,
+                                       spaix::QuadraticSplit<Ops>,
+                                       spaix::LinearInsertion<Ops>>>>(
     span, n_queries);
 }
 

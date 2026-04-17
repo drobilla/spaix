@@ -86,13 +86,6 @@ private:
 };
 
 template<class... Ts>
-constexpr Rect<Ts...>
-make_rect(DimRange<Ts>... ranges) noexcept
-{
-  return Rect<Ts...>{std::move(ranges)...};
-}
-
-template<class... Ts>
 constexpr bool
 operator==(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {

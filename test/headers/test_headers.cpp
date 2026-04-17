@@ -8,8 +8,10 @@
 #include <spaix/Iterator.hpp>                // IWYU pragma: keep
 #include <spaix/LinearInsertion.hpp>         // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>             // IWYU pragma: keep
+#include <spaix/Operations.hpp>              // IWYU pragma: keep
 #include <spaix/Point.hpp>                   // IWYU pragma: keep
 #include <spaix/QuadraticSplit.hpp>          // IWYU pragma: keep
+#include <spaix/Queries.hpp>                 // IWYU pragma: keep
 #include <spaix/RTree.hpp>                   // IWYU pragma: keep
 #include <spaix/RTree.ipp>                   // IWYU pragma: keep
 #include <spaix/Rect.hpp>                    // IWYU pragma: keep
@@ -17,7 +19,6 @@
 #include <spaix/SplitSeeds.hpp>              // IWYU pragma: keep
 #include <spaix/StaticVector.hpp>            // IWYU pragma: keep
 #include <spaix/TreeRange.hpp>               // IWYU pragma: keep
-#include <spaix/contains.hpp>                // IWYU pragma: keep
 #include <spaix/detail/DatEntryType.hpp>     // IWYU pragma: keep
 #include <spaix/detail/DirectoryNode.hpp>    // IWYU pragma: keep
 #include <spaix/detail/NodePointerEntry.hpp> // IWYU pragma: keep
@@ -25,14 +26,11 @@
 #include <spaix/detail/distribute.hpp>       // IWYU pragma: keep
 #include <spaix/detail/entry.hpp>            // IWYU pragma: keep
 #include <spaix/detail/meta.hpp>             // IWYU pragma: keep
-#include <spaix/intersects.hpp>              // IWYU pragma: keep
 #include <spaix/search/everything.hpp>       // IWYU pragma: keep
 #include <spaix/search/touching.hpp>         // IWYU pragma: keep
 #include <spaix/search/within.hpp>           // IWYU pragma: keep
 #include <spaix/sizes.hpp>                   // IWYU pragma: keep
 #include <spaix/types.hpp>                   // IWYU pragma: keep
-#include <spaix/union.hpp>                   // IWYU pragma: keep
-#include <spaix/volume.hpp>                  // IWYU pragma: keep
 
 #ifdef __GNUC__
 __attribute__((const))

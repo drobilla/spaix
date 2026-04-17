@@ -9,7 +9,6 @@
 #include <spaix/detail/DirectoryNode.hpp>
 #include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
-#include <spaix/union.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -30,12 +29,13 @@ void
 RTree<B, K, D, C>::insert(const Key& key, const Data& data)
 {
   if (empty()) {
-    _root = {Box{key}, std::make_unique<DirNode>(NodeType::data)};
+    _root = {B{key}, std::make_unique<DirNode>(NodeType::data)};
   }
 
-  auto sides = insert_rec(_root, _root.key | key, key, data);
+  auto sides = insert_rec(_root, Ops::unify(_root.key, key), key, data);
+
   if (sides[0].node) {
-    const auto root_key  = sides[0].key | sides[1].key;
+    const auto root_key  = Ops::unify(sides[0].key, sides[1].key);
     auto       root_node = std::make_unique<DirNode>(NodeType::directory);
 
     root_node->append_child(std::move(sides[0]));
@@ -74,7 +74,7 @@ RTree<B, K, D, C>::parent_key(const Children& children) noexcept -> Box
                          children.end(),
                          Box{},
                          [](const Box& box, const auto& entry) {
-                           return box | detail::entry_key(entry);
+                           return Ops::unify(box, detail::entry_key(entry));
                          });
 }
 
@@ -99,7 +99,7 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
   auto& parent = *parent_entry.node;
   if (parent.child_type() == NodeType::directory) { // Recursing downwards
     auto children                = parent.dir_children();
-    const auto [index, expanded] = _insertion.choose(children, key);
+    const auto [index, expanded] = _insertion.template choose<B>(children, key);
     auto& entry                  = children[index];
     auto  sides                  = insert_rec(entry, expanded, key, data);
 

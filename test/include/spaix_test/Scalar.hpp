@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_TEST_SCALAR_HPP
@@ -6,6 +6,7 @@
 
 #include <iosfwd>
 #include <limits>
+#include <utility>
 
 #undef NDEBUG
 
@@ -41,9 +42,44 @@ struct Scalar {
 
   [[nodiscard]] constexpr Rep value() const { return _value; }
 
+  constexpr explicit operator Rep() const { return _value; }
+
 private:
   Rep _value{};
 };
+
+template<class Rep>
+struct SimpleVolume {
+  constexpr SimpleVolume() = default;
+
+  constexpr SimpleVolume(const Rep v) // NOLINT
+    : _value{v}
+  {}
+
+  [[nodiscard]] constexpr Rep value() const { return _value; }
+
+  [[nodiscard]] constexpr bool operator==(const Rep rep) const
+  {
+    return _value == rep;
+  }
+
+private:
+  Rep _value{};
+};
+
+template<class Rep>
+std::ostream&
+operator<<(std::ostream& os, const SimpleVolume<Rep>& volume)
+{
+  return os << volume.value();
+}
+
+template<class LhsTag, class LhsRep, class RhsTag, class RhsRep>
+SimpleVolume<decltype(std::declval<LhsRep>() * std::declval<RhsRep>())>
+operator*(const Scalar<LhsTag, LhsRep>& lhs, const Scalar<RhsTag, RhsRep>& rhs)
+{
+  return {lhs.value() * rhs.value()};
+}
 
 template<class Tag, class Rep>
 std::ostream&

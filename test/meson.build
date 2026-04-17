@@ -60,6 +60,7 @@ elif cpp.get_id() == 'msvc'
       '/wd4623',  # default constructor implicitly deleted
       '/wd4625',  # copy constructor implicitly deleted
       '/wd4626',  # copy assignment operator implicitly deleted
+      '/wd4686',  # change in UDT return calling convention
       '/wd4710',  # function not inlined
       '/wd4711',  # function selected for automatic inline expansion
       '/wd4820',  # padding added after construct
