@@ -132,9 +132,6 @@ constexpr detail::DifferenceOf<detail::Nth<dim, Ts...>, detail::Nth<dim, Ts...>>
 span(const Rect<Ts...>& rect) noexcept
 {
   const auto& dim_range = get<dim>(rect);
-  if (dim_range.upper < dim_range.lower) {
-    return {};
-  }
 
   return dim_range.upper - dim_range.lower;
 }

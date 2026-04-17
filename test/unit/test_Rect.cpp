@@ -42,7 +42,9 @@ test_rect()
 
   // Comparison
   STATIC_CHECK((rect == OpRect{{1, 3}, {2, 5}}));
+  STATIC_CHECK(!(rect == OpRect{{2, 3}, {2, 5}}));
   STATIC_CHECK((rect != OpRect{{2, 3}, {2, 5}}));
+  STATIC_CHECK(!(rect == OpRect{{1, 3}, {4, 5}}));
   STATIC_CHECK((rect != OpRect{{1, 3}, {4, 5}}));
 
   // Basic access

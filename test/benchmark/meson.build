@@ -84,6 +84,13 @@ test(
 test(
   'bench',
   bench_exe,
+  args: ['--size', '16', '--placement', 'separate'],
+  suite: 'benchmark',
+)
+
+test(
+  'bench',
+  bench_exe,
   args: ['--insert', 'unknown'],
   should_fail: true,
   suite: 'benchmark',
@@ -92,6 +99,13 @@ test(
   'bench',
   bench_exe,
   args: ['--split', 'unknown'],
+  should_fail: true,
+  suite: 'benchmark',
+)
+test(
+  'bench',
+  bench_exe,
+  args: ['--placement', 'unknown'],
   should_fail: true,
   suite: 'benchmark',
 )

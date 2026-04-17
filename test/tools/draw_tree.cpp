@@ -56,7 +56,7 @@ run(const Parameters& params)
   std::mt19937                           rng{params.seed};
   std::uniform_real_distribution<Scalar> dist{0, params.span};
 
-  Tree tree;
+  Tree tree{typename Tree::Insertion{}, typename Tree::Split{}};
   for (size_t i = 0; i < params.n_elements; ++i) {
     tree.insert(Point2{floor(dist(rng)), floor(dist(rng))},
                 static_cast<double>(i));
