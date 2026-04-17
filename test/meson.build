@@ -41,6 +41,10 @@ elif cpp.get_id() == 'gcc'
     ]
   endif
 
+  if host_machine.system() == 'windows'
+    cpp_suppressions += ['-Wno-useless-cast']
+  endif
+
 elif cpp.get_id() == 'msvc'
   cpp_suppressions += [
     '/experimental:external',

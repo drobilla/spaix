@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_CONFIG_HPP
@@ -9,7 +9,6 @@
 #include <spaix/detail/NodePointerEntry.hpp>
 #include <spaix/types.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <limits>
 #include <ratio>
@@ -66,25 +65,42 @@ template<class B,
          size_t        page_size,
          DataPlacement data_placement>
 struct PageStructure {
-  static constexpr auto placement = data_placement;
-
+  using DirEntry = detail::NodePointerEntry<B, void>;
   using DatEntry =
-    typename detail::DatEntryType<DataNode<K, D>, placement>::Type;
+    typename detail::DatEntryType<DataNode<K, D>, data_placement>::Type;
 
-  static constexpr auto dir_entry_size =
-    sizeof(detail::NodePointerEntry<B, void>);
+  /* We need to be careful about padding here, since keys can be any type and
+     we want to cram as many children in a page as possible.  Since this
+     configuration code can't depend on the actual directory node definition,
+     we define simple structs with the same structure but only a single child,
+     and subtract the size of the child entry.  This accounts for any padding
+     the compiler inserts between the header fields (the child type and size)
+     and the array of children. */
 
-  static constexpr auto dat_entry_size = sizeof(DatEntry);
-  static constexpr auto max_entry_size =
-    std::max(dir_entry_size, dat_entry_size);
+  struct DirDirectory {
+    NodeType   child_type;
+    ChildCount size;
+    DirEntry   children;
+  };
 
-  static constexpr auto overhead    = 3 * sizeof(size_t);
-  static constexpr auto entry_space = page_size - overhead;
-  static constexpr auto dir_fanout  = entry_space / dir_entry_size;
-  static constexpr auto dat_fanout  = entry_space / dat_entry_size;
+  struct DatDirectory {
+    NodeType   child_type;
+    ChildCount size;
+    DatEntry   children;
+  };
+
+  static constexpr auto dir_overhead = sizeof(DirDirectory) - sizeof(DirEntry);
+  static constexpr auto dat_overhead = sizeof(DatDirectory) - sizeof(DatEntry);
+  static constexpr auto dir_space    = page_size - dir_overhead;
+  static constexpr auto dat_space    = page_size - dat_overhead;
+
+  // Configuration constants
+  static constexpr auto placement  = data_placement;
+  static constexpr auto dir_fanout = dir_space / sizeof(DirEntry);
+  static constexpr auto dat_fanout = dat_space / sizeof(DatEntry);
 
   // Bounds used for static assertions
-  static constexpr auto min_dir_node_size = page_size - max_entry_size;
+  static constexpr auto min_dir_node_size = page_size - sizeof(DirEntry);
   static constexpr auto max_dir_node_size = page_size;
 };
 

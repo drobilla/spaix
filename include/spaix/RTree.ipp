@@ -4,7 +4,7 @@
 #ifndef SPAIX_RTREE_IPP
 #define SPAIX_RTREE_IPP
 
-#include <spaix/StaticVector.hpp>
+#include <spaix/StaticVectorView.hpp>
 #include <spaix/TreeRange.hpp>
 #include <spaix/detail/DirectoryNode.hpp>
 #include <spaix/detail/entry.hpp>
@@ -98,7 +98,7 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
 {
   auto& parent = *parent_entry.node;
   if (parent.child_type() == NodeType::directory) { // Recursing downwards
-    auto& children               = parent.dir_children();
+    auto children                = parent.dir_children();
     const auto [index, expanded] = _insertion.choose(children, key);
     auto& entry                  = children[index];
     auto  sides                  = insert_rec(entry, expanded, key, data);
@@ -106,7 +106,8 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
     if (sides[0].node) { // Child was split, replace it
       children[index] = std::move(sides[0]);
       if (children.size() == Conf::dir_fanout) {
-        return split(children, std::move(sides[1]), parent.child_type());
+        return split(
+          std::move(children), std::move(sides[1]), parent.child_type());
       }
 
       parent.append_child(std::move(sides[1]));
@@ -116,8 +117,7 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
       assert(parent_entry.key == ideal_key(parent));
     }
 
-  } else if (parent.dat_children().size() <
-             Conf::dat_fanout) { // Simple leaf insert
+  } else if (parent.num_children() < Conf::dat_fanout) { // Simple leaf insert
     parent.append_child(DirNode::make_dat_entry(key, data));
     parent_entry.key = new_parent_key;
     assert(parent_entry.key == ideal_key(parent));
@@ -186,8 +186,8 @@ RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
 template<class B, class K, class D, class C>
 template<class Entry, ChildCount fanout>
 auto
-RTree<B, K, D, C>::split(StaticVector<Entry, ChildCount, fanout>& nodes,
-                         Entry                                    entry,
+RTree<B, K, D, C>::split(StaticVectorView<Entry, ChildCount, fanout> nodes,
+                         Entry                                       entry,
                          const NodeType type) noexcept -> DirNodePair
 {
   constexpr auto max_fanout =

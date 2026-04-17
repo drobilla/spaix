@@ -4,12 +4,10 @@
 #ifndef SPAIX_TYPES_HPP
 #define SPAIX_TYPES_HPP
 
-#include <cstddef>
-
 namespace spaix {
 
-using ChildIndex = size_t;
-using ChildCount = size_t;
+using ChildIndex = unsigned;
+using ChildCount = unsigned;
 
 enum class NodeType : unsigned char {
   directory, ///< Internal directory node
