@@ -68,9 +68,12 @@ template<class B,
 struct PageStructure {
   static constexpr auto placement = data_placement;
 
-  using DatEntry = typename DatEntryType<DataNode<K, D>, placement>::Type;
+  using DatEntry =
+    typename detail::DatEntryType<DataNode<K, D>, placement>::Type;
 
-  static constexpr auto dir_entry_size = sizeof(NodePointerEntry<B, void>);
+  static constexpr auto dir_entry_size =
+    sizeof(detail::NodePointerEntry<B, void>);
+
   static constexpr auto dat_entry_size = sizeof(DatEntry);
   static constexpr auto max_entry_size =
     std::max(dir_entry_size, dat_entry_size);

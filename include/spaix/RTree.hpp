@@ -41,8 +41,9 @@ public:
   using Insertion = typename Conf::Insertion; ///< Insertion algorithm
   using Split     = typename Conf::Split;     ///< Split algorithm
 
-  using DatNode = DataNode<Key, Data>;                    ///< Leaf node
-  using DirNode = DirectoryNode<Box, DatNode, Structure>; ///< Internal node
+  using DatNode = DataNode<Key, Data>; ///< Leaf node
+  using DirNode =
+    detail::DirectoryNode<Box, DatNode, Structure>; ///< Internal node
 
   /// Return the maximum height of a tree
   static constexpr size_t max_height() noexcept

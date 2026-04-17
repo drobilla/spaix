@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DETAIL_META_HPP
@@ -9,13 +9,7 @@
 #include <type_traits>
 #include <utility>
 
-#ifdef __GNUC__
-#  define SPAIX_ALWAYS_INLINE __attribute__((always_inline))
-#else
-#  define SPAIX_ALWAYS_INLINE
-#endif
-
-namespace spaix {
+namespace spaix::detail {
 
 template<size_t n, typename... Ts>
 using Nth = typename std::tuple_element_t<n, std::tuple<Ts...>>;
@@ -82,6 +76,6 @@ using ProductOf =
 template<class L, class R>
 using DifferenceOf = decltype(std::declval<L>() - std::declval<R>());
 
-} // namespace spaix
+} // namespace spaix::detail
 
 #endif // SPAIX_DETAIL_META_HPP

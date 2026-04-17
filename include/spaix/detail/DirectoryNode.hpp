@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
@@ -15,7 +15,7 @@
 #include <new>
 #include <utility>
 
-namespace spaix {
+namespace spaix::detail {
 
 template<class Box, class DatNode, class Structure>
 struct DirectoryNode {
@@ -196,6 +196,6 @@ entry_num_children(const DataNode<Key, Data>&) noexcept
   return 0U;
 }
 
-} // namespace spaix
+} // namespace spaix::detail
 
 #endif // SPAIX_DETAIL_DIRECTORYNODE_HPP

@@ -69,11 +69,12 @@ template<class Children>
 auto
 RTree<B, K, D, C>::parent_key(const Children& children) noexcept -> Box
 {
-  return std::accumulate(
-    children.begin(),
-    children.end(),
-    Box{},
-    [](const Box& box, const auto& entry) { return box | entry_key(entry); });
+  return std::accumulate(children.begin(),
+                         children.end(),
+                         Box{},
+                         [](const Box& box, const auto& entry) {
+                           return box | detail::entry_key(entry);
+                         });
 }
 
 template<class B, class K, class D, class C>
@@ -155,8 +156,8 @@ RTree<B, K, D, C>::fast_query_rec(const DirNode&   node,
     }
   } else {
     for (const auto& entry : node.dat_children()) {
-      if (predicate.leaf(entry_key(entry))) {
-        visitor(entry_ref(entry));
+      if (predicate.leaf(detail::entry_key(entry))) {
+        visitor(detail::entry_ref(entry));
       }
     }
   }
@@ -171,7 +172,7 @@ RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
                               NodeType child_type) noexcept -> DirEntry
 {
   auto* const iter{deposit.begin() + index};
-  const Box   key{entry_key(*iter)};
+  const Box   key{detail::entry_key(*iter)};
   auto        node{std::make_unique<DirNode>(child_type)};
 
   node->append_child(std::move(*iter));

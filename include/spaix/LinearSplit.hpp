@@ -42,10 +42,11 @@ public:
     using std::max;
     using std::min;
 
-    using Scalar = typename CommonElementType<typename DirKey::Scalars>::type;
+    using Scalar =
+      typename detail::CommonElementType<typename DirKey::Scalars>::type;
 
     std::array<ExtremeIndices, DirKey::size()> indices{};
-    const Index<0U, DirKey::size()>            dim_begin{};
+    const detail::Index<0U, DirKey::size()>    dim_begin{};
 
     for (ChildIndex i = 1; i < deposit.size(); ++i) {
       update_indices(deposit, i, indices, dim_begin);
@@ -63,8 +64,8 @@ public:
 
     return {lhs_index,
             rhs_index,
-            volume(entry_key(deposit[lhs_index])),
-            volume(entry_key(deposit[rhs_index]))};
+            volume(detail::entry_key(deposit[lhs_index])),
+            volume(detail::entry_key(deposit[rhs_index]))};
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
@@ -83,9 +84,9 @@ public:
       auto child = std::move(deposit.back());
       deposit.pop_back();
 
-      const auto& key     = entry_key(child);
-      const auto  n_left  = entry_num_children(lhs);
-      const auto  n_right = entry_num_children(rhs);
+      const auto& key     = detail::entry_key(child);
+      const auto  n_left  = detail::entry_num_children(lhs);
+      const auto  n_right = detail::entry_num_children(rhs);
 
       auto chooser =
         make_side_chooser(seeds, lhs.key, n_left, rhs.key, n_right, key);
@@ -132,24 +133,24 @@ private:
   static void update_indices(const Entries&,
                              const ChildIndex,
                              std::array<ExtremeIndices, n_dims>&,
-                             Index<n_dims, n_dims>) noexcept
+                             detail::Index<n_dims, n_dims>) noexcept
   {}
 
   template<class Entries, size_t dim, size_t n_dims>
   static void update_indices(const Entries&                      deposit,
                              const ChildIndex                    child_index,
                              std::array<ExtremeIndices, n_dims>& indices,
-                             Index<dim, n_dims>                  index) noexcept
+                             detail::Index<dim, n_dims>          index) noexcept
   {
     const auto& child      = deposit[child_index];
-    const auto& child_key  = entry_key(child);
+    const auto& child_key  = detail::entry_key(child);
     const auto [low, high] = range<dim>(child_key);
     auto& extremes         = indices[dim];
 
-    const auto& min_min = entry_key(deposit[extremes.min_min]);
-    const auto& max_min = entry_key(deposit[extremes.max_min]);
-    const auto& min_max = entry_key(deposit[extremes.min_max]);
-    const auto& max_max = entry_key(deposit[extremes.max_max]);
+    const auto& min_min = detail::entry_key(deposit[extremes.min_min]);
+    const auto& max_min = detail::entry_key(deposit[extremes.max_min]);
+    const auto& min_max = detail::entry_key(deposit[extremes.min_max]);
+    const auto& max_max = detail::entry_key(deposit[extremes.max_max]);
 
     if (low <= range<dim>(min_min).lower) {
       extremes.min_min = child_index;
@@ -174,7 +175,7 @@ private:
   static void update_max_separation(const Entries&,
                                     const std::array<ExtremeIndices, n_dims>&,
                                     MaxSeparation<T>&,
-                                    Index<n_dims, n_dims>) noexcept
+                                    detail::Index<n_dims, n_dims>) noexcept
   {}
 
   template<class Entries, class T, size_t dim, size_t n_dims>
@@ -182,12 +183,12 @@ private:
     const Entries&                            deposit,
     const std::array<ExtremeIndices, n_dims>& indices,
     MaxSeparation<T>&                         max_separation,
-    Index<dim, n_dims>                        index) noexcept
+    detail::Index<dim, n_dims>                index) noexcept
   {
-    const auto& min_min = entry_key(deposit[indices[dim].min_min]);
-    const auto& max_min = entry_key(deposit[indices[dim].max_min]);
-    const auto& min_max = entry_key(deposit[indices[dim].min_max]);
-    const auto& max_max = entry_key(deposit[indices[dim].max_max]);
+    const auto& min_min = detail::entry_key(deposit[indices[dim].min_min]);
+    const auto& max_min = detail::entry_key(deposit[indices[dim].max_min]);
+    const auto& min_max = detail::entry_key(deposit[indices[dim].min_max]);
+    const auto& max_max = detail::entry_key(deposit[indices[dim].max_max]);
 
     const auto width =
       static_cast<T>(range<dim>(max_max).upper - range<dim>(min_min).lower);

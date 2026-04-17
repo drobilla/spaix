@@ -41,11 +41,11 @@ template<class... Ts>
 constexpr auto
 volume(const Rect<Ts...>& rect) noexcept
 {
-  return detail::volume_rec(rect, ibegin_inclusive<Ts...>());
+  return detail::volume_rec(rect, detail::ibegin_inclusive<Ts...>());
 }
 
 template<class... Ts>
-constexpr ProductOf<Ts...>
+constexpr detail::ProductOf<Ts...>
 volume(const Point<Ts...>&) noexcept
 {
   return {};

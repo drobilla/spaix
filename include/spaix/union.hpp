@@ -6,6 +6,7 @@
 
 #include <spaix/Point.hpp>
 #include <spaix/Rect.hpp>
+#include <spaix/detail/attributes.hpp>
 #include <spaix/detail/meta.hpp>
 #include <spaix/types.hpp>
 
@@ -73,7 +74,7 @@ template<class... Ts>
 constexpr Rect<Ts...>
 operator|(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
-  return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
+  return Rect<Ts...>{detail::union_rec(lhs, rhs, detail::ibegin<Ts...>())};
 }
 
 /// Return the geometric union of a point and a rectangle
@@ -81,7 +82,7 @@ template<class... Ts>
 constexpr Rect<Ts...>
 operator|(const Point<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
-  return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
+  return Rect<Ts...>{detail::union_rec(lhs, rhs, detail::ibegin<Ts...>())};
 }
 
 /// Return the geometric union of a rectangle and a point
@@ -89,7 +90,7 @@ template<class... Ts>
 constexpr Rect<Ts...>
 operator|(const Rect<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
-  return Rect<Ts...>{detail::union_rec(lhs, rhs, ibegin<Ts...>())};
+  return Rect<Ts...>{detail::union_rec(lhs, rhs, detail::ibegin<Ts...>())};
 }
 
 /// Expand `lhs` to include `rhs`
@@ -97,7 +98,7 @@ template<class... Ts>
 constexpr Rect<Ts...>&
 operator|=(Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
-  detail::union_rec(lhs, rhs, ibegin<Ts...>());
+  detail::union_rec(lhs, rhs, detail::ibegin<Ts...>());
   return lhs;
 }
 
@@ -106,7 +107,7 @@ template<class... Ts>
 constexpr Rect<Ts...>
 operator|=(Rect<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
-  detail::union_rec(lhs, rhs, ibegin<Ts...>());
+  detail::union_rec(lhs, rhs, detail::ibegin<Ts...>());
   return lhs;
 }
 

@@ -6,6 +6,7 @@
 
 #include <spaix/Point.hpp>
 #include <spaix/Rect.hpp>
+#include <spaix/detail/attributes.hpp>
 #include <spaix/detail/meta.hpp>
 
 #include <cstddef>
@@ -48,7 +49,7 @@ template<class... Ts>
 constexpr bool
 contains(const Rect<Ts...>& parent, const Rect<Ts...>& child) noexcept
 {
-  return detail::contains_rec(parent, child, ibegin<Ts...>());
+  return detail::contains_rec(parent, child, detail::ibegin<Ts...>());
 }
 
 /// Return true iff `parent` contains `child`
@@ -56,7 +57,7 @@ template<class... Ts>
 constexpr bool
 contains(const Point<Ts...>& parent, const Rect<Ts...>& child) noexcept
 {
-  return detail::contains_rec(parent, child, ibegin<Ts...>());
+  return detail::contains_rec(parent, child, detail::ibegin<Ts...>());
 }
 
 /// Return true iff `parent` contains `child`
@@ -64,7 +65,7 @@ template<class... Ts>
 constexpr bool
 contains(const Rect<Ts...>& parent, const Point<Ts...>& child) noexcept
 {
-  return detail::contains_rec(parent, child, ibegin<Ts...>());
+  return detail::contains_rec(parent, child, detail::ibegin<Ts...>());
 }
 
 } // namespace spaix

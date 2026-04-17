@@ -45,15 +45,15 @@ public:
 
     std::array<Volume, count> volumes{};
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
-      volumes[i] = volume(entry_key(deposit[i]));
+      volumes[i] = volume(detail::entry_key(deposit[i]));
     }
 
     Volume           max_waste{std::numeric_limits<Volume>::lowest()};
     SeedsFor<DirKey> seeds{};
     for (ChildIndex i = 0; i < deposit.size() - 1; ++i) {
       for (ChildIndex j = i + 1; j < deposit.size(); ++j) {
-        const auto& k = entry_key(deposit[i]);
-        const auto& l = entry_key(deposit[j]);
+        const auto& k = detail::entry_key(deposit[i]);
+        const auto& l = detail::entry_key(deposit[j]);
 
         const Volume waste = volume(k | l) - volumes[i] - volumes[j];
 
@@ -139,10 +139,10 @@ private:
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
       auto chooser = make_side_chooser(seeds,
                                        lhs.key,
-                                       entry_num_children(lhs),
+                                       detail::entry_num_children(lhs),
                                        rhs.key,
-                                       entry_num_children(rhs),
-                                       entry_key(deposit[i]));
+                                       detail::entry_num_children(rhs),
+                                       detail::entry_key(deposit[i]));
 
       const auto preference = chooser.preference();
       if (preference >= best_preference) {

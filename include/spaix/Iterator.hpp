@@ -47,7 +47,8 @@ public:
       }
     }
 
-    assert(this->empty() || _predicate.leaf(entry_key(this->operator*())));
+    assert(this->empty() ||
+           _predicate.leaf(detail::entry_key(this->operator*())));
   }
 
   Iterator& operator++() noexcept
@@ -87,7 +88,7 @@ private:
     }
 
     for (ChildIndex i = 0U; i < dir.dat_children().size(); ++i) {
-      if (predicate.leaf(entry_key(dir.dat_children()[i]))) {
+      if (predicate.leaf(detail::entry_key(dir.dat_children()[i]))) {
         return i;
       }
     }
@@ -100,8 +101,9 @@ private:
     assert(node()->child_type() == NodeType::data);
     do {
       Base::increment_leaf();
-    } while (index() < node()->dat_children().size() &&
-             !_predicate.leaf(entry_key(node()->dat_children()[index()])));
+    } while (
+      index() < node()->dat_children().size() &&
+      !_predicate.leaf(detail::entry_key(node()->dat_children()[index()])));
 
     return index() < node()->dat_children().size() ? Status::success
                                                    : Status::reached_end;
@@ -163,9 +165,10 @@ private:
     }
 
     // Now at a matching directory, and a matching child of that directory
-    assert((node()->child_type() == NodeType::directory &&
-            _predicate.directory(node()->dir_children()[index()].key)) ||
-           (_predicate.leaf(entry_key(node()->dat_children()[index()]))));
+    assert(
+      (node()->child_type() == NodeType::directory &&
+       _predicate.directory(node()->dir_children()[index()].key)) ||
+      (_predicate.leaf(detail::entry_key(node()->dat_children()[index()]))));
 
     return move_down_left();
   }

@@ -21,6 +21,7 @@
 #include <spaix/detail/DatEntryType.hpp>     // IWYU pragma: keep
 #include <spaix/detail/DirectoryNode.hpp>    // IWYU pragma: keep
 #include <spaix/detail/NodePointerEntry.hpp> // IWYU pragma: keep
+#include <spaix/detail/attributes.hpp>       // IWYU pragma: keep
 #include <spaix/detail/distribute.hpp>       // IWYU pragma: keep
 #include <spaix/detail/meta.hpp>             // IWYU pragma: keep
 #include <spaix/intersects.hpp>              // IWYU pragma: keep

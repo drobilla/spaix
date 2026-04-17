@@ -38,7 +38,10 @@ public:
 
   ~Point() noexcept = default;
 
-  [[nodiscard]] constexpr auto ibegin() const { return spaix::ibegin<Ts...>(); }
+  [[nodiscard]] constexpr auto ibegin() const
+  {
+    return detail::ibegin<Ts...>();
+  }
 
   [[nodiscard]] constexpr size_t       size() const { return sizeof...(Ts); }
   [[nodiscard]] constexpr const Tuple& tuple() const { return _values; }
@@ -69,14 +72,14 @@ operator!=(const Point<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 }
 
 template<size_t dim, class... Ts>
-constexpr const Nth<dim, Ts...>&
+constexpr const detail::Nth<dim, Ts...>&
 get(const Point<Ts...>& point) noexcept
 {
   return std::get<dim>(point.tuple());
 }
 
 template<size_t dim, class... Ts>
-constexpr DimRange<Nth<dim, Ts...>>
+constexpr DimRange<detail::Nth<dim, Ts...>>
 range(const Point<Ts...>& point) noexcept
 {
   return {get<dim>(point), get<dim>(point)};
@@ -106,11 +109,11 @@ template<class... Ts>
 constexpr auto
 ranges(const Point<Ts...>& point) noexcept
 {
-  return detail::point_ranges_rec(point, ibegin<Ts...>());
+  return detail::point_ranges_rec(point, detail::ibegin<Ts...>());
 }
 
 template<size_t dim, class... Ts>
-constexpr Nth<dim, Ts...>
+constexpr detail::Nth<dim, Ts...>
 span(const Point<Ts...>&) noexcept
 {
   return {};

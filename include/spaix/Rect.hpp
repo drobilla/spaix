@@ -75,7 +75,7 @@ public:
 
   ~Rect() noexcept = default;
 
-  static constexpr auto   ibegin() { return spaix::ibegin<T0, Ts...>(); }
+  static constexpr auto   ibegin() { return detail::ibegin<T0, Ts...>(); }
   static constexpr size_t size() { return 1 + sizeof...(Ts); }
 
   [[nodiscard]] constexpr const Tuple& tuple() const { return _ranges; }
@@ -107,21 +107,21 @@ operator!=(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 }
 
 template<size_t dim, class... Ts>
-constexpr const DimRange<Nth<dim, Ts...>>&
+constexpr const DimRange<detail::Nth<dim, Ts...>>&
 get(const Rect<Ts...>& rect) noexcept
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<size_t dim, class... Ts>
-constexpr const DimRange<Nth<dim, Ts...>>&
+constexpr const DimRange<detail::Nth<dim, Ts...>>&
 range(const Rect<Ts...>& rect) noexcept
 {
   return std::get<dim>(rect.tuple());
 }
 
 template<size_t dim, class... Ts>
-DimRange<Nth<dim, Ts...>>&
+DimRange<detail::Nth<dim, Ts...>>&
 range(Rect<Ts...>& rect) noexcept
 {
   return std::get<dim>(rect.tuple());
@@ -135,7 +135,7 @@ ranges(const Rect<Ts...>& rect) noexcept
 }
 
 template<size_t dim, class... Ts>
-constexpr DifferenceOf<Nth<dim, Ts...>, Nth<dim, Ts...>>
+constexpr detail::DifferenceOf<detail::Nth<dim, Ts...>, detail::Nth<dim, Ts...>>
 span(const Rect<Ts...>& rect) noexcept
 {
   const auto& dim_range = get<dim>(rect);

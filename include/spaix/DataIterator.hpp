@@ -36,7 +36,7 @@ public:
     assert(back().index < back().node->num_children());
     assert(back().node->child_type() == NodeType::data);
 
-    return entry_ptr(back().node->dat_children()[back().index]);
+    return detail::entry_ptr(back().node->dat_children()[back().index]);
   }
 
   template<class RhsDir, class RhsDat>

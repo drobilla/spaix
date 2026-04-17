@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DETAIL_DATENTRYTYPE_HPP
@@ -9,7 +9,7 @@
 #include <memory>
 #include <utility>
 
-namespace spaix {
+namespace spaix::detail {
 
 template<class DatNode, DataPlacement placement>
 struct DatEntryType;
@@ -37,6 +37,6 @@ struct DatEntryType<DatNode, DataPlacement::separate> {
   }
 };
 
-} // namespace spaix
+} // namespace spaix::detail
 
 #endif // SPAIX_DETAIL_DATENTRYTYPE_HPP

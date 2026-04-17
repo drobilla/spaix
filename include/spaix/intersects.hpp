@@ -6,6 +6,7 @@
 
 #include <spaix/Point.hpp>
 #include <spaix/Rect.hpp>
+#include <spaix/detail/attributes.hpp>
 #include <spaix/detail/meta.hpp>
 
 #include <cstddef>
@@ -48,7 +49,7 @@ template<class... Ts>
 constexpr bool
 intersects(const Rect<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
-  return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
+  return detail::intersects_rec(lhs, rhs, detail::ibegin<Ts...>());
 }
 
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
@@ -56,7 +57,7 @@ template<class... Ts>
 constexpr bool
 intersects(const Point<Ts...>& lhs, const Rect<Ts...>& rhs) noexcept
 {
-  return detail::intersects_rec(rhs, lhs, ibegin<Ts...>());
+  return detail::intersects_rec(rhs, lhs, detail::ibegin<Ts...>());
 }
 
 /// Return true iff `lhs` has a non-empty intersection with `rhs`
@@ -64,7 +65,7 @@ template<class... Ts>
 constexpr bool
 intersects(const Rect<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {
-  return detail::intersects_rec(lhs, rhs, ibegin<Ts...>());
+  return detail::intersects_rec(lhs, rhs, detail::ibegin<Ts...>());
 }
 
 } // namespace spaix
