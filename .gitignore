@@ -1,7 +1,8 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
-.cache/
-build/
-debug/
-release/
+/.meson-subproject-wrap-hash.txt
+/build/
+
+*.pyc
+__pycache__/
