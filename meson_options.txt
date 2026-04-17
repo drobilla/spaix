@@ -3,6 +3,7 @@
 
 option('benchmarks', type: 'feature', description: 'Build benchmarks')
 option('boost', type: 'feature', description: 'Build boost benchmark')
+option('glm', type: 'feature', description: 'Build glm test')
 option('install', type: 'feature', description: 'Install project')
 option('lint', type: 'boolean', value: false, description: 'Test code quality')
 option('tests', type: 'feature', description: 'Build tests')

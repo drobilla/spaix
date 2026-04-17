@@ -39,7 +39,7 @@ test(
   suite: 'unit',
 )
 
-glm_dep = dependency('glm', version: '>= 0.9.9.6', required: false)
+glm_dep = dependency('glm', version: '>= 0.9.9.6', required: get_option('glm'))
 if glm_dep.found()
   test(
     'test_glm',
