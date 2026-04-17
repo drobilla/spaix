@@ -526,7 +526,6 @@ main(int argc, char** argv)
 
     test_key<Point>(span, queries);
     test_key<Rect>(span, queries);
-
   } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);
