@@ -7,6 +7,7 @@
 #include <spaix/StaticVector.hpp>
 #include <spaix/TreeRange.hpp>
 #include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
 #include <spaix/union.hpp>
 

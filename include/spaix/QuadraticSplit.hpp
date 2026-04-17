@@ -7,8 +7,8 @@
 #include <spaix/SideChooser.hpp>
 #include <spaix/SplitSeeds.hpp>
 #include <spaix/StaticVector.hpp>
-#include <spaix/detail/DirectoryNode.hpp>
 #include <spaix/detail/distribute.hpp>
+#include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
 #include <spaix/volume.hpp>
 

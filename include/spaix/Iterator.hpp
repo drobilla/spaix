@@ -5,7 +5,7 @@
 #define SPAIX_ITERATOR_HPP
 
 #include <spaix/DataIterator.hpp>
-#include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
 
 #include <cassert>

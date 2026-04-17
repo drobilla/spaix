@@ -4,7 +4,7 @@
 #ifndef SPAIX_DETAIL_DISTRIBUTE_HPP
 #define SPAIX_DETAIL_DISTRIBUTE_HPP
 
-#include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
 
 #include <utility>

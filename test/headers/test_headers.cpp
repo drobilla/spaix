@@ -23,6 +23,7 @@
 #include <spaix/detail/NodePointerEntry.hpp> // IWYU pragma: keep
 #include <spaix/detail/attributes.hpp>       // IWYU pragma: keep
 #include <spaix/detail/distribute.hpp>       // IWYU pragma: keep
+#include <spaix/detail/entry.hpp>            // IWYU pragma: keep
 #include <spaix/detail/meta.hpp>             // IWYU pragma: keep
 #include <spaix/intersects.hpp>              // IWYU pragma: keep
 #include <spaix/search/everything.hpp>       // IWYU pragma: keep
