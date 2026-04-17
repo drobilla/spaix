@@ -16,7 +16,8 @@ template<class Tag, class Rep>
 struct Scalar {
   constexpr Scalar() = default;
 
-  constexpr explicit Scalar(const Rep v)
+  // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+  constexpr Scalar(const Rep v)
     : _value{v}
   {}
 

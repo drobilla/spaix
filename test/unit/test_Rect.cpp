@@ -7,21 +7,20 @@
 #include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
 
+#include <spaix/Operations.hpp>
 #include <spaix/Rect.hpp>
-#include <spaix/types.hpp>
 
 #include <limits>
 #include <sstream>
 #include <string>
-#include <tuple>
 
 namespace spaix::test {
 namespace {
 
-void
-test_rect()
+constexpr void
+test_empty()
 {
-  constexpr auto rect = TestRect{XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc}};
+  using spaix::Rect;
 
   STATIC_CHECK(
     (Rect<int, int>{} ==
@@ -34,37 +33,39 @@ test_rect()
                                     std::numeric_limits<float>::lowest()},
                                    {std::numeric_limits<float>::max(),
                                     std::numeric_limits<float>::lowest()}}));
+}
 
-  STATIC_CHECK((TestRect{TestPoint{1_xc, 2.0_yc}} ==
-                TestRect{{1_xc, 1_xc}, {2.0_yc, 2.0_yc}}));
+template<typename Ops, typename OpRect, typename OpPoint>
+void
+test_rect()
+{
+  constexpr auto rect = OpRect{{1, 3}, {2, 5}};
 
-  STATIC_CHECK((TestRect{std::make_tuple(XRange{1_xc, 3_xc},
-                                         YRange{2.0_yc, 5.0_yc})} == rect));
+  STATIC_CHECK((OpRect{OpPoint{1, 2}} == OpRect{{1, 1}, {2, 2}}));
 
   // Comparison
-  STATIC_CHECK((rect == TestRect{XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc}}));
-  STATIC_CHECK((rect != TestRect{XRange{2_xc, 3_xc}, YRange{2.0_yc, 5.0_yc}}));
-  STATIC_CHECK((rect != TestRect{XRange{1_xc, 3_xc}, YRange{4.0_yc, 5.0_yc}}));
+  STATIC_CHECK((rect == OpRect{{1, 3}, {2, 5}}));
+  STATIC_CHECK((rect != OpRect{{2, 3}, {2, 5}}));
+  STATIC_CHECK((rect != OpRect{{1, 3}, {4, 5}}));
 
   // Basic access
-  STATIC_CHECK((ranges(rect) ==
-                std::make_tuple(XRange{1_xc, 3_xc}, YRange{2.0_yc, 5.0_yc})));
   STATIC_CHECK((rect.size() == 2));
-  STATIC_CHECK((get<0>(rect) == XRange{1_xc, 3_xc}));
-  STATIC_CHECK((get<1>(rect) == YRange{2.0_yc, 5.0_yc}));
-  STATIC_CHECK((range<0>(rect) == XRange{1_xc, 3_xc}));
-  STATIC_CHECK((range<1>(rect) == YRange{2.0_yc, 5.0_yc}));
-  STATIC_CHECK((span<0>(rect) == 2));
-  STATIC_CHECK((span<1>(rect) == 3.0f));
-
-  // Empty ranges
-  STATIC_CHECK(
-    (span<0>(TestRect{XRange{2_xc, 1_xc}, YRange{1.0_yc, 2.0_yc}})) == 0);
+  STATIC_CHECK((Ops::template lower<0>(rect) == 1));
+  STATIC_CHECK((Ops::template upper<0>(rect) == 3));
+  STATIC_CHECK((Ops::template lower<1>(rect) == 2));
+  STATIC_CHECK((Ops::template upper<1>(rect) == 5));
 
   // Printing
   std::ostringstream ss;
-  ss << TestRect{make_dim_range(1_xc, 2_xc), make_dim_range(3.0_yc, 4.0_yc)};
-  CHECK((ss.str() == "[[1, 2], [3, 4]]"));
+  ss << rect;
+  CHECK((ss.str() == "[[1, 3], [2, 5]]"));
+}
+
+void
+run()
+{
+  test_empty();
+  test_rect<Operations<XCoord, YCoord>, TestRect, TestPoint>();
 }
 
 } // namespace
@@ -73,6 +74,6 @@ test_rect()
 int
 main()
 {
-  spaix::test::test_rect();
+  spaix::test::run();
   return 0;
 }

@@ -18,9 +18,9 @@ test_volume()
 {
   auto volume = [](const auto& k) { return Ops::volume(k); };
 
-  STATIC_CHECK((volume(TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}}) == 6));
-  STATIC_CHECK((volume(TestRect{{1_xc, 1_xc}, {2.0_yc, 5.0_yc}}) == 0));
-  STATIC_CHECK((volume(TestRect{{1_xc, 3_xc}, {2.0_yc, 2.0_yc}}) == 0));
+  STATIC_CHECK((volume(TestRect{{1, 3}, {2.0, 5.0}}) == 6));
+  STATIC_CHECK((volume(TestRect{{1, 1}, {2.0, 5.0}}) == 0));
+  STATIC_CHECK((volume(TestRect{{1, 3}, {2.0, 2.0}}) == 0));
 }
 
 constexpr void
