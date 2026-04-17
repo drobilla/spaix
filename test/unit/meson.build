@@ -38,3 +38,18 @@ test(
   should_fail: true,
   suite: 'unit',
 )
+
+glm_dep = dependency('glm', version: '>= 0.9.9.6', required: false)
+if glm_dep.found()
+  test(
+    'test_glm',
+    executable(
+      'test_glm',
+      files('test_glm.cpp'),
+      cpp_args: cpp_suppressions,
+      dependencies: [spaix_dep, spaix_test_dep],
+    ),
+    suite: 'unit',
+  )
+endif
+
