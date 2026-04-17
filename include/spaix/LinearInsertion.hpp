@@ -9,6 +9,7 @@
 #include <spaix/volume.hpp>
 
 #include <limits>
+#include <tuple>
 #include <utility>
 
 namespace spaix {
@@ -28,23 +29,24 @@ public:
   {
     using Volume = decltype(volume(std::declval<Key>()));
     using DirKey = UnionOf<Key>;
-    using Sizes  = std::pair<Volume, Volume>;
+    using Cost   = std::tuple<Volume, Volume, ChildCount>;
 
-    constexpr auto max_volume = std::numeric_limits<Volume>::max();
+    constexpr auto max_volume   = std::numeric_limits<Volume>::max();
+    constexpr auto max_children = std::numeric_limits<ChildCount>::max();
 
-    ChildIndex best_index{0};
+    ChildIndex best_index{};
     DirKey     best_key{children[0].key};
-    Sizes      best_sizes{max_volume, max_volume};
+    Cost       best_cost{max_volume, max_volume, max_children};
 
-    for (ChildIndex i = 0; i < children.size(); ++i) {
+    for (auto i = ChildIndex{}; i < children.size(); ++i) {
       const auto& child_key       = children[i].key;
       const auto  child_volume    = volume(child_key);
       const auto  new_key         = child_key | key;
       const auto  volume_increase = volume(new_key) - child_volume;
 
-      Sizes sizes{volume_increase, child_volume};
-      if (sizes < best_sizes) {
-        best_sizes = std::move(sizes);
+      Cost cost{volume_increase, child_volume, entry_num_children(children[i])};
+      if (cost < best_cost) {
+        best_cost  = std::move(cost);
         best_index = i;
         best_key   = new_key;
       }
