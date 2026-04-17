@@ -3,12 +3,8 @@
 
 #undef NDEBUG
 
-#include <spaix_test/Scalar.hpp>
-#include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
-
-#include <spaix/Operations.hpp>
-#include <spaix/Point.hpp>
+#include <spaix_test/hetero2.hpp>
 
 #include <sstream>
 #include <string>
@@ -46,7 +42,7 @@ test_point()
 void
 run()
 {
-  test_point<Operations<XCoord, YCoord>, TestPoint>();
+  test_point<hetero2::Ops, hetero2::Point>();
 }
 
 } // namespace

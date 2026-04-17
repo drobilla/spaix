@@ -1,10 +1,11 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_POINT_HPP
-#define SPAIX_POINT_HPP
+#ifndef SPAIX_HETEROX_POINT_HPP
+#define SPAIX_HETEROX_POINT_HPP
 
-#include <spaix/detail/meta.hpp>
+#include <spaix/detail/Index.hpp>
+#include <spaix/heterox/detail/meta.hpp>
 #include <spaix/types.hpp>
 
 #include <cstddef>
@@ -13,7 +14,7 @@
 #include <tuple>
 #include <utility>
 
-namespace spaix {
+namespace spaix::heterox {
 
 /// A multi-dimension point which supports heterogeneous types
 template<class... Ts>
@@ -82,14 +83,16 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 constexpr auto
-point_ranges_rec(const Point<Ts...>&, EndIndex<n_dims>) noexcept
+point_ranges_rec(const Point<Ts...>&,
+                 ::spaix::detail::EndIndex<n_dims>) noexcept
 {
   return std::make_tuple();
 }
 
 template<class... Ts, size_t dim, size_t n_dims>
 constexpr auto
-point_ranges_rec(Point<Ts...> point, Index<dim, n_dims> index) noexcept
+point_ranges_rec(Point<Ts...>                        point,
+                 ::spaix::detail::Index<dim, n_dims> index) noexcept
 {
   return std::tuple_cat(
     std::make_tuple(make_dim_range(get<dim>(point), get<dim>(point))),
@@ -116,12 +119,16 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 void
-print_rec(std::ostream&, const Point<Ts...>&, EndIndex<n_dims>) noexcept
+print_rec(std::ostream&,
+          const Point<Ts...>&,
+          ::spaix::detail::EndIndex<n_dims>) noexcept
 {}
 
 template<class... Ts, size_t dim, size_t n_dims>
 void
-print_rec(std::ostream& os, const Point<Ts...>& point, Index<dim, n_dims> index)
+print_rec(std::ostream&                       os,
+          const Point<Ts...>&                 point,
+          ::spaix::detail::Index<dim, n_dims> index)
 {
   os << ((dim > 0) ? ", " : "") << get<dim>(point);
   print_rec(os, point, ++index);
@@ -138,6 +145,6 @@ operator<<(std::ostream& os, const Point<Ts...>& point)
   return os << ']';
 }
 
-} // namespace spaix
+} // namespace spaix::heterox
 
-#endif // SPAIX_POINT_HPP
+#endif // SPAIX_HETEROX_POINT_HPP

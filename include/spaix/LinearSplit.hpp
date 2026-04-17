@@ -6,9 +6,9 @@
 
 #include <spaix/SideChooser.hpp>
 #include <spaix/SplitSeeds.hpp>
+#include <spaix/detail/Index.hpp>
 #include <spaix/detail/distribute.hpp>
 #include <spaix/detail/entry.hpp>
-#include <spaix/detail/meta.hpp>
 #include <spaix/types.hpp>
 
 #include <algorithm>
@@ -131,7 +131,7 @@ private:
   static void update_indices(const Entries&,
                              const ChildIndex,
                              std::array<ExtremeIndices, n_dims>&,
-                             detail::Index<n_dims, n_dims>) noexcept
+                             detail::EndIndex<n_dims>) noexcept
   {}
 
   template<class Entries, size_t dim, size_t n_dims>
@@ -175,7 +175,7 @@ private:
   static void update_max_separation(const Entries&,
                                     const std::array<ExtremeIndices, n_dims>&,
                                     MaxSeparation<T>&,
-                                    detail::Index<n_dims, n_dims>) noexcept
+                                    detail::EndIndex<n_dims>) noexcept
   {}
 
   template<class Entries, class T, size_t dim, size_t n_dims>

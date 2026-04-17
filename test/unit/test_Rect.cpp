@@ -3,12 +3,8 @@
 
 #undef NDEBUG
 
-#include <spaix_test/Scalar.hpp>
-#include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
-
-#include <spaix/Operations.hpp>
-#include <spaix/Rect.hpp>
+#include <spaix_test/hetero2.hpp>
 
 #include <limits>
 #include <sstream>
@@ -20,7 +16,7 @@ namespace {
 constexpr void
 test_empty()
 {
-  using spaix::Rect;
+  using heterox::Rect;
 
   STATIC_CHECK(
     (Rect<int, int>{} ==
@@ -65,7 +61,7 @@ void
 run()
 {
   test_empty();
-  test_rect<Operations<XCoord, YCoord>, TestRect, TestPoint>();
+  test_rect<hetero2::Ops, hetero2::Rect, hetero2::Point>();
 }
 
 } // namespace

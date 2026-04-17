@@ -3,10 +3,8 @@
 
 #undef NDEBUG
 
-#include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
-
-#include <spaix/Queries.hpp>
+#include <spaix_test/hetero2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -41,7 +39,7 @@ test_intersects()
 constexpr void
 run()
 {
-  test_intersects<Queries<XCoord, YCoord>, TestRect, TestPoint>();
+  test_intersects<hetero2::Queries, hetero2::Rect, hetero2::Point>();
 }
 
 } // namespace

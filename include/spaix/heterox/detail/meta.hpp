@@ -1,15 +1,18 @@
 // Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_DETAIL_META_HPP
-#define SPAIX_DETAIL_META_HPP
+#ifndef SPAIX_HETEROX_DETAIL_META_HPP
+#define SPAIX_HETEROX_DETAIL_META_HPP
 
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
-namespace spaix::detail {
+#include <spaix/detail/Index.hpp>
+#include <spaix/heterox/detail/meta.hpp>
+
+namespace spaix::heterox::detail {
 
 template<size_t n, typename... Ts>
 using Nth = typename std::tuple_element_t<n, std::tuple<Ts...>>;
@@ -23,14 +26,6 @@ struct CommonElementType<std::tuple<Ts...>> {
 };
 
 template<size_t i, size_t n>
-struct Index {
-  constexpr Index<i + 1, n> operator++() const { return {}; }
-};
-
-template<size_t n>
-using EndIndex = Index<n, n>;
-
-template<size_t i, size_t n>
 struct InclusiveIndex {
   constexpr InclusiveIndex<i + 1, n> operator++() const { return {}; }
 };
@@ -39,7 +34,7 @@ template<size_t n>
 using LastIndex = InclusiveIndex<n, n>;
 
 template<class... Ts>
-constexpr Index<0, sizeof...(Ts)>
+constexpr ::spaix::detail::Index<0, sizeof...(Ts)>
 ibegin() noexcept
 {
   return {};
@@ -76,6 +71,6 @@ using ProductOf =
 template<class L, class R>
 using DifferenceOf = decltype(std::declval<L>() - std::declval<R>());
 
-} // namespace spaix::detail
+} // namespace spaix::heterox::detail
 
-#endif // SPAIX_DETAIL_META_HPP
+#endif // SPAIX_HETEROX_DETAIL_META_HPP

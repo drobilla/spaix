@@ -1,11 +1,12 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_RECT_HPP
-#define SPAIX_RECT_HPP
+#ifndef SPAIX_HETEROX_RECT_HPP
+#define SPAIX_HETEROX_RECT_HPP
 
-#include <spaix/Point.hpp>
-#include <spaix/detail/meta.hpp>
+#include <spaix/detail/Index.hpp>
+#include <spaix/heterox/Point.hpp>
+#include <spaix/heterox/detail/meta.hpp>
 #include <spaix/types.hpp>
 
 #include <cstddef>
@@ -14,22 +15,21 @@
 #include <tuple>
 #include <utility>
 
-namespace spaix {
+namespace spaix::heterox {
 
 namespace detail {
 
 template<class... Ts, size_t n_dims>
-constexpr auto
-empty_ranges_rec(EndIndex<n_dims>) noexcept
+constexpr auto empty_ranges_rec(::spaix::detail::EndIndex<n_dims>) noexcept
 {
   return std::make_tuple();
 }
 
 template<class... Ts, size_t dim, size_t n_dims>
 constexpr auto
-empty_ranges_rec(Index<dim, n_dims> index) noexcept
+empty_ranges_rec(::spaix::detail::Index<dim, n_dims> index) noexcept
 {
-  using T = Nth<dim, Ts...>;
+  using T = detail::Nth<dim, Ts...>;
 
   return std::tuple_cat(
     std::make_tuple(DimRange<T>{std::numeric_limits<T>::max(),
@@ -44,8 +44,7 @@ template<class T0, class... Ts>
 class Rect
 {
 public:
-  using Tuple   = std::tuple<DimRange<T0>, DimRange<Ts>...>;
-  using Scalars = std::tuple<T0, Ts...>;
+  using Tuple = std::tuple<DimRange<T0>, DimRange<Ts>...>;
 
   /// Construct an empty rectangle
   constexpr explicit Rect() noexcept
@@ -75,7 +74,8 @@ public:
 
   ~Rect() noexcept = default;
 
-  static constexpr auto   ibegin() { return detail::ibegin<T0, Ts...>(); }
+  static constexpr auto ibegin() { return detail::ibegin<T0, Ts...>(); }
+
   static constexpr size_t size() { return 1 + sizeof...(Ts); }
 
   [[nodiscard]] constexpr const Tuple& tuple() const { return _ranges; }
@@ -143,12 +143,16 @@ namespace detail {
 
 template<class... Ts, size_t n_dims>
 void
-print_rec(std::ostream&, const Rect<Ts...>&, EndIndex<n_dims>) noexcept
+print_rec(std::ostream&,
+          const Rect<Ts...>&,
+          ::spaix::detail::EndIndex<n_dims>) noexcept
 {}
 
 template<class... Ts, size_t dim, size_t n_dims>
 void
-print_rec(std::ostream& os, const Rect<Ts...>& rect, Index<dim, n_dims> index)
+print_rec(std::ostream&                       os,
+          const Rect<Ts...>&                  rect,
+          ::spaix::detail::Index<dim, n_dims> index)
 {
   const auto [lower, upper] = range<dim>(rect);
 
@@ -168,6 +172,6 @@ operator<<(std::ostream& os, const Rect<Ts...>& rect)
   return os << ']';
 }
 
-} // namespace spaix
+} // namespace spaix::heterox
 
-#endif // SPAIX_RECT_HPP
+#endif // SPAIX_HETEROX_RECT_HPP

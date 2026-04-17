@@ -3,11 +3,8 @@
 
 #undef NDEBUG
 
-#include <spaix_test/Scalar.hpp>
-#include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
-
-#include <spaix/Operations.hpp>
+#include <spaix_test/hetero2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -26,7 +23,7 @@ test_volume()
 constexpr void
 run()
 {
-  test_volume<Operations<XCoord, YCoord>, TestRect>();
+  test_volume<hetero2::Ops, hetero2::Rect>();
 }
 
 } // namespace

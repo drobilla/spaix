@@ -10,11 +10,11 @@
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
-#include <spaix/Operations.hpp>
-#include <spaix/Point.hpp>
-#include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
+#include <spaix/QuadraticSplit.hpp>  // IWYU pragma: keep
 #include <spaix/RTree.hpp>
-#include <spaix/Rect.hpp>
+#include <spaix/heterox/Operations.hpp>
+#include <spaix/heterox/Point.hpp>
+#include <spaix/heterox/Rect.hpp>
 
 #include <cmath>
 #include <cstdint>
@@ -29,9 +29,9 @@ namespace {
 
 using Args   = spaix::test::Arguments;
 using Scalar = double;
-using Rect2  = spaix::Rect<Scalar, Scalar>;
-using Point2 = spaix::Point<Scalar, Scalar>;
-using Ops    = spaix::Operations<Scalar, Scalar>;
+using Rect2  = spaix::heterox::Rect<Scalar, Scalar>;
+using Point2 = spaix::heterox::Point<Scalar, Scalar>;
+using Ops    = spaix::heterox::Operations<Scalar, Scalar>;
 
 struct Parameters {
   explicit Parameters(const spaix::test::Arguments& args)
