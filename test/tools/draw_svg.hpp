@@ -15,20 +15,20 @@
 
 namespace spaix {
 
-namespace heterox {
+namespace homox {
 
-template<class... Ts>
+template<class T, size_t D>
 class Point;
 
-template<class T0, class... Ts>
+template<class T, size_t D>
 class Rect;
 
-} // namespace heterox
+} // namespace homox
 
 namespace svg {
 
-using heterox::Point;
-using heterox::Rect;
+using homox::Point;
+using homox::Rect;
 
 constexpr double pad = 8;
 
@@ -106,24 +106,24 @@ draw_dir(std::ostream&   os,
   os << "/>\n";
 }
 
-template<class Ops, class... Values, class NodePath>
+template<class Ops, class T, size_t D, class NodePath>
 inline void
-draw_dat(std::ostream&          os,
-         const Rect<Values...>& key,
-         const NodePath&        path,
-         const Rect<Values...>& bounds,
-         const double           scale)
+draw_dat(std::ostream&     os,
+         const Rect<T, D>& key,
+         const NodePath&   path,
+         const Rect<T, D>& bounds,
+         const double      scale)
 {
   draw_dir(os, key, path, bounds, scale);
 }
 
-template<class Ops, class... Values, class NodePath>
+template<class Ops, class T, size_t D, class NodePath>
 inline void
-draw_dat(std::ostream&           os,
-         const Point<Values...>& key,
-         const NodePath&         path,
-         const Rect<Values...>&  bounds,
-         const double            scale)
+draw_dat(std::ostream&      os,
+         const Point<T, D>& key,
+         const NodePath&    path,
+         const Rect<T, D>&  bounds,
+         const double       scale)
 {
   const auto style = "fill: " + color(path, 1.0) + "; stroke: black";
 

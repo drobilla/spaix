@@ -5,6 +5,7 @@
 
 #include <spaix_test/check.hpp>
 #include <spaix_test/hetero2.hpp>
+#include <spaix_test/homo2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -40,6 +41,7 @@ constexpr void
 run()
 {
   test_intersects<hetero2::Queries, hetero2::Rect, hetero2::Point>();
+  test_intersects<homo2::Queries, homo2::Rect, homo2::Point>();
 }
 
 } // namespace

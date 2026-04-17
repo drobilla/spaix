@@ -5,6 +5,7 @@
 
 #include <spaix_test/check.hpp>
 #include <spaix_test/hetero2.hpp>
+#include <spaix_test/homo2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -24,6 +25,7 @@ constexpr void
 run()
 {
   test_volume<hetero2::Ops, hetero2::Rect>();
+  test_volume<homo2::Ops, homo2::Rect>();
 }
 
 } // namespace

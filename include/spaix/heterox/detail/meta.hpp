@@ -10,7 +10,6 @@
 #include <utility>
 
 #include <spaix/detail/Index.hpp>
-#include <spaix/heterox/detail/meta.hpp>
 
 namespace spaix::heterox::detail {
 
