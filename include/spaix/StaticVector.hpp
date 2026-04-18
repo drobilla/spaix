@@ -12,7 +12,7 @@
 
 namespace spaix {
 
-template<class T, class Size, Size Capacity>
+template<class T, class Size, Size max_size>
 class StaticVector
 {
 public:
@@ -72,7 +72,7 @@ public:
   template<class... Args>
   void emplace_back(Args&&... args) noexcept
   {
-    assert(_size < Capacity);
+    assert(_size < max_size);
 
     new (&_array[_size++]) T{std::forward<Args>(args)...};
   }
@@ -113,7 +113,7 @@ public:
   }
 
   [[nodiscard]] Size                  size() const noexcept { return _size; }
-  [[nodiscard]] static constexpr Size capacity() noexcept { return Capacity; }
+  [[nodiscard]] static constexpr Size capacity() noexcept { return max_size; }
 
   [[nodiscard]] iterator begin() noexcept
   {
@@ -138,13 +138,13 @@ private:
   using Element = typename std::aligned_storage_t<sizeof(T), alignof(T)>;
 
   Size    _size{};
-  Element _array[Capacity]{}; // NOLINT(*-c-arrays)
+  Element _array[max_size]{}; // NOLINT(*-c-arrays)
 };
 
-template<class T, class Size, Size capacity>
+template<class T, class Size, Size max_size>
 [[nodiscard]] bool
-operator<(const spaix::StaticVector<T, Size, capacity>& lhs,
-          const spaix::StaticVector<T, Size, capacity>& rhs) noexcept
+operator<(const spaix::StaticVector<T, Size, max_size>& lhs,
+          const spaix::StaticVector<T, Size, max_size>& rhs) noexcept
 {
   using std::lexicographical_compare;
 
