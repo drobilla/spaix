@@ -1,6 +1,3 @@
-<!-- Copyright 2020-2022 David Robillard <d@drobilla.net> -->
-<!-- SPDX-License-Identifier: 0BSD or GPL-3.0-only -->
-
 Spaix
 =====
 
