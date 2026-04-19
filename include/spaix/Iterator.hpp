@@ -121,7 +121,9 @@ private:
   /// Move up/right until we reach a node we are not at the end of yet
   [[nodiscard]] Status move_up_right() noexcept
   {
-    while (!empty() && index() >= node()->num_children()) {
+    assert(!empty());
+
+    while (index() >= node()->num_children()) {
       Base::pop_frame(); // Move up
       if (empty()) {
         return Status::reached_end;

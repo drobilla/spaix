@@ -4,8 +4,6 @@
 #ifndef SPAIX_TEST_CHECK_HPP
 #define SPAIX_TEST_CHECK_HPP
 
-#undef NDEBUG
-
 #include <cassert>
 
 #ifdef _MSC_VER

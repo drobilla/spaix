@@ -1,9 +1,6 @@
 // Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "spaix_test/check.hpp"
-#include "spaix_test/options.hpp"
-
 #include <spaix/Config.hpp>
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
@@ -13,6 +10,11 @@
 
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
+
+#undef NDEBUG
+
+#include <spaix_test/check.hpp>
+#include <spaix_test/options.hpp>
 
 #include <algorithm>
 #include <ctime>

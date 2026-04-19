@@ -1,9 +1,6 @@
 // Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include <spaix_test/check.hpp>
-#include <spaix_test/options.hpp>
-
 #include <spaix/Config.hpp>
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
@@ -17,6 +14,11 @@
 #include <spaix/heterox/Point.hpp>
 #include <spaix/heterox/Rect.hpp>
 #include <spaix/types.hpp>
+
+#undef NDEBUG
+
+#include <spaix_test/check.hpp>
+#include <spaix_test/options.hpp>
 
 #include <algorithm>
 #include <ctime>
@@ -73,6 +75,10 @@ test_empty_tree(const Tree& tree, const unsigned span)
   CHECK(!tree.size());
   CHECK(tree.begin() == tree.end());
   CHECK(tree.query(Queries::everything()).empty());
+  CHECK(tree.bounds() == typename Tree::Box{});
+
+  auto no_results = tree.query(Queries::everything());
+  CHECK(!std::distance(no_results.begin(), no_results.end()));
 }
 
 template<class Tree>
@@ -250,9 +256,14 @@ test_tree(const unsigned span, const unsigned n_queries)
   test_visit(tree);
   test_structure(tree);
 
+  CHECK(tree.begin() == tree.begin());
+  CHECK(tree.end() == tree.end());
+  CHECK(tree.begin() != tree.end());
+  CHECK(tree.end() != tree.begin());
   CHECK(tree.cbegin() == tree.cbegin());
   CHECK(tree.cend() == tree.cend());
   CHECK(tree.cbegin() != tree.cend());
+  CHECK(tree.cend() != tree.cbegin());
   CHECK(std::next(tree.cbegin()) != tree.cbegin());
 
   STATIC_CHECK(tree.max_height() > 1U);
@@ -266,12 +277,23 @@ test_tree(const unsigned span, const unsigned n_queries)
   CHECK(n_nodes == tree.size());
 
   // Test a query that is in the tree bounds, but has no matches
-  const auto mid = static_cast<float>(span) / 2.0f;
-  const auto no_matches_query =
-    Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
-  auto no_results = tree.query(Queries::within(no_matches_query));
-  CHECK(!std::distance(no_results.begin(), no_results.end()));
+  {
+    const auto mid = static_cast<float>(span) / 2.0f;
+    const auto inside_query =
+      Rect{{mid + 0.1f, mid + 0.1f}, {mid + 0.9f, mid + 0.9f}};
+    auto no_results = tree.query(Queries::within(inside_query));
+    CHECK(!std::distance(no_results.begin(), no_results.end()));
+  }
 
+  // Test a query that is completely outside the tree bounds
+  {
+    const auto beyond        = static_cast<float>(span) + 2.0f;
+    const auto outside_query = Rect{{beyond, beyond}, {beyond, beyond}};
+    auto       no_results    = tree.query(Queries::touching(outside_query));
+    CHECK(!std::distance(no_results.begin(), no_results.end()));
+  }
+
+  // Test random queries
   for (auto i = 0U; i < n_queries; ++i) {
     const auto x0     = dist(rng);
     const auto x1     = dist(rng);
@@ -299,6 +321,10 @@ test_tree(const unsigned span, const unsigned n_queries)
       CHECK((Comparisons::contains(tree.bounds(), node.first)));
       ++count;
     };
+
+    // Identical queries
+    CHECK((tree.query(Queries::touching(query)).begin() ==
+           tree.query(Queries::touching(query)).begin()));
 
     // Visitor query
     tree.visit_matches(Queries::within(query), verify);

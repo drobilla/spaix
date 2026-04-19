@@ -8,8 +8,6 @@
 #include <limits>
 #include <utility>
 
-#undef NDEBUG
-
 namespace spaix::test {
 
 template<class Tag, class Rep>

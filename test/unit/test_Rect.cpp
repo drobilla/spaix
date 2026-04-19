@@ -1,11 +1,12 @@
 // Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include <spaix_test/hetero2.hpp>
+#include <spaix_test/homo2.hpp>
+
 #undef NDEBUG
 
 #include <spaix_test/check.hpp>
-#include <spaix_test/hetero2.hpp>
-#include <spaix_test/homo2.hpp>
 
 #include <limits>
 #include <sstream>
@@ -42,8 +43,14 @@ test_rect()
 
   // Comparison
   STATIC_CHECK((rect == OpRect{{1, 3}, {2, 5}}));
+  STATIC_CHECK(!(rect == OpRect{{2, 3}, {2, 5}}));
   STATIC_CHECK((rect != OpRect{{2, 3}, {2, 5}}));
+  STATIC_CHECK(!(rect == OpRect{{1, 3}, {4, 5}}));
   STATIC_CHECK((rect != OpRect{{1, 3}, {4, 5}}));
+  STATIC_CHECK(!(rect == OpRect{{1, 3}, {2, 6}}));
+  STATIC_CHECK((rect != OpRect{{1, 3}, {2, 6}}));
+  STATIC_CHECK(!(rect == OpRect{{1, 4}, {2, 5}}));
+  STATIC_CHECK((rect != OpRect{{1, 4}, {2, 5}}));
 
   // Basic access
   STATIC_CHECK((rect.size() == 2));
