@@ -252,7 +252,8 @@ visit_dir_entry(const NodePointerEntry<Key, Node>& entry,
 {
   const auto& node = *entry.node;
 
-  if (visit_dir(path, entry.key, node.num_children()) == VisitStatus::finish) {
+  if (visit_dir(path, entry.key, node.child_type(), node.num_children()) ==
+      VisitStatus::finish) {
     return VisitStatus::finish;
   }
 

@@ -151,7 +151,7 @@ draw_svg(std::ostream&  os,
 
   tree.visit(
     [&os, bounds, scale, max_depth](
-      const NodePath& path, const DirKey& key, size_t) {
+      const NodePath& path, const DirKey& key, NodeType, ChildCount) {
       svg::draw_dir<Ops>(os, key, path, bounds, scale);
       return (!max_depth || path.size() <= max_depth) ? VisitStatus::proceed
                                                       : VisitStatus::finish;

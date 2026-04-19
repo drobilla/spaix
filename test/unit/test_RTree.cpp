@@ -32,6 +32,9 @@
 
 namespace {
 
+using ChildCount = spaix::ChildCount;
+using NodeType   = spaix::NodeType;
+
 using Scalar      = float;
 using Rect        = spaix::Rect<float, float>;
 using Point       = spaix::Point<float, float>;
@@ -146,7 +149,7 @@ test_visit(const Tree& tree)
 
   // Check that visitation can be stopped at directories
   tree.visit(
-    [&](const NodePath& path, const DirKey&, const size_t) {
+    [&](const NodePath& path, const DirKey&, NodeType, ChildCount) {
       CHECK(path.size() <= 2);
       top_paths.emplace_back(path);
       return path.size() < 2 ? spaix::VisitStatus::proceed
@@ -164,7 +167,7 @@ test_visit(const Tree& tree)
   size_t n_dirs   = 0;
   size_t n_leaves = 0;
   tree.visit(
-    [&](const NodePath&, const DirKey&, const size_t) {
+    [&](const NodePath&, const DirKey&, NodeType, ChildCount) {
       ++n_dirs;
       return spaix::VisitStatus::proceed;
     },
@@ -190,8 +193,14 @@ test_structure(const Tree& tree)
 
   size_t n_leaves = 0;
   tree.visit(
-    [&](const NodePath& path, const DirKey& key, const size_t) {
+    [&](const NodePath&  path,
+        const DirKey&    key,
+        const NodeType   child_type,
+        const ChildCount n_children) {
       check_node(dir_keys, key, path);
+      CHECK(path.size() == 1 ||
+            n_children >= Tree::Conf::min_fanout(child_type));
+      CHECK(n_children <= Tree::Conf::fanout(child_type));
       dir_keys.emplace(path, key);
       return spaix::VisitStatus::proceed;
     },

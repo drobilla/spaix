@@ -69,8 +69,10 @@ draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0U)
   os << "graph Tree {\n";
   os << "  node [shape=box];\n";
   tree.visit(
-    [&os, max_depth](
-      const NodePath& path, const DirKey& key, const size_t n_children) {
+    [&os, max_depth](const NodePath& path,
+                     const DirKey&   key,
+                     const NodeType /*child_type*/,
+                     const ChildCount n_children) {
       detail::draw_dir_dot(os, key, path, n_children);
       return (!max_depth || path.size() <= max_depth) ? VisitStatus::proceed
                                                       : VisitStatus::finish;

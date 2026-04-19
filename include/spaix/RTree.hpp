@@ -150,10 +150,10 @@ public:
      The traversal is terminated immediately if any visitor returns
      VisitStatus::finish.
 
-     @param visit_dir Function called for every internal directory node, with
-     prototype `VisitStatus (const NodePath&, const Box&, ChildCount)`.
+     @param visit_dir Function called for every directory node, with prototype
+     `VisitStatus (const NodePath&, const Box&, NodeType, ChildCount)`.
 
-     @param visit_dat Function called for every internal directory node, with
+     @param visit_dat Function called for every data element, with
      prototype `VisitStatus (const NodePath&, const Key&, const Data&)`.
   */
   template<typename DirVisitor, typename DatVisitor>

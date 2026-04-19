@@ -130,6 +130,25 @@ struct Config {
   static constexpr auto min_dat_fanout =
     dat_fanout * MinFillRatio::num / MinFillRatio::den;
 
+#if !defined(__clang__) && defined(__GNUC__)
+  _Pragma("GCC diagnostic push")
+  _Pragma("GCC diagnostic ignored \"-Wduplicated-branches\"")
+#endif
+
+  static constexpr auto fanout(const NodeType node_type)
+  {
+    return node_type == NodeType::directory ? dir_fanout : dat_fanout;
+  }
+
+  static constexpr auto min_fanout(const NodeType node_type)
+  {
+    return node_type == NodeType::directory ? min_dir_fanout : min_dat_fanout;
+  }
+
+#if !defined(__clang__) && defined(__GNUC__)
+  _Pragma("GCC diagnostic pop")
+#endif
+
   static_assert(dir_fanout > 1);
   static_assert(dat_fanout > 1);
   static_assert(min_dir_fanout >= 1);
