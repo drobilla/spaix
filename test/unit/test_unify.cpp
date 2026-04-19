@@ -18,27 +18,22 @@ template<typename Ops, typename Rect, typename Point>
 constexpr void
 test_unify()
 {
-  using OpRect = decltype(Rect{{0_xc, 0_xc}, {0.0_yc, 0.0_yc}});
+  using OpRect = decltype(Rect{{0, 0}, {0, 0}});
 
-  constexpr auto rect = OpRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}};
+  constexpr auto rect = OpRect{{1, 3}, {2, 5}};
 
   CHECK((Ops::unify(rect, OpRect{}) == rect));
 
-  CHECK((Ops::unify(rect, Rect{{2_xc, 4_xc}, {1.0_yc, 5.0_yc}}) ==
-         Rect{{1_xc, 4_xc}, {1.0_yc, 5.0_yc}}));
+  CHECK((Ops::unify(rect, Rect{{2, 4}, {1, 5}}) == Rect{{1, 4}, {1, 5}}));
 
-  CHECK((Ops::unify(rect, Point{0_xc, 2.0_yc}) ==
-         Rect{{0_xc, 3_xc}, {2.0_yc, 5.0_yc}}));
-  CHECK((Ops::unify(rect, Point{4_xc, 2.0_yc}) ==
-         Rect{{1_xc, 4_xc}, {2.0_yc, 5.0_yc}}));
-  CHECK((Ops::unify(rect, Point{1_xc, 1.0_yc}) ==
-         Rect{{1_xc, 3_xc}, {1.0_yc, 5.0_yc}}));
-  CHECK((Ops::unify(rect, Point{1_xc, 6.0_yc}) ==
-         Rect{{1_xc, 3_xc}, {2.0_yc, 6.0_yc}}));
+  CHECK((Ops::unify(rect, Point{0, 2}) == Rect{{0, 3}, {2, 5}}));
+  CHECK((Ops::unify(rect, Point{4, 2}) == Rect{{1, 4}, {2, 5}}));
+  CHECK((Ops::unify(rect, Point{1, 1}) == Rect{{1, 3}, {1, 5}}));
+  CHECK((Ops::unify(rect, Point{1, 6}) == Rect{{1, 3}, {2, 6}}));
 
-  auto mut = Rect{{1_xc, 3_xc}, {1.0_yc, 5.0_yc}};
-  Ops::expand(mut, Rect{{2_xc, 4_xc}, {2.0_yc, 6.0_yc}});
-  CHECK((mut == Rect{{1_xc, 4_xc}, {1.0_yc, 6.0_yc}}));
+  auto mut = Rect{{1, 3}, {1, 5}};
+  Ops::expand(mut, Rect{{2, 4}, {2, 6}});
+  CHECK((mut == Rect{{1, 4}, {1, 6}}));
 }
 
 constexpr void
