@@ -67,6 +67,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
                         {0.0f, static_cast<float>(span)}};
 
   CHECK(tree.empty());
+  CHECK(!tree.size());
   CHECK(tree.begin() == tree.end());
   CHECK(tree.query(Queries::everything()).empty());
 }
@@ -207,6 +208,24 @@ test_structure(const Tree& tree)
 
 template<class Tree>
 void
+test_clear(const unsigned span)
+{
+  const auto start_time = static_cast<unsigned>(time(nullptr));
+  const auto seed       = std::random_device{}() ^ start_time;
+
+  std::mt19937 rng{seed};
+
+  // Create a non-empty tree with several levels of random data
+  auto tree = make_tree<Tree>(rng, span);
+  CHECK(tree.size());
+
+  // Clear tree and make sure all contents were dropped
+  tree.clear();
+  test_empty_tree(tree, span);
+}
+
+template<class Tree>
+void
 test_tree(const unsigned span, const unsigned n_queries)
 {
   using Key = typename Tree::Key;
@@ -302,6 +321,14 @@ test_page_size(const unsigned span, const unsigned n_queries)
                                        spaix::LinearSplit<Ops, 2U>,
                                        spaix::LinearInsertion<Ops>>>>(
     2, n_queries);
+
+  // Test clear on a small (but not quite so trivially small) tree
+  test_clear<spaix::RTree<Rect,
+                          Key,
+                          Data,
+                          spaix::Config<Structure,
+                                        spaix::LinearSplit<Ops, 2U>,
+                                        spaix::LinearInsertion<Ops>>>>(16);
 
   test_tree<spaix::RTree<Rect,
                          Key,

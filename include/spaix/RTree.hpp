@@ -126,7 +126,11 @@ public:
                   const Visitor&   visitor) const noexcept;
 
   /// Remove all items from the tree
-  void clear() noexcept { _root = {Box{}, nullptr}; }
+  void clear() noexcept
+  {
+    _root = {Box{}, nullptr};
+    _size = 0;
+  }
 
   /// Return the number of items in the tree
   [[nodiscard]] size_t size() const noexcept { return _size; }
