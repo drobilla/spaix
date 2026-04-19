@@ -9,7 +9,6 @@
 #include <spaix/types.hpp>
 
 #include <cassert>
-#include <cstddef>
 #include <utility>
 
 namespace spaix {
@@ -19,7 +18,7 @@ namespace spaix {
 
    This iterates over data items in the tree which match the given predicate.
 */
-template<class Predicate, class DirNode, class DatNode, size_t max_height>
+template<class Predicate, class DirNode, class DatNode, unsigned max_height>
 class Iterator : public DataIterator<DirNode, DatNode, max_height>
 {
 public:

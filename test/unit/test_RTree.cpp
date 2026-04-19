@@ -223,6 +223,9 @@ test_tree(const unsigned span, const unsigned n_queries)
   CHECK(tree.cbegin() != tree.cend());
   CHECK(std::next(tree.cbegin()) != tree.cbegin());
 
+  STATIC_CHECK(tree.max_height() > 1U);
+  STATIC_CHECK(tree.max_size() > tree.max_height());
+
   size_t n_nodes = 0;
   for (const auto& node : tree) {
     (void)node;

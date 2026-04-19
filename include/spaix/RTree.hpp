@@ -46,7 +46,7 @@ public:
     detail::DirectoryNode<Box, DatNode, Structure>; ///< Internal node
 
   /// Return the maximum height of a tree
-  static constexpr size_t max_height() noexcept
+  static constexpr unsigned max_height() noexcept
   {
     return max_tree_height<DirNode, DatNode, Conf::placement>(
       Conf::min_dir_fanout);
@@ -55,7 +55,8 @@ public:
   /// Return an upper bound on the maximum number of elements in a tree
   static constexpr size_t max_size() noexcept
   {
-    return Conf::dat_fanout * power(Conf::dir_fanout, max_height() - 1);
+    return Conf::dat_fanout *
+           power(Conf::dir_fanout, static_cast<size_t>(max_height()) - 1U);
   }
 
   /// An iterator over a search area

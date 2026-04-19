@@ -9,14 +9,13 @@
 #include <spaix/types.hpp>
 
 #include <cassert>
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
 
 namespace spaix {
 
 /// An iterator that points at a data node in an RTree
-template<class DirNode, class DatNode, size_t max_height>
+template<class DirNode, class DatNode, unsigned max_height>
 class DataIterator
 {
 public:
@@ -96,7 +95,7 @@ private:
     return _stack.back();
   }
 
-  StaticVector<Frame, size_t, max_height> _stack;
+  StaticVector<Frame, unsigned, max_height> _stack;
 };
 
 } // namespace spaix
