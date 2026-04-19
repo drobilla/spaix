@@ -14,5 +14,10 @@
 
   { "symbol": [ "std::lexicographical_compare", "private", "<algorithm>", "public" ] },
   { "symbol": [ "std::move", "private", "<utility>", "public" ] },
-  { "symbol": [ "std::pair", "private", "<utility>", "public" ] }
+  { "symbol": [ "std::pair", "private", "<utility>", "public" ] },
+
+  { include: ["<glm/detail/type_vec2.hpp>", "private", "<glm/ext/vector_float2.hpp>", "public" ] },
+  { include: ["<glm/detail/type_vec2.inl>", "private", "<glm/ext/vector_float2.hpp>", "public" ] },
+  { include: ["<glm/detail/type_vec4.hpp>", "private", "<glm/ext/vector_float4.hpp>", "public" ] },
+  { include: ["<glm/detail/type_vec4.inl>", "private", "<glm/ext/vector_float4.hpp>", "public" ] }
 ]

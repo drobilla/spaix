@@ -4,5 +4,5 @@ Upstream-Contact: David Robillard <d@drobilla.net>
 Source: https://gitlab.com/drobilla/spaix
 
 Files: .clant.json .includes.imp NEWS README.md
-Copyright: 2020-2024 David Robillard <d@drobilla.net>
+Copyright: 2020-2026 David Robillard <d@drobilla.net>
 License: 0BSD OR GPL-3.0-only
