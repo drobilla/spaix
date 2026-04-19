@@ -22,11 +22,12 @@ class LinearInsertion
 {
 public:
   using Ops = Operations;
+  using Box = typename Operations::Box;
 
   /// Choose the best child node to insert/expand by `key`
-  template<class DirKey, class Children, class Key>
-  std::pair<ChildIndex, DirKey> choose(const Children& children,
-                                       const Key&      key) noexcept
+  template<class Children, class Key>
+  std::pair<ChildIndex, Box> choose(const Children& children,
+                                    const Key&      key) noexcept
   {
     using Count  = decltype(entry_num_children(children[0]));
     using Volume = decltype(Ops::volume(std::declval<Key>()));
@@ -36,7 +37,7 @@ public:
     constexpr auto max_children = std::numeric_limits<Count>::max();
 
     ChildIndex best_index{};
-    DirKey     best_key{children[0].key};
+    Box        best_key{};
     Cost       best_cost{max_volume, max_volume, max_children};
 
     for (auto i = ChildIndex{}; i < children.size(); ++i) {

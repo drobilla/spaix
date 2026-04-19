@@ -89,6 +89,9 @@ expand_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index) noexcept
 */
 template<typename T0, typename... Tn>
 struct Operations {
+  /// The union of several data keys
+  using Box = Rect<T0, Tn...>;
+
   /// A number that measures volume (a product of all dimensions)
   using Volume = detail::ProductOf<T0, Tn...>;
 

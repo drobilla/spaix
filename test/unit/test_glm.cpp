@@ -143,6 +143,7 @@ struct Queries {
 
 struct Ops {
   using Scalar = float;
+  using Box    = Rect;
   using Volume = float;
 
   template<size_t dim>
