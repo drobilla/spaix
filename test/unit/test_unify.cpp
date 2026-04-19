@@ -5,6 +5,7 @@
 
 #include <spaix_test/check.hpp>
 #include <spaix_test/hetero2.hpp>
+#include <spaix_test/homo2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -35,6 +36,7 @@ constexpr void
 run()
 {
   test_unify<hetero2::Ops, hetero2::Rect, hetero2::Point>();
+  test_unify<homo2::Ops, homo2::Rect, homo2::Point>();
 }
 
 } // namespace

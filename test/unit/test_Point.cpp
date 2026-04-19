@@ -5,6 +5,7 @@
 
 #include <spaix_test/check.hpp>
 #include <spaix_test/hetero2.hpp>
+#include <spaix_test/homo2.hpp>
 
 #include <sstream>
 #include <string>
@@ -43,6 +44,7 @@ void
 run()
 {
   test_point<hetero2::Ops, hetero2::Point>();
+  test_point<homo2::Ops, homo2::Point>();
 }
 
 } // namespace

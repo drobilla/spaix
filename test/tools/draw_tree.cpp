@@ -12,9 +12,9 @@
 #include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
 #include <spaix/QuadraticSplit.hpp>  // IWYU pragma: keep
 #include <spaix/RTree.hpp>
-#include <spaix/heterox/Operations.hpp>
-#include <spaix/heterox/Point.hpp>
-#include <spaix/heterox/Rect.hpp>
+#include <spaix/homox/Operations.hpp>
+#include <spaix/homox/Point.hpp>
+#include <spaix/homox/Rect.hpp>
 
 #include <cmath>
 #include <cstdint>
@@ -29,9 +29,9 @@ namespace {
 
 using Args   = spaix::test::Arguments;
 using Scalar = double;
-using Rect2  = spaix::heterox::Rect<Scalar, Scalar>;
-using Point2 = spaix::heterox::Point<Scalar, Scalar>;
-using Ops    = spaix::heterox::Operations<Scalar, Scalar>;
+using Rect2  = spaix::homox::Rect<Scalar, 2U>;
+using Point2 = spaix::homox::Point<Scalar, 2U>;
+using Ops    = spaix::homox::Operations<Scalar, 2U>;
 
 struct Parameters {
   explicit Parameters(const spaix::test::Arguments& args)

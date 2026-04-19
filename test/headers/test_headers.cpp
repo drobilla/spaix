@@ -28,6 +28,10 @@
 #include <spaix/heterox/Point.hpp>           // IWYU pragma: keep
 #include <spaix/heterox/Rect.hpp>            // IWYU pragma: keep
 #include <spaix/heterox/detail/meta.hpp>     // IWYU pragma: keep
+#include <spaix/homox/Comparisons.hpp>       // IWYU pragma: keep
+#include <spaix/homox/Operations.hpp>        // IWYU pragma: keep
+#include <spaix/homox/Point.hpp>             // IWYU pragma: keep
+#include <spaix/homox/Rect.hpp>              // IWYU pragma: keep
 #include <spaix/search/Everything.hpp>       // IWYU pragma: keep
 #include <spaix/search/Touching.hpp>         // IWYU pragma: keep
 #include <spaix/search/Within.hpp>           // IWYU pragma: keep
