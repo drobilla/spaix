@@ -1,4 +1,4 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_DRAW_SVG_HPP
@@ -46,11 +46,21 @@ color(const NodePath& path, const double alpha)
   return {buf.data()};
 }
 
-template<size_t axis, class Key, class DirKey>
+template<class Ops, size_t axis, class Key, class DirKey>
 inline double
 coord(const Key& key, const DirKey& bounds, const double scale)
 {
-  return ((range<axis>(key).lower - range<axis>(bounds).lower) * scale) + pad;
+  return (
+    ((Ops::template lower<axis>(key) - Ops::template lower<axis>(bounds)) *
+     scale) +
+    pad);
+}
+
+template<class Ops, size_t axis, class Key>
+inline double
+span(const Key& key)
+{
+  return Ops::template upper<axis>(key) - Ops::template lower<axis>(key);
 }
 
 template<class T>
@@ -60,7 +70,7 @@ write_attr(std::ostream& os, const std::string& key, const T& value)
   os << " " << key << "=\"" << value << "\"";
 }
 
-template<class DirKey, class NodePath>
+template<class Ops, class DirKey, class NodePath>
 inline void
 draw_dir(std::ostream&   os,
          const DirKey&   key,
@@ -77,14 +87,14 @@ draw_dir(std::ostream&   os,
 
   os << "  <rect";
   write_attr(os, "style", style);
-  write_attr(os, "x", coord<0>(key, bounds, scale));
-  write_attr(os, "y", coord<1>(key, bounds, scale));
-  write_attr(os, "width", span<0>(key) * scale);
-  write_attr(os, "height", span<1>(key) * scale);
+  write_attr(os, "x", coord<Ops, 0>(key, bounds, scale));
+  write_attr(os, "y", coord<Ops, 1>(key, bounds, scale));
+  write_attr(os, "width", span<Ops, 0>(key) * scale);
+  write_attr(os, "height", span<Ops, 1>(key) * scale);
   os << "/>\n";
 }
 
-template<class... Values, class NodePath>
+template<class Ops, class... Values, class NodePath>
 inline void
 draw_dat(std::ostream&          os,
          const Rect<Values...>& key,
@@ -95,7 +105,7 @@ draw_dat(std::ostream&          os,
   draw_dir(os, key, path, bounds, scale);
 }
 
-template<class... Values, class NodePath>
+template<class Ops, class... Values, class NodePath>
 inline void
 draw_dat(std::ostream&           os,
          const Point<Values...>& key,
@@ -107,8 +117,8 @@ draw_dat(std::ostream&           os,
 
   os << "  <circle";
   write_attr(os, "style", style);
-  write_attr(os, "cx", coord<0>(key, bounds, scale));
-  write_attr(os, "cy", coord<1>(key, bounds, scale));
+  write_attr(os, "cx", coord<Ops, 0>(key, bounds, scale));
+  write_attr(os, "cy", coord<Ops, 1>(key, bounds, scale));
   write_attr(os, "r", 2.0);
   os << "/>\n";
 }
@@ -122,28 +132,32 @@ draw_svg(std::ostream&  os,
          const double   scale     = 1.0,
          const unsigned max_depth = 0)
 {
+  using svg::span;
+
   using Key      = typename Tree::Key;
   using Data     = typename Tree::Data;
   using DirKey   = typename Tree::Box;
   using NodePath = typename Tree::NodePath;
+  using Ops      = typename Tree::Ops;
 
   const auto bounds = tree.bounds();
 
   os << "<svg";
   svg::write_attr(os, "xmlns", std::string{"http://www.w3.org/2000/svg"});
-  svg::write_attr(os, "width", (span<0>(bounds) * scale) + (2 * svg::pad));
-  svg::write_attr(os, "height", (span<1>(bounds) * scale) + (2 * svg::pad));
+  svg::write_attr(os, "width", (span<Ops, 0>(bounds) * scale) + (2 * svg::pad));
+  svg::write_attr(
+    os, "height", (span<Ops, 1>(bounds) * scale) + (2 * svg::pad));
   os << ">\n";
 
   tree.visit(
     [&os, bounds, scale, max_depth](
       const NodePath& path, const DirKey& key, size_t) {
-      svg::draw_dir(os, key, path, bounds, scale);
+      svg::draw_dir<Ops>(os, key, path, bounds, scale);
       return (!max_depth || path.size() <= max_depth) ? VisitStatus::proceed
                                                       : VisitStatus::finish;
     },
     [&os, bounds, scale](const NodePath& path, const Key& key, const Data&) {
-      svg::draw_dat(os, key, path, bounds, scale);
+      svg::draw_dat<Ops>(os, key, path, bounds, scale);
       return VisitStatus::proceed;
     });
 

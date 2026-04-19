@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #undef NDEBUG
@@ -6,14 +6,19 @@
 #include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
 
-#include <spaix/intersects.hpp>
+#include <spaix/Comparisons.hpp>
 
 namespace spaix::test {
 namespace {
 
-void
+template<typename Comparisons, typename TestRect, typename TestPoint>
+constexpr void
 test_intersects()
 {
+  auto intersects = [](const auto& l, const auto& r) {
+    return Comparisons::intersects(l, r);
+  };
+
   constexpr auto rect = TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}};
 
   STATIC_CHECK((intersects(rect, TestRect{{1_xc, 3_xc}, {2.0_yc, 5.0_yc}})));
@@ -31,11 +36,12 @@ test_intersects()
   STATIC_CHECK((intersects(rect, TestPoint{2_xc, 5.0_yc})));
   STATIC_CHECK((!intersects(rect, TestPoint{0_xc, 2.0_yc})));
   STATIC_CHECK((!intersects(rect, TestPoint{1_xc, 0.0_yc})));
+}
 
-  STATIC_CHECK((intersects(TestPoint{1_xc, 2.0_yc}, rect)));
-  STATIC_CHECK((intersects(TestPoint{2_xc, 5.0_yc}, rect)));
-  STATIC_CHECK((!intersects(TestPoint{0_xc, 2.0_yc}, rect)));
-  STATIC_CHECK((!intersects(TestPoint{1_xc, 0.0_yc}, rect)));
+constexpr void
+run()
+{
+  test_intersects<Comparisons<XCoord, YCoord>, TestRect, TestPoint>();
 }
 
 } // namespace
@@ -44,6 +50,6 @@ test_intersects()
 int
 main()
 {
-  spaix::test::test_intersects();
+  spaix::test::run();
   return 0;
 }

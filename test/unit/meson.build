@@ -1,4 +1,4 @@
-# Copyright 2019-2024 David Robillard <d@drobilla.net>
+# Copyright 2019-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 tests = [
@@ -6,7 +6,7 @@ tests = [
   'Rect',
   'contains',
   'intersects',
-  'union',
+  'unify',
   'volume',
 ]
 

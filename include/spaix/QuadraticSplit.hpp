@@ -10,7 +10,6 @@
 #include <spaix/detail/distribute.hpp>
 #include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
-#include <spaix/volume.hpp>
 
 #include <array>
 #include <cassert>
@@ -24,38 +23,34 @@ namespace spaix {
 
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
+template<typename Ops>
 class QuadraticSplit
 {
 public:
-  template<class DirKey>
-  using VolumeOf = decltype(volume(std::declval<DirKey>()));
-
-  template<class DirKey>
-  using SeedsFor = SplitSeeds<VolumeOf<DirKey>>;
+  using Volume = typename Ops::Volume;
 
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entry, ChildCount count>
-  SeedsFor<DirKey> pick_seeds(
+  SplitSeeds<Volume> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit) noexcept
   {
-    using Volume = decltype(volume(std::declval<DirKey>()));
-
     assert(deposit.size() > 1U);
     assert(deposit.size() == deposit.capacity());
 
     std::array<Volume, count> volumes{};
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
-      volumes[i] = volume(detail::entry_key(deposit[i]));
+      volumes[i] = Ops::volume(detail::entry_key(deposit[i]));
     }
 
-    Volume           max_waste{std::numeric_limits<Volume>::lowest()};
-    SeedsFor<DirKey> seeds{};
+    Volume             max_waste{std::numeric_limits<Volume>::lowest()};
+    SplitSeeds<Volume> seeds{};
     for (ChildIndex i = 0; i < deposit.size() - 1; ++i) {
       for (ChildIndex j = i + 1; j < deposit.size(); ++j) {
         const auto& k = detail::entry_key(deposit[i]);
         const auto& l = detail::entry_key(deposit[j]);
 
-        const Volume waste = volume(k | l) - volumes[i] - volumes[j];
+        const auto both  = Ops::unify(DirKey{k}, l);
+        const auto waste = Ops::volume(both) - volumes[i] - volumes[j];
 
         if (waste >= max_waste) {
           max_waste       = waste;
@@ -76,11 +71,11 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirEntry>
-  void distribute_children(SeedsFor<typename DirEntry::Key>& seeds,
-                           Deposit&&                         deposit,
-                           DirEntry&                         lhs,
-                           DirEntry&                         rhs,
-                           const ChildCount max_fanout) noexcept
+  void distribute_children(SplitSeeds<Volume>& seeds,
+                           Deposit&&           deposit,
+                           DirEntry&           lhs,
+                           DirEntry&           rhs,
+                           const ChildCount    max_fanout) noexcept
   {
     const ChildIndex n_entries = deposit.size();
     for (ChildIndex i = 0; i < n_entries; ++i) {
@@ -96,8 +91,8 @@ public:
       deposit.pop(iter);
 
       if (n_children == max_fanout) {
-        detail::distribute_remaining(best.side == Side::left ? rhs : lhs,
-                                     std::forward<Deposit>(deposit));
+        detail::distribute_remaining<Ops>(best.side == Side::left ? rhs : lhs,
+                                          std::forward<Deposit>(deposit));
         return;
       }
 
@@ -113,23 +108,22 @@ private:
   /// Assignment of a child to a parent during a split
   template<class DirKey>
   struct ChildAssignment {
-    ChildIndex       child_index;
-    DirKey           new_parent_key;
-    VolumeOf<DirKey> new_parent_volume;
-    Side             side;
+    ChildIndex child_index;
+    DirKey     new_parent_key;
+    Volume     new_parent_volume;
+    Side       side;
   };
 
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
   ChildAssignment<typename DirEntry::Key> pick_next(
-    const SeedsFor<typename DirEntry::Key>& seeds,
-    const Deposit&                          deposit,
-    const DirEntry&                         lhs,
-    const DirEntry&                         rhs) noexcept
+    const SplitSeeds<Volume>& seeds,
+    const Deposit&            deposit,
+    const DirEntry&           lhs,
+    const DirEntry&           rhs) noexcept
   {
     using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::DirKey;
-    using Volume     = VolumeOf<DirKey>;
     using Result     = ChildAssignment<DirKey>;
     using Preference = Volume;
 
@@ -137,12 +131,12 @@ private:
     Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
 
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
-      auto chooser = make_side_chooser(seeds,
-                                       lhs.key,
-                                       detail::entry_num_children(lhs),
-                                       rhs.key,
-                                       detail::entry_num_children(rhs),
-                                       detail::entry_key(deposit[i]));
+      auto chooser = make_side_chooser<Ops>(seeds,
+                                            lhs.key,
+                                            detail::entry_num_children(lhs),
+                                            rhs.key,
+                                            detail::entry_num_children(rhs),
+                                            detail::entry_key(deposit[i]));
 
       const auto preference = chooser.preference();
       if (preference >= best_preference) {

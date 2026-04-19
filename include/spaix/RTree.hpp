@@ -9,7 +9,7 @@
 #include <spaix/StaticVector.hpp>
 #include <spaix/TreeRange.hpp>
 #include <spaix/detail/DirectoryNode.hpp>
-#include <spaix/search/everything.hpp>
+#include <spaix/search/Everything.hpp>
 #include <spaix/sizes.hpp>
 #include <spaix/types.hpp>
 
@@ -40,6 +40,7 @@ public:
   using Structure = typename Conf::Structure; ///< Tree structure configuration
   using Insertion = typename Conf::Insertion; ///< Insertion algorithm
   using Split     = typename Conf::Split;     ///< Split algorithm
+  using Ops       = typename Insertion::Ops;  ///< Key operations
 
   using DatNode = DataNode<Key, Data>; ///< Leaf node
   using DirNode =

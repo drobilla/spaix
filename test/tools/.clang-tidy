@@ -1,9 +1,11 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 Checks: >
   -*-vararg,
+  -cert-err33-c,
   -fuchsia-default-arguments-*,
+  -google-readability-casting,
   -llvm-header-guard,
   -misc-non-private-member-variables-in-classes,
 InheritParentConfig: true

@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #undef NDEBUG
@@ -17,12 +17,13 @@
 namespace spaix::test {
 namespace {
 
+template<typename TestPoint>
 void
 test_point()
 {
-  constexpr auto point = make_point(XCoord{1}, YCoord{2.0f});
+  constexpr auto point = TestPoint{1_xc, 2.0_yc};
 
-  STATIC_CHECK((TestPoint{std::make_tuple(XCoord{1}, YCoord{2.0f})} == point));
+  STATIC_CHECK(((TestPoint{1_xc, 2.0_yc}) == point));
 
   // Comparison
   STATIC_CHECK((point == TestPoint{1_xc, 2.0_yc}));
@@ -41,8 +42,14 @@ test_point()
   STATIC_CHECK((span<1>(point).value() == 0.0f));
 
   std::ostringstream ss;
-  ss << make_point(1, 2);
+  ss << point;
   CHECK((ss.str() == "[1, 2]"));
+}
+
+void
+run()
+{
+  test_point<TestPoint>();
 }
 
 } // namespace
@@ -51,7 +58,6 @@ test_point()
 int
 main()
 {
-  spaix::test::test_point();
-
+  spaix::test::run();
   return 0;
 }

@@ -1,4 +1,4 @@
-// Copyright 2013-2020 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <spaix_test/BenchParameters.hpp>
@@ -6,15 +6,16 @@
 #include <spaix_test/options.hpp>
 #include <spaix_test/write_row.hpp>
 
+#include <spaix/Comparisons.hpp>
 #include <spaix/Config.hpp>
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp>
-#include <spaix/LinearSplit.hpp>    // IWYU pragma: keep
+#include <spaix/LinearSplit.hpp> // IWYU pragma: keep
+#include <spaix/Operations.hpp>
 #include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
+#include <spaix/Queries.hpp>
 #include <spaix/RTree.hpp>
 #include <spaix/Rect.hpp>
-#include <spaix/contains.hpp>
-#include <spaix/intersects.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -29,11 +30,14 @@
 
 namespace {
 
-using Args       = spaix::test::Arguments;
-using Parameters = spaix::test::BenchParameters;
-using Scalar     = float;
-using Data       = size_t;
-using Rect2      = spaix::Rect<Scalar, Scalar>;
+using Args        = spaix::test::Arguments;
+using Parameters  = spaix::test::BenchParameters;
+using Scalar      = float;
+using Data        = size_t;
+using Rect2       = spaix::Rect<Scalar, Scalar>;
+using Comparisons = spaix::Comparisons<Scalar, Scalar>;
+using Queries     = spaix::Queries<Comparisons>;
+using Ops         = spaix::Operations<Scalar, Scalar>;
 
 template<class T>
 using Distribution = spaix::test::Distribution<T>;
@@ -55,14 +59,14 @@ struct BenchmarkWithin {
   [[nodiscard]] constexpr bool directory(const DirKey& k) const
   {
     ++_counts->n_checked_dirs;
-    return intersects(_query_key, k);
+    return Comparisons::intersects(_query_key, k);
   }
 
   template<class DatKey>
   [[nodiscard]] constexpr bool leaf(const DatKey& k) const
   {
     ++_counts->n_checked_dats;
-    return contains(_query_key, k);
+    return Comparisons::contains(_query_key, k);
   }
 
 private:
@@ -284,11 +288,11 @@ run(const Parameters& params, const Args& args)
 {
   const auto split = args.at("split");
   if (split == "linear") {
-    return run<Insertion, spaix::LinearSplit>(params, args);
+    return run<Insertion, spaix::LinearSplit<Ops, 2U>>(params, args);
   }
 
   if (split == "quadratic") {
-    return run<Insertion, spaix::QuadraticSplit>(params, args);
+    return run<Insertion, spaix::QuadraticSplit<Ops>>(params, args);
   }
 
   throw std::runtime_error("Unknown split algorithm '" + split + "'");
@@ -299,7 +303,7 @@ run(const Parameters& params, const Args& args)
 {
   const auto insert = args.at("insert");
   if (insert == "linear") {
-    return run<spaix::LinearInsertion>(params, args);
+    return run<spaix::LinearInsertion<Ops>>(params, args);
   }
 
   throw std::runtime_error("Unknown insert algorithm '" + insert + "'");

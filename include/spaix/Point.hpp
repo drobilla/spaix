@@ -51,13 +51,6 @@ private:
 };
 
 template<class... Ts>
-constexpr auto
-make_point(Ts&&... values) noexcept
-{
-  return Point<Ts...>{std::forward<Ts>(values)...};
-}
-
-template<class... Ts>
 constexpr bool
 operator==(const Point<Ts...>& lhs, const Point<Ts...>& rhs) noexcept
 {

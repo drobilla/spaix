@@ -10,7 +10,6 @@
 #include <spaix/detail/entry.hpp>
 #include <spaix/detail/meta.hpp>
 #include <spaix/types.hpp>
-#include <spaix/volume.hpp>
 
 #include <algorithm>
 #include <array>
@@ -26,27 +25,24 @@ namespace spaix {
 
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
+template<typename Ops, size_t n_dimensions>
 class LinearSplit
 {
 public:
-  template<class DirKey>
-  using VolumeOf = decltype(volume(std::declval<DirKey>()));
-
-  template<class DirKey>
-  using SeedsFor = SplitSeeds<VolumeOf<DirKey>>;
+  using Volume = typename Ops::Volume;
 
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entries>
-  SeedsFor<DirKey> pick_seeds(const Entries& deposit) noexcept
+  SplitSeeds<Volume> pick_seeds(const Entries& deposit) noexcept
   {
     using std::max;
     using std::min;
 
     using Scalar =
-      typename detail::CommonElementType<typename DirKey::Scalars>::type;
+      decltype(Ops::template lower<0>(detail::entry_key(deposit[0])));
 
-    std::array<ExtremeIndices, DirKey::size()> indices{};
-    const detail::Index<0U, DirKey::size()>    dim_begin{};
+    std::array<ExtremeIndices, n_dimensions> indices{};
+    const detail::Index<0U, n_dimensions>    dim_begin{};
 
     for (ChildIndex i = 1; i < deposit.size(); ++i) {
       update_indices(deposit, i, indices, dim_begin);
@@ -64,17 +60,17 @@ public:
 
     return {lhs_index,
             rhs_index,
-            volume(detail::entry_key(deposit[lhs_index])),
-            volume(detail::entry_key(deposit[rhs_index]))};
+            Ops::volume(detail::entry_key(deposit[lhs_index])),
+            Ops::volume(detail::entry_key(deposit[rhs_index]))};
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirNode>
-  void distribute_children(SeedsFor<typename DirNode::Key>& seeds,
-                           Deposit&&                        deposit,
-                           DirNode&                         lhs,
-                           DirNode&                         rhs,
-                           const ChildCount                 max_fanout) noexcept
+  void distribute_children(SplitSeeds<Volume>& seeds,
+                           Deposit&&           deposit,
+                           DirNode&            lhs,
+                           DirNode&            rhs,
+                           const ChildCount    max_fanout) noexcept
   {
     using detail::distribute_child;
 
@@ -89,7 +85,7 @@ public:
       const auto  n_right = detail::entry_num_children(rhs);
 
       auto chooser =
-        make_side_chooser(seeds, lhs.key, n_left, rhs.key, n_right, key);
+        make_side_chooser<Ops>(seeds, lhs.key, n_left, rhs.key, n_right, key);
 
       const Side side    = chooser.choose_side();
       const auto outcome = chooser.outcome(side);
@@ -98,7 +94,8 @@ public:
       if (side == Side::left) {
         const auto n = distribute_child(lhs, outcome.key, std::move(child));
         if (n == max_fanout) {
-          detail::distribute_remaining(rhs, std::forward<Deposit>(deposit));
+          detail::distribute_remaining<Ops>(rhs,
+                                            std::forward<Deposit>(deposit));
           return;
         }
 
@@ -106,7 +103,8 @@ public:
       } else {
         const auto n = distribute_child(rhs, outcome.key, std::move(child));
         if (n == max_fanout) {
-          detail::distribute_remaining(lhs, std::forward<Deposit>(deposit));
+          detail::distribute_remaining<Ops>(lhs,
+                                            std::forward<Deposit>(deposit));
           return;
         }
 
@@ -142,29 +140,31 @@ private:
                              std::array<ExtremeIndices, n_dims>& indices,
                              detail::Index<dim, n_dims>          index) noexcept
   {
-    const auto& child      = deposit[child_index];
-    const auto& child_key  = detail::entry_key(child);
-    const auto [low, high] = range<dim>(child_key);
-    auto& extremes         = indices[dim];
+    const auto& child     = deposit[child_index];
+    const auto& child_key = detail::entry_key(child);
+    const auto  low       = Ops::template lower<dim>(child_key);
+    const auto  high      = Ops::template upper<dim>(child_key);
+    auto&       extremes  = indices[dim];
 
     const auto& min_min = detail::entry_key(deposit[extremes.min_min]);
     const auto& max_min = detail::entry_key(deposit[extremes.max_min]);
     const auto& min_max = detail::entry_key(deposit[extremes.min_max]);
     const auto& max_max = detail::entry_key(deposit[extremes.max_max]);
 
-    if (low <= range<dim>(min_min).lower) {
+    if (low <= Ops::template lower<dim>(min_min)) {
       extremes.min_min = child_index;
     }
 
-    if (low >= range<dim>(max_min).lower) {
+    if (low >= Ops::template lower<dim>(max_min)) {
       extremes.max_min = child_index;
     }
 
-    if (high <= range<dim>(min_max).upper && child_index != extremes.max_min) {
+    if (high <= Ops::template upper<dim>(min_max) &&
+        child_index != extremes.max_min) {
       extremes.min_max = child_index;
     }
 
-    if (high >= range<dim>(max_max).upper) {
+    if (high >= Ops::template upper<dim>(max_max)) {
       extremes.max_max = child_index;
     }
 
@@ -190,11 +190,11 @@ private:
     const auto& min_max = detail::entry_key(deposit[indices[dim].min_max]);
     const auto& max_max = detail::entry_key(deposit[indices[dim].max_max]);
 
-    const auto width =
-      static_cast<T>(range<dim>(max_max).upper - range<dim>(min_min).lower);
+    const auto width = static_cast<T>(Ops::template upper<dim>(max_max) -
+                                      Ops::template lower<dim>(min_min));
 
-    const auto separation =
-      static_cast<T>(range<dim>(min_max).upper - range<dim>(max_min).lower);
+    const auto separation = static_cast<T>(Ops::template upper<dim>(min_max) -
+                                           Ops::template lower<dim>(max_min));
 
     const auto normalized_separation =
       (width < std::numeric_limits<T>::epsilon()) ? separation
