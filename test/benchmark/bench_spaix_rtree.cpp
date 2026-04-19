@@ -112,7 +112,7 @@ benchmark_queries(std::mt19937& rng,
       ++n_results;
     }
 #else
-    tree.fast_query(predicate, [&n_results](const auto& node) {
+    tree.visit_matches(predicate, [&n_results](const auto& node) {
       volatile auto result = node;
 
       (void)result;

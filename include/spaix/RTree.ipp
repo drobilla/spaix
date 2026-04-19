@@ -134,25 +134,25 @@ RTree<B, K, D, C>::insert_rec(DirEntry&   parent_entry,
 template<class B, class K, class D, class C>
 template<class Predicate, class Visitor>
 void
-RTree<B, K, D, C>::fast_query(const Predicate& predicate,
-                              const Visitor&   visitor) const noexcept
+RTree<B, K, D, C>::visit_matches(const Predicate& predicate,
+                                 const Visitor&   visitor) const noexcept
 {
   if (_root.node && predicate.directory(_root.key)) {
-    fast_query_rec(*_root.node, predicate, visitor);
+    visit_matches_rec(*_root.node, predicate, visitor);
   }
 }
 
 template<class B, class K, class D, class C>
 template<class Predicate, class Visitor>
 void
-RTree<B, K, D, C>::fast_query_rec(const DirNode&   node,
-                                  const Predicate& predicate,
-                                  const Visitor&   visitor) const noexcept
+RTree<B, K, D, C>::visit_matches_rec(const DirNode&   node,
+                                     const Predicate& predicate,
+                                     const Visitor&   visitor) const noexcept
 {
   if (node.child_type() == NodeType::directory) {
     for (const auto& entry : node.dir_children()) {
       if (predicate.directory(entry.key)) {
-        fast_query_rec(*entry.node, predicate, visitor);
+        visit_matches_rec(*entry.node, predicate, visitor);
       }
     }
   } else {

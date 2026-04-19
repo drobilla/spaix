@@ -300,8 +300,8 @@ test_tree(const unsigned span, const unsigned n_queries)
       ++count;
     };
 
-    // Fast visitor query
-    tree.fast_query(Queries::within(query), verify);
+    // Visitor query
+    tree.visit_matches(Queries::within(query), verify);
     CHECK((count == expected_count));
 
     // Incremental query

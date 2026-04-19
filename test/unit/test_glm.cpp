@@ -341,9 +341,9 @@ test_tree(const unsigned span, const unsigned n_queries)
       ++count;
     };
 
-    // Fast visitor query
+    // Visitor query
     count = 0;
-    tree.fast_query(Queries::Contained{query}, verify);
+    tree.visit_matches(Queries::Contained{query}, verify);
     CHECK((count == expected_count));
 
     // Incremental query

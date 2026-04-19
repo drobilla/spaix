@@ -122,8 +122,8 @@ public:
 
   /// Visit every entry in the tree that matches a predicate
   template<class Predicate, class Visitor>
-  void fast_query(const Predicate& predicate,
-                  const Visitor&   visitor) const noexcept;
+  void visit_matches(const Predicate& predicate,
+                     const Visitor&   visitor) const noexcept;
 
   /// Remove all items from the tree
   void clear() noexcept
@@ -191,9 +191,9 @@ private:
                          const Data& data) noexcept;
 
   template<class Predicate, class Visitor>
-  void fast_query_rec(const DirNode&   node,
-                      const Predicate& predicate,
-                      const Visitor&   visitor) const noexcept;
+  void visit_matches_rec(const DirNode&   node,
+                         const Predicate& predicate,
+                         const Visitor&   visitor) const noexcept;
 
   /// Create a new parent seeded with a child
   template<class Entry, ChildCount count>
