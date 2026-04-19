@@ -6,8 +6,8 @@
 
 #include <spaix_test/Scalar.hpp>
 
-#include <spaix/Point.hpp>
-#include <spaix/Rect.hpp>
+#include <spaix/heterox/Point.hpp>
+#include <spaix/heterox/Rect.hpp>
 #include <spaix/types.hpp>
 
 namespace spaix::test {
@@ -18,8 +18,8 @@ using YCoord = Scalar<struct Y, float>;
 using XRange = DimRange<XCoord>;
 using YRange = DimRange<YCoord>;
 
-using TestRect  = Rect<XCoord, YCoord>;
-using TestPoint = Point<XCoord, YCoord>;
+using TestRect  = heterox::Rect<XCoord, YCoord>;
+using TestPoint = heterox::Point<XCoord, YCoord>;
 
 } // namespace spaix::test
 

@@ -1,20 +1,21 @@
 // Copyright 2022-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_OPERATIONS_HPP
-#define SPAIX_OPERATIONS_HPP
+#ifndef SPAIX_HETEROX_OPERATIONS_HPP
+#define SPAIX_HETEROX_OPERATIONS_HPP
 
-#include <spaix/Point.hpp>
-#include <spaix/Rect.hpp>
+#include <spaix/detail/Index.hpp>
 #include <spaix/detail/attributes.hpp>
-#include <spaix/detail/meta.hpp>
+#include <spaix/heterox/Point.hpp>
+#include <spaix/heterox/Rect.hpp>
+#include <spaix/heterox/detail/meta.hpp>
 #include <spaix/types.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <tuple>
 
-namespace spaix {
+namespace spaix::heterox {
 namespace detail {
 
 using std::max;
@@ -22,15 +23,15 @@ using std::min;
 
 template<class... Ts, size_t last_dim>
 constexpr auto
-volume_rec(const Rect<Ts...>& rect, LastIndex<last_dim>) noexcept
+volume_rec(const Rect<Ts...>& rect, detail::LastIndex<last_dim>) noexcept
 {
   return span<last_dim>(rect);
 }
 
 template<class... Ts, size_t dim, size_t last_dim>
 constexpr auto
-volume_rec(const Rect<Ts...>&            rect,
-           InclusiveIndex<dim, last_dim> index) noexcept
+volume_rec(const Rect<Ts...>&                    rect,
+           detail::InclusiveIndex<dim, last_dim> index) noexcept
 {
   const auto r = range<dim>(rect);
 
@@ -38,19 +39,22 @@ volume_rec(const Rect<Ts...>&            rect,
     return (r.upper - r.lower) * volume_rec(rect, ++index);
   }
 
-  return DifferenceOf<Nth<dim + 1U, Ts...>, Nth<dim + 1U, Ts...>>{};
+  return detail::DifferenceOf<detail::Nth<dim + 1U, Ts...>,
+                              detail::Nth<dim + 1U, Ts...>>{};
 }
 
 template<class Lhs, class Rhs, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr auto
-unify_rec(const Lhs&, const Rhs&, EndIndex<n_dims>) noexcept
+unify_rec(const Lhs&, const Rhs&, ::spaix::detail::EndIndex<n_dims>) noexcept
 {
   return std::make_tuple();
 }
 
 template<class Lhs, class Rhs, size_t dim, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr auto
-unify_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index) noexcept
+unify_rec(const Lhs&                          lhs,
+          const Rhs&                          rhs,
+          ::spaix::detail::Index<dim, n_dims> index) noexcept
 {
   const auto l  = range<dim>(lhs);
   const auto r  = range<dim>(rhs);
@@ -63,12 +67,14 @@ unify_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index) noexcept
 
 template<class Lhs, class Rhs, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr void
-expand_rec(Lhs&, const Rhs&, EndIndex<n_dims>) noexcept
+expand_rec(Lhs&, const Rhs&, ::spaix::detail::EndIndex<n_dims>) noexcept
 {}
 
 template<class Lhs, class Rhs, size_t dim, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr void
-expand_rec(Lhs& lhs, const Rhs& rhs, Index<dim, n_dims> index) noexcept
+expand_rec(Lhs&                                lhs,
+           const Rhs&                          rhs,
+           ::spaix::detail::Index<dim, n_dims> index) noexcept
 {
   auto&      l = range<dim>(lhs);
   const auto r = range<dim>(rhs);
@@ -165,6 +171,6 @@ struct Operations {
   }
 };
 
-} // namespace spaix
+} // namespace spaix::heterox
 
-#endif // SPAIX_OPERATIONS_HPP
+#endif // SPAIX_HETEROX_OPERATIONS_HPP

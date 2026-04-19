@@ -4,8 +4,6 @@
 #ifndef SPAIX_DRAW_SVG_HPP
 #define SPAIX_DRAW_SVG_HPP
 
-#include <spaix/Point.hpp>
-#include <spaix/Rect.hpp>
 #include <spaix/types.hpp>
 
 #include <array>
@@ -16,7 +14,21 @@
 #include <string>
 
 namespace spaix {
+
+namespace heterox {
+
+template<class... Ts>
+class Point;
+
+template<class T0, class... Ts>
+class Rect;
+
+} // namespace heterox
+
 namespace svg {
+
+using heterox::Point;
+using heterox::Rect;
 
 constexpr double pad = 8;
 

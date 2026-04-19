@@ -4,18 +4,18 @@
 #include <spaix_test/check.hpp>
 #include <spaix_test/options.hpp>
 
-#include <spaix/Comparisons.hpp>
 #include <spaix/Config.hpp>
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
-#include <spaix/Operations.hpp>
-#include <spaix/Point.hpp>
-#include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
+#include <spaix/QuadraticSplit.hpp>  // IWYU pragma: keep
 #include <spaix/Queries.hpp>
 #include <spaix/RTree.hpp>
-#include <spaix/Rect.hpp>
 #include <spaix/StaticVector.hpp>
+#include <spaix/heterox/Comparisons.hpp>
+#include <spaix/heterox/Operations.hpp>
+#include <spaix/heterox/Point.hpp>
+#include <spaix/heterox/Rect.hpp>
 #include <spaix/types.hpp>
 
 #include <algorithm>
@@ -36,12 +36,12 @@ using ChildCount = spaix::ChildCount;
 using NodeType   = spaix::NodeType;
 
 using Scalar      = float;
-using Rect        = spaix::Rect<float, float>;
-using Point       = spaix::Point<float, float>;
+using Rect        = spaix::heterox::Rect<float, float>;
+using Point       = spaix::heterox::Point<float, float>;
 using Data        = size_t;
-using Comparisons = spaix::Comparisons<Scalar, Scalar>;
+using Comparisons = spaix::heterox::Comparisons<Scalar, Scalar>;
 using Queries     = spaix::Queries<Comparisons>;
-using Ops         = spaix::Operations<float, float>;
+using Ops         = spaix::heterox::Operations<float, float>;
 
 template<class Key>
 Key
@@ -387,8 +387,8 @@ main(int argc, char** argv)
     const auto span    = static_cast<unsigned>(std::stoul(args.at("span")));
     const auto queries = static_cast<unsigned>(std::stoul(args.at("queries")));
 
-    test_key<spaix::Point<float, float>>(span, queries);
-    test_key<spaix::Rect<float, float>>(span, queries);
+    test_key<spaix::heterox::Point<float, float>>(span, queries);
+    test_key<spaix::heterox::Rect<float, float>>(span, queries);
   } catch (const std::exception& e) {
     std::cerr << "error: " << e.what() << "\n\n";
     print_usage(argv[0], opts);

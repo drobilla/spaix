@@ -3,13 +3,8 @@
 
 #undef NDEBUG
 
-#include <spaix_test/Scalar.hpp>
-#include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
-
-#include <spaix/Operations.hpp>
-#include <spaix/Rect.hpp>
-#include <spaix/types.hpp>
+#include <spaix_test/hetero2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -39,7 +34,7 @@ test_unify()
 constexpr void
 run()
 {
-  test_unify<Operations<XCoord, YCoord>, TestRect, TestPoint>();
+  test_unify<hetero2::Ops, hetero2::Rect, hetero2::Point>();
 }
 
 } // namespace

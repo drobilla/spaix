@@ -3,10 +3,8 @@
 
 #undef NDEBUG
 
-#include <spaix_test/TestRect.hpp>
 #include <spaix_test/check.hpp>
-
-#include <spaix/Comparisons.hpp>
+#include <spaix_test/hetero2.hpp>
 
 namespace spaix::test {
 namespace {
@@ -36,7 +34,7 @@ test_contains()
 constexpr void
 run()
 {
-  test_contains<Comparisons<XCoord, YCoord>, TestRect, TestPoint>();
+  test_contains<hetero2::Comparisons, hetero2::Rect, hetero2::Point>();
 }
 
 } // namespace

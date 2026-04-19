@@ -1,29 +1,31 @@
-// Copyright 2022-2026 David Robillard <d@drobilla.net>
+// copyright 2022-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_COMPARISONS_HPP
-#define SPAIX_COMPARISONS_HPP
+#ifndef SPAIX_HETEROX_COMPARISONS_HPP
+#define SPAIX_HETEROX_COMPARISONS_HPP
 
-#include <spaix/Point.hpp>
-#include <spaix/Rect.hpp>
+#include <spaix/detail/Index.hpp>
 #include <spaix/detail/attributes.hpp>
-#include <spaix/detail/meta.hpp>
+#include <spaix/heterox/Point.hpp>
+#include <spaix/heterox/Rect.hpp>
 
 #include <cstddef>
 
-namespace spaix {
+namespace spaix::heterox {
 namespace detail {
 
 template<class Parent, class Child, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-contains_rec(const Parent&, const Child&, EndIndex<n_dims>)
+contains_rec(const Parent&, const Child&, ::spaix::detail::EndIndex<n_dims>)
 {
   return true;
 }
 
 template<class Parent, class Child, size_t dim, size_t n_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
+contains_rec(const Parent&                       parent,
+             const Child&                        child,
+             ::spaix::detail::Index<dim, n_dims> index)
 {
   const auto& p = range<dim>(parent);
   const auto& c = range<dim>(child);
@@ -34,14 +36,16 @@ contains_rec(const Parent& parent, const Child& child, Index<dim, n_dims> index)
 
 template<class Lhs, class Rhs, size_t num_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-intersects_rec(const Lhs&, const Rhs&, EndIndex<num_dims>)
+intersects_rec(const Lhs&, const Rhs&, ::spaix::detail::EndIndex<num_dims>)
 {
   return true;
 }
 
 template<class Lhs, class Rhs, size_t dim, size_t num_dims>
 SPAIX_ALWAYS_INLINE constexpr bool
-intersects_rec(const Lhs& lhs, const Rhs& rhs, Index<dim, num_dims> index)
+intersects_rec(const Lhs&                            lhs,
+               const Rhs&                            rhs,
+               ::spaix::detail::Index<dim, num_dims> index)
 {
   const auto& l = range<dim>(lhs);
   const auto& r = range<dim>(rhs);
@@ -77,6 +81,6 @@ struct Comparisons {
   }
 };
 
-} // namespace spaix
+} // namespace spaix::heterox
 
-#endif // SPAIX_COMPARISONS_HPP
+#endif // SPAIX_HETEROX_COMPARISONS_HPP

@@ -6,16 +6,16 @@
 #include <spaix_test/options.hpp>
 #include <spaix_test/write_row.hpp>
 
-#include <spaix/Comparisons.hpp>
 #include <spaix/Config.hpp>
 #include <spaix/DataPlacement.hpp>
 #include <spaix/LinearInsertion.hpp>
-#include <spaix/LinearSplit.hpp> // IWYU pragma: keep
-#include <spaix/Operations.hpp>
+#include <spaix/LinearSplit.hpp>    // IWYU pragma: keep
 #include <spaix/QuadraticSplit.hpp> // IWYU pragma: keep
 #include <spaix/Queries.hpp>
 #include <spaix/RTree.hpp>
-#include <spaix/Rect.hpp>
+#include <spaix/heterox/Comparisons.hpp>
+#include <spaix/heterox/Operations.hpp>
+#include <spaix/heterox/Rect.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -34,10 +34,10 @@ using Args        = spaix::test::Arguments;
 using Parameters  = spaix::test::BenchParameters;
 using Scalar      = float;
 using Data        = size_t;
-using Rect2       = spaix::Rect<Scalar, Scalar>;
-using Comparisons = spaix::Comparisons<Scalar, Scalar>;
+using Rect2       = spaix::heterox::Rect<Scalar, Scalar>;
+using Comparisons = spaix::heterox::Comparisons<Scalar, Scalar>;
 using Queries     = spaix::Queries<Comparisons>;
-using Ops         = spaix::Operations<Scalar, Scalar>;
+using Ops         = spaix::heterox::Operations<Scalar, Scalar>;
 
 template<class T>
 using Distribution = spaix::test::Distribution<T>;
