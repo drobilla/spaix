@@ -18,7 +18,6 @@ from enum import Enum
 import matplotlib
 import pandas
 
-
 FIG_HEIGHT = 4.0
 
 
@@ -405,8 +404,7 @@ def main(argv):
 
         html_path = os.path.join(args.dir, "benchmarks.html")
         with open(html_path, "w", encoding="utf-8") as html:
-            html.write(
-                """<!DOCTYPE html>
+            html.write("""<!DOCTYPE html>
 <html lang="en">
   <head><title>R-tree Benchmarks</title>
   <meta charset="utf-8"/></head>
@@ -418,8 +416,7 @@ def main(argv):
     <figure><img src="q_dats.svg" alt="Leaf nodes searched"/></figure>
   </body>
 </html>
-"""
-            )
+""")
             sys.stderr.write(f"Wrote {html_path}\n")
 
     return 0
