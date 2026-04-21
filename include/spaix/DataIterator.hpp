@@ -27,9 +27,9 @@ public:
 
   DataIterator() noexcept = default;
 
-  DatNode& operator*() const noexcept { return *operator->(); }
+  [[nodiscard]] DatNode& operator*() const noexcept { return *operator->(); }
 
-  DatNode* operator->() const noexcept
+  [[nodiscard]] DatNode* operator->() const noexcept
   {
     assert(!this->empty());
     assert(this->index() < this->parent()->num_children());

@@ -195,10 +195,10 @@ private:
   void insert_entry(unsigned depth, Entry entry) noexcept;
 
   template<class Entry>
-  DirNodePair insert_rec(unsigned   depth,
-                         DirEntry&  parent_entry,
-                         const Box& new_parent_key,
-                         Entry      element) noexcept;
+  [[nodiscard]] DirNodePair insert_rec(unsigned   depth,
+                                       DirEntry&  parent_entry,
+                                       const Box& new_parent_key,
+                                       Entry      element) noexcept;
 
   template<class Predicate, class Visitor>
   void visit_matches_rec(const DirNode&   node,
@@ -207,18 +207,19 @@ private:
 
   /// Create a new parent seeded with a child
   template<class Entry, class Count, Count count>
-  static DirEntry new_parent(StaticVector<Entry, Count, count>& deposit,
-                             ChildIndex                         index,
-                             NodeType child_type) noexcept;
+  [[nodiscard]] static DirEntry new_parent(
+    StaticVector<Entry, Count, count>& deposit,
+    ChildIndex                         index,
+    NodeType                           child_type) noexcept;
 
-  DirNodePair split_node(DirNode& node, DirEntry entry) noexcept;
-  DirNodePair split_node(DirNode& node, DatEntry entry) noexcept;
+  [[nodiscard]] DirNodePair split_node(DirNode& node, DirEntry entry) noexcept;
+  [[nodiscard]] DirNodePair split_node(DirNode& node, DatEntry entry) noexcept;
 
   /// Split `nodes` plus `entry` in two and return the resulting sides
   template<class Entry, class Count, Count fanout>
-  DirNodePair split(StaticVectorView<Entry, Count, fanout> nodes,
-                    Entry                                  entry,
-                    NodeType                               type) noexcept;
+  [[nodiscard]] DirNodePair split(StaticVectorView<Entry, Count, fanout> nodes,
+                                  Entry                                  entry,
+                                  NodeType type) noexcept;
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm
