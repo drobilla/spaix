@@ -64,11 +64,14 @@ public:
 
   /// An iterator over a search area
   template<class S>
-  using Searcher = Iterator<S, const DirNode, DatNode, max_height()>;
+  using Searcher = Iterator<S, DirNode, DatNode, max_height()>;
 
   /// A constant iterator over a search area
   template<class S>
   using ConstSearcher = Iterator<S, const DirNode, const DatNode, max_height()>;
+
+  /// A path of indexes to a node starting at the root
+  using NodePath = StaticVector<ChildIndex, ChildCount, max_height() + 1U>;
 
   // STL Container member types
   using iterator       = Searcher<search::Everything>;
@@ -81,8 +84,8 @@ public:
   using node_type   = DatNode;
 
   // RTree-specific types
-  using NodePath     = StaticVector<ChildIndex, ChildCount, max_height() + 1U>;
-  using end_iterator = typename iterator::Base;
+  using data_iterator       = typename iterator::Base;
+  using const_data_iterator = typename const_iterator::Base;
 
   /// Construct an RTree with a default-constructed insertion and split
   RTree() = default;
@@ -162,18 +165,13 @@ public:
   void visit(DirVisitor&& visit_dir, DatVisitor&& visit_dat) const;
 
   [[nodiscard]] const_iterator begin() const noexcept { return {_root, {}}; }
-  [[nodiscard]] end_iterator   end() const noexcept
-  {
-    return iterator::make_end();
-  }
+  [[nodiscard]] const_data_iterator end() const noexcept { return {}; }
 
-  [[nodiscard]] const_iterator cbegin() const noexcept { return begin(); }
-  [[nodiscard]] end_iterator   cend() const noexcept
-  {
-    return iterator::make_end();
-  }
+  [[nodiscard]] const_iterator      cbegin() const noexcept { return begin(); }
+  [[nodiscard]] const_data_iterator cend() const noexcept { return {}; }
 
-  [[nodiscard]] iterator begin() noexcept { return {_root, {}}; }
+  [[nodiscard]] iterator      begin() noexcept { return {_root, {}}; }
+  [[nodiscard]] data_iterator end() noexcept { return {}; }
 
 private:
   using DirEntry    = typename DirNode::DirEntry;

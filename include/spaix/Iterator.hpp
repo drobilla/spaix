@@ -9,6 +9,8 @@
 #include <spaix/types.hpp>
 
 #include <cassert>
+#include <cstdint>
+#include <iterator>
 #include <utility>
 
 namespace spaix {
@@ -16,7 +18,8 @@ namespace spaix {
 /**
    An iterator for an RTree.
 
-   This iterates over data items in the tree which match the given predicate.
+   This iterates over data elements (key/value pairs) in the tree that match a
+   given predicate.
 */
 template<class Predicate, class DirNode, class DatNode, unsigned max_height>
 class Iterator : public DataIterator<DirNode, DatNode, max_height>
@@ -24,6 +27,9 @@ class Iterator : public DataIterator<DirNode, DatNode, max_height>
 public:
   using Base     = DataIterator<DirNode, DatNode, max_height>;
   using DirEntry = typename DirNode::DirEntry;
+
+  using iterator_category = std::forward_iterator_tag;
+  using difference_type   = intptr_t;
 
   Iterator(const DataIterator<DirNode, DatNode, max_height>& base,
            Predicate                                         predicate) noexcept
@@ -39,7 +45,7 @@ public:
     if (root && _predicate.directory(root_entry.key)) {
       const ChildIndex root_child_index = leftmost_child(*root, _predicate);
       if (root_child_index < root->num_children()) {
-        this->push_frame(root.get(), root_child_index);
+        this->step_down(root.get(), root_child_index);
         if (move_down_left() == Status::reached_end) {
           this->clear();
         }
@@ -62,7 +68,7 @@ public:
 private:
   using Base::empty;
   using Base::index;
-  using Base::node;
+  using Base::parent;
 
   enum class Status : unsigned char {
     success,
@@ -97,25 +103,25 @@ private:
   /// Move right until we reach a good leaf or the end of the parent
   [[nodiscard]] Status move_right_leaf() noexcept
   {
-    assert(node()->child_type() == NodeType::data);
+    assert(parent()->child_type() == NodeType::data);
     do {
-      Base::increment_leaf();
+      Base::step_right();
     } while (
-      index() < node()->num_children() &&
-      !_predicate.leaf(detail::entry_key(node()->dat_children()[index()])));
+      index() < parent()->num_children() &&
+      !_predicate.leaf(detail::entry_key(parent()->dat_children()[index()])));
 
-    return index() < node()->num_children() ? Status::success
-                                            : Status::reached_end;
+    return index() < parent()->num_children() ? Status::success
+                                              : Status::reached_end;
   }
 
   /// Move right until we reach a good directory or the end of the parent
   void move_right_dir() noexcept
   {
-    assert(node()->child_type() == NodeType::directory);
+    assert(parent()->child_type() == NodeType::directory);
     do {
-      Base::increment_leaf();
-    } while (index() < node()->num_children() &&
-             !_predicate.directory(node()->dir_children()[index()].key));
+      Base::step_right();
+    } while (index() < parent()->num_children() &&
+             !_predicate.directory(parent()->dir_children()[index()].key));
   }
 
   /// Move up/right until we reach a node we are not at the end of yet
@@ -123,8 +129,8 @@ private:
   {
     assert(!empty());
 
-    while (index() >= node()->num_children()) {
-      Base::pop_frame(); // Move up
+    while (index() >= parent()->num_children()) {
+      Base::step_up(); // Step up to parent
       if (empty()) {
         return Status::reached_end;
       }
@@ -138,11 +144,11 @@ private:
   /// Move down/left until we reach a potentially matching leaf
   [[nodiscard]] Status move_down_left() noexcept
   {
-    while (node()->child_type() == NodeType::directory) {
-      auto* const      dir         = node()->dir_children()[index()].node.get();
+    while (parent()->child_type() == NodeType::directory) {
+      auto* const      dir = parent()->dir_children()[index()].node.get();
       const ChildIndex first_index = leftmost_child(*dir, _predicate);
 
-      Base::push_frame(dir, first_index);
+      Base::step_down(dir, first_index);
 
       if (first_index >= dir->num_children()) {
         // No matches in this directory node, skip to the next
@@ -167,9 +173,9 @@ private:
 
     // Now at a matching directory, and a matching child of that directory
     assert(
-      (node()->child_type() == NodeType::directory &&
-       _predicate.directory(node()->dir_children()[index()].key)) ||
-      (_predicate.leaf(detail::entry_key(node()->dat_children()[index()]))));
+      (parent()->child_type() == NodeType::directory &&
+       _predicate.directory(parent()->dir_children()[index()].key)) ||
+      (_predicate.leaf(detail::entry_key(parent()->dat_children()[index()]))));
 
     return move_down_left();
   }

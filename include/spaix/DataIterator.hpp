@@ -9,23 +9,23 @@
 #include <spaix/types.hpp>
 
 #include <cassert>
-#include <cstdint>
-#include <iterator>
 
 namespace spaix {
 
-/// An iterator that points at a data node in an RTree
+/**
+   Base class for iterators that refer to data entries.
+
+   This is either empty, or can be dereferenced to access a data entry.
+*/
 template<class DirNode, class DatNode, unsigned max_height>
 class DataIterator
 {
 public:
-  using iterator_category = std::forward_iterator_tag;
-  using value_type        = DatNode;
-  using difference_type   = intptr_t;
-  using pointer           = const DatNode*;
-  using reference         = const DatNode&;
+  using value_type = DatNode;
+  using pointer    = const DatNode*;
+  using reference  = const DatNode&;
 
-  static DataIterator make_end() { return DataIterator{}; }
+  DataIterator() noexcept = default;
 
   const DatNode& operator*() const noexcept { return *operator->(); }
 
@@ -56,20 +56,18 @@ public:
   [[nodiscard]] bool empty() const noexcept { return _stack.empty(); }
 
 protected:
-  DataIterator() noexcept = default;
-
-  void push_frame(const DirNode* const node, const ChildIndex index) noexcept
+  void step_down(const DirNode* const node, const ChildIndex index) noexcept
   {
     _stack.emplace_back(Frame{node, index});
   }
 
-  void pop_frame() noexcept { _stack.pop_back(); }
+  void step_up() noexcept { _stack.pop_back(); }
 
-  void increment_leaf() noexcept { ++back().index; }
+  void step_right() noexcept { ++back().index; }
 
   void clear() noexcept { _stack.clear(); }
 
-  [[nodiscard]] const DirNode* node() const noexcept { return back().node; }
+  [[nodiscard]] const DirNode* parent() const noexcept { return back().node; }
   [[nodiscard]] ChildIndex     index() const noexcept { return back().index; }
 
 private:

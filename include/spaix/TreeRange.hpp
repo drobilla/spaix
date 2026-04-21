@@ -29,8 +29,11 @@ struct TreeRange {
 
   ~TreeRange() = default;
 
-  [[nodiscard]] IteratorType&       begin() noexcept { return _first; }
-  [[nodiscard]] const IteratorType& end() noexcept { return _last; }
+  [[nodiscard]] const IteratorType& begin() const noexcept { return _first; }
+  [[nodiscard]] const IteratorType& end() const noexcept { return _last; }
+
+  [[nodiscard]] IteratorType& begin() noexcept { return _first; }
+  [[nodiscard]] IteratorType& end() noexcept { return _last; }
 
   [[nodiscard]] bool empty() const noexcept { return _first == _last; }
 
