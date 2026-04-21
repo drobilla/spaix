@@ -59,6 +59,25 @@ RTree<B, K, D, C>::insert_entry(const unsigned depth, Entry entry) noexcept
 }
 
 template<class B, class K, class D, class C>
+void
+RTree<B, K, D, C>::erase(data_iterator& i)
+{
+  // Drop leaf entry
+  i.parent()->dat_children().pop_at(i.index());
+  i.step_up();
+  if (--_size == 0U) {
+    clear();
+    return;
+  }
+
+  // Condense tree by re-inserting any under-full directory nodes
+  condense_tree(i);
+
+  assert(!(_root.node->child_type() == NodeType::directory &&
+           _root.node->num_children() == 1));
+}
+
+template<class B, class K, class D, class C>
 template<class S>
 auto
 RTree<B, K, D, C>::query(S search) const -> TreeRange<ConstSearcher<S>>
@@ -69,6 +88,23 @@ RTree<B, K, D, C>::query(S search) const -> TreeRange<ConstSearcher<S>>
 
   ConstSearcher<S> first{_root, search};
   ConstSearcher<S> last{{Box{}, nullptr}, search};
+
+  assert(first == last || search.leaf(first->first));
+
+  return {std::move(first), std::move(last)};
+}
+
+template<class B, class K, class D, class C>
+template<class S>
+auto
+RTree<B, K, D, C>::query(S search) -> TreeRange<Searcher<S>>
+{
+  if (empty()) {
+    return {{{Box{}, nullptr}, search}, {{Box{}, nullptr}, search}};
+  }
+
+  Searcher<S> first{_root, search};
+  Searcher<S> last{{Box{}, nullptr}, search};
 
   assert(first == last || search.leaf(first->first));
 
@@ -142,6 +178,53 @@ RTree<B, K, D, C>::insert_rec(const unsigned depth,
   }
 
   return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
+}
+
+template<class B, class K, class D, class C>
+void
+RTree<B, K, D, C>::condense_tree(entry_iterator& i) noexcept
+{
+  // Condense upwards by removing under-filled directory nodes
+  StaticVector<std::unique_ptr<DirNode>, unsigned, max_height()> removed;
+  bool condensing = true;
+  for (; !i.empty() && condensing; i.step_up()) {
+    auto& e = i.parent()->dir_children()[i.index()];
+    if (e.node->num_children() < Conf::min_fanout(e.node->child_type())) {
+      // This entry's node is under-filled, remove it and continue
+      removed.emplace_back(std::move(e.node));
+      i.parent()->dir_children().pop_at(i.index());
+    } else {
+      // Recompute this entry's key and continue if it shrank
+      const auto new_key = ideal_key(*e.node);
+      condensing         = (new_key != e.key);
+      if (condensing) {
+        e.key = new_key;
+      }
+    }
+  }
+
+  // Shrink the root key if necessary
+  if (condensing) {
+    assert(i.empty() || i.parent() == _root.node.get());
+    _root.key = ideal_key(*_root.node);
+  }
+  assert(_root.key == ideal_key(*_root.node));
+
+  // Reinsert the children of all the removed directories
+  for (auto h = 0U; h < removed.size(); ++h) {
+    if (removed[h]->child_type() == NodeType::directory) {
+      reinsert_children(h, removed[h]->dir_children());
+    } else {
+      reinsert_children(h, removed[h]->dat_children());
+    }
+  }
+
+  // Remove superfluous root if possible
+  if (_root.node->child_type() == NodeType::directory &&
+      _root.node->num_children() == 1) {
+    _root = std::move(_root.node->dir_children()[0]);
+    --_height;
+  }
 }
 
 template<class B, class K, class D, class C>
@@ -248,6 +331,20 @@ RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> nodes,
   assert(sides[1].key == ideal_key(*sides[1].node));
 
   return sides;
+}
+
+template<class B, class K, class D, class C>
+template<class Entry, class Fanout, Fanout fanout>
+void
+RTree<B, K, D, C>::reinsert_children(
+  const unsigned                          skip,
+  StaticVectorView<Entry, Fanout, fanout> nodes) noexcept
+{
+  for (Fanout i = 0U; i < nodes.size(); ++i) {
+    Entry& e = nodes[i];
+    assert(_height >= 1U + skip);
+    insert_entry(_height - 1U - skip, std::move(e));
+  }
 }
 
 namespace detail {

@@ -326,6 +326,8 @@ template<class Tree>
 void
 test_tree(const unsigned span, const unsigned n_queries)
 {
+  using Key = typename Tree::Key;
+
   const auto start_time = static_cast<unsigned>(time(nullptr));
   const auto seed       = std::random_device{}() ^ start_time;
 
@@ -359,7 +361,32 @@ test_tree(const unsigned span, const unsigned n_queries)
 
   test_queries(tree, rng, span, n_queries);
 
-  tree.clear();
+  // Remove all elements
+  {
+    std::vector<unsigned> y_values(span + 1);
+    std::vector<unsigned> x_values(span + 1);
+
+    std::iota(y_values.begin(), y_values.end(), 0U);
+    std::iota(x_values.begin(), x_values.end(), 0U);
+
+    for (unsigned y = 0; y <= span; ++y) {
+      for (unsigned x = 0; x <= span; ++x) {
+        const auto key = make_key<Key>(x_values[x], y_values[y]);
+
+        auto matches = tree.query(Queries::exactly(key));
+        CHECK(!matches.empty());
+        CHECK(std::distance(matches.begin(), matches.end()) == 1U);
+        CHECK(matches.begin()->first == key);
+
+        const auto size_before = tree.size();
+        tree.erase(matches.begin());
+        const auto size_after = tree.size();
+
+        CHECK(size_after == size_before - 1U);
+      }
+    }
+  }
+
   test_empty_tree(tree, span);
 }
 

@@ -5,6 +5,7 @@
 #define SPAIX_RTREE_HPP
 
 #include <spaix/DataNode.hpp>
+#include <spaix/EntryIterator.hpp>
 #include <spaix/Iterator.hpp>
 #include <spaix/StaticVector.hpp>
 #include <spaix/TreeRange.hpp>
@@ -112,6 +113,9 @@ public:
   /// Insert a new item with the given `key` and `data`
   void insert(const Key& key, const Data& data);
 
+  /// Erase the given item
+  void erase(data_iterator& i);
+
   /**
      Return a range over all items covered by the given search.
 
@@ -128,6 +132,10 @@ public:
   */
   template<class S>
   [[nodiscard]] TreeRange<ConstSearcher<S>> query(S search) const;
+
+  /// Return a range over all items covered by the given search
+  template<class S>
+  [[nodiscard]] TreeRange<Searcher<S>> query(S search);
 
   /// Visit every entry in the tree that matches a predicate
   template<class Predicate, class Visitor>
@@ -186,6 +194,8 @@ private:
   using DirEntry    = typename DirNode::DirEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 
+  using entry_iterator = EntryIterator<DirNode, max_height()>;
+
   template<class Children>
   static Box parent_key(const Children& children) noexcept;
 
@@ -199,6 +209,8 @@ private:
                                        DirEntry&  parent_entry,
                                        const Box& new_parent_key,
                                        Entry      element) noexcept;
+
+  void condense_tree(entry_iterator& i) noexcept;
 
   template<class Predicate, class Visitor>
   void visit_matches_rec(const DirNode&   node,
@@ -220,6 +232,12 @@ private:
   [[nodiscard]] DirNodePair split(StaticVectorView<Entry, Count, fanout> nodes,
                                   Entry                                  entry,
                                   NodeType type) noexcept;
+
+  /// Reinsert children from an old directory node
+  template<class Entry, class Fanout, Fanout fanout>
+  void reinsert_children(
+    unsigned                                skip,
+    StaticVectorView<Entry, Fanout, fanout> nodes) noexcept;
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm
