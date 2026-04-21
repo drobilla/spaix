@@ -78,12 +78,12 @@ private:
                                    const Predicate& predicate) noexcept
   {
     if (dir.child_type() == NodeType::directory) {
-      for (ChildIndex i = 0U; i < dir.dir_children().size(); ++i) {
+      for (ChildIndex i = 0U; i < dir.num_children(); ++i) {
         if (predicate.directory(dir.dir_children()[i].key)) {
           return i;
         }
       }
-      return dir.dir_children().size();
+      return dir.num_children();
     }
 
     for (ChildIndex i = 0U; i < dir.dat_children().size(); ++i) {
@@ -101,11 +101,11 @@ private:
     do {
       Base::increment_leaf();
     } while (
-      index() < node()->dat_children().size() &&
+      index() < node()->num_children() &&
       !_predicate.leaf(detail::entry_key(node()->dat_children()[index()])));
 
-    return index() < node()->dat_children().size() ? Status::success
-                                                   : Status::reached_end;
+    return index() < node()->num_children() ? Status::success
+                                            : Status::reached_end;
   }
 
   /// Move right until we reach a good directory or the end of the parent
@@ -114,7 +114,7 @@ private:
     assert(node()->child_type() == NodeType::directory);
     do {
       Base::increment_leaf();
-    } while (index() < node()->dir_children().size() &&
+    } while (index() < node()->num_children() &&
              !_predicate.directory(node()->dir_children()[index()].key));
   }
 

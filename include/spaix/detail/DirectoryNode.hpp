@@ -4,13 +4,16 @@
 #ifndef SPAIX_DETAIL_DIRECTORYNODE_HPP
 #define SPAIX_DETAIL_DIRECTORYNODE_HPP
 
-#include <spaix/StaticVector.hpp>
+#include <spaix/ConstStaticVectorView.hpp>
+#include <spaix/StaticVectorView.hpp>
 #include <spaix/detail/DatEntryType.hpp>
 #include <spaix/detail/NodePointerEntry.hpp>
 #include <spaix/types.hpp>
 
+#include <algorithm>
+#include <array>
 #include <cassert>
-#include <new>
+#include <cstddef>
 #include <utility>
 
 namespace spaix::detail {
@@ -30,25 +33,25 @@ public:
   using DirEntry = NodePointerEntry<DirKey, DirNode>;
   using DatEntry = typename DatEntryType<DatNode, placement>::Type;
 
-  using DirChildren = StaticVector<DirEntry, ChildCount, dir_fanout>;
-  using DatChildren = StaticVector<DatEntry, ChildCount, dat_fanout>;
+  using DirChildrenView = StaticVectorView<DirEntry, ChildCount, dir_fanout>;
+  using DatChildrenView = StaticVectorView<DatEntry, ChildCount, dat_fanout>;
+
+  using ConstDirChildrenView =
+    ConstStaticVectorView<const DirEntry, ChildCount, dir_fanout>;
+
+  using ConstDatChildrenView =
+    ConstStaticVectorView<const DatEntry, ChildCount, dat_fanout>;
 
   explicit DirectoryNode(const NodeType t)
     : _child_type{t}
-  {
-    if (_child_type == NodeType::directory) {
-      new (&_dir_children) DirChildren();
-    } else {
-      new (&_dat_children) DatChildren();
-    }
-  }
+  {}
 
   ~DirectoryNode()
   {
     if (_child_type == NodeType::directory) {
-      _dir_children.~DirChildren();
+      dir_children().clear();
     } else {
-      _dat_children.~DatChildren();
+      dat_children().clear();
     }
   }
 
@@ -66,55 +69,64 @@ public:
   ChildCount append_child(DatEntry child)
   {
     assert(_child_type == NodeType::data);
-    _dat_children.emplace_back(std::move(child));
-    return _dat_children.size();
+    dat_children().emplace_back(std::move(child));
+    return _size;
   }
 
   ChildCount append_child(DirEntry entry)
   {
     assert(_child_type == NodeType::directory);
-    _dir_children.emplace_back(std::move(entry));
-    return _dir_children.size();
+    assert(entry.node);
+    dir_children().emplace_back(std::move(entry));
+    return _size;
   }
 
-  [[nodiscard]] ChildIndex num_children() const
-  {
-    return _child_type == NodeType::directory ? _dir_children.size()
-                                              : _dat_children.size();
-  }
+  [[nodiscard]] ChildIndex num_children() const { return _size; }
 
   [[nodiscard]] NodeType child_type() const { return _child_type; }
 
-  [[nodiscard]] const DirChildren& dir_children() const
+  [[nodiscard]] ConstDirChildrenView dir_children() const
   {
     assert(_child_type == NodeType::directory);
-    return _dir_children;
+    return {_size, reinterpret_cast<const DirEntry*>(&_children)};
   }
 
-  [[nodiscard]] const DatChildren& dat_children() const
+  [[nodiscard]] ConstDatChildrenView dat_children() const
   {
     assert(_child_type == NodeType::data);
-    return _dat_children;
+    return {_size, reinterpret_cast<const DatEntry*>(&_children)};
   }
 
-  [[nodiscard]] DirChildren& dir_children()
+  [[nodiscard]] DirChildrenView dir_children()
   {
     assert(_child_type == NodeType::directory);
-    return _dir_children;
+    return {_size, reinterpret_cast<DirEntry*>(&_children)};
   }
 
-  [[nodiscard]] DatChildren& dat_children()
+  [[nodiscard]] DatChildrenView dat_children()
   {
     assert(_child_type == NodeType::data);
-    return _dat_children;
+    return {_size, reinterpret_cast<DatEntry*>(&_children)};
   }
 
 private:
-  union {
-    DirChildren _dir_children; ///< Directory node children
-    DatChildren _dat_children; ///< Data node children
+  using AnyEntry = union {
+    DirEntry dir;
+    DatEntry dat;
   };
+
+  static constexpr auto n_children_bytes =
+    std::max(dir_fanout * sizeof(DirEntry), dat_fanout * sizeof(DatEntry));
+
   const NodeType _child_type; ///< Type of children nodes
+  ChildCount     _size{};     ///< Number of children nodes
+
+  struct alignas(AnyEntry) Children {
+    std::array<std::byte, n_children_bytes> bytes;
+  };
+
+  /// Opaque storage for children array (array of DirEntry or DatEntry)
+  Children _children{};
 };
 
 } // namespace spaix::detail

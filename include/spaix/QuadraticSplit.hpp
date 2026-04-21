@@ -88,7 +88,7 @@ public:
       const auto n_children =
         detail::distribute_child(parent, best.new_parent_key, std::move(*iter));
 
-      deposit.pop(iter);
+      deposit.pop_at(best.child_index);
 
       if (n_children == max_fanout) {
         detail::distribute_remaining<Ops>(best.side == Side::left ? rhs : lhs,

@@ -4,8 +4,12 @@
 #ifndef SPAIX_STATICVECTOR_HPP
 #define SPAIX_STATICVECTOR_HPP
 
+#include <spaix/ConstStaticVectorView.hpp>
+#include <spaix/StaticVectorView.hpp>
+
 #include <algorithm>
-#include <cassert>
+#include <array>
+#include <cstddef>
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -16,100 +20,73 @@ template<class T, class Size, Size max_size>
 class StaticVector
 {
 public:
+  static_assert(max_size);
+
+  static_assert(alignof(T) <= sizeof(T),
+                "element alignment must not exceed its size");
+
+  static_assert((sizeof(T) % alignof(T)) == 0U,
+                "element size must be a multiple of its alignment");
+
   using const_iterator = const T*;
   using iterator       = T*;
   using value_type     = T;
+  using size_type      = Size;
 
   StaticVector() noexcept = default;
-
-  ~StaticVector() { clear(); }
 
   StaticVector(StaticVector&& vec) noexcept
   {
     for (Size i = 0; i < vec.size(); ++i) {
-      new (&_array[i]) T{std::move(vec[i])};
+      new (&begin()[i]) T{std::move(vec[i])};
       ++_size;
     }
   }
 
-  StaticVector(const StaticVector& vec)
+  StaticVector(const StaticVector& vec) noexcept
   {
     for (Size i = 0; i < vec.size(); ++i) {
-      new (&_array[i]) T{vec[i]};
+      new (&begin()[i]) T{vec[i]};
       ++_size;
     }
   }
 
-  StaticVector& operator=(StaticVector&)  = delete;
-  StaticVector& operator=(StaticVector&&) = delete;
+  StaticVector& operator=(const StaticVector&) = delete;
+  StaticVector& operator=(StaticVector&&)      = delete;
 
-  void pop(T* const iter) noexcept
+  ~StaticVector() { clear(); }
+
+  void clear() noexcept { impl().clear(); }
+
+  void pop_at(const size_t index) noexcept(
+    std::is_nothrow_move_constructible_v<T>)
   {
-    assert(iter < cend());
-    if (iter != cend() - 1) {
-      auto last = std::move(back());
-
-      if constexpr (!std::is_trivially_destructible_v<T>) {
-        iter->~T();
-      }
-
-      new (iter) T{std::move(last)};
-    }
-
-    pop_back();
+    impl().pop_at(index);
   }
 
-  void pop_back() noexcept
-  {
-    assert(!empty());
-    --_size;
-
-    if constexpr (!std::is_trivially_destructible_v<T>) {
-      reinterpret_cast<T*>(&_array[_size])->~T();
-    }
-  }
+  void pop_back() noexcept { impl().pop_back(); }
 
   template<class... Args>
-  void emplace_back(Args&&... args) noexcept
+  void emplace_back(Args&&... args) noexcept(
+    std::is_nothrow_constructible_v<T, Args...>)
   {
-    assert(_size < max_size);
-
-    new (&_array[_size++]) T{std::forward<Args>(args)...};
+    impl().emplace_back(std::forward<Args>(args)...);
   }
 
   [[nodiscard]] bool empty() const noexcept { return _size == 0; }
 
-  [[nodiscard]] const T& back() const noexcept
-  {
-    assert(_size > 0);
-    return *reinterpret_cast<const T*>(&_array[_size - 1]);
-  }
+  [[nodiscard]] const T& back() const noexcept { return impl().back(); }
 
-  [[nodiscard]] T& back() noexcept
-  {
-    assert(_size > 0);
-    return *reinterpret_cast<T*>(&_array[_size - 1]);
-  }
+  [[nodiscard]] T& back() noexcept { return impl().back(); }
 
   [[nodiscard]] const T& operator[](const Size index) const noexcept
   {
-    return *reinterpret_cast<const T*>(&_array[index]);
+    return impl().operator[](index);
   }
 
   [[nodiscard]] T& operator[](const Size index) noexcept
   {
-    return *reinterpret_cast<T*>(&_array[index]);
-  }
-
-  void clear() noexcept
-  {
-    if constexpr (!std::is_trivially_destructible_v<T>) {
-      for (Size i = 0; i < _size; ++i) {
-        reinterpret_cast<T*>(&_array[i])->~T();
-      }
-    }
-
-    _size = 0;
+    return impl().operator[](index);
   }
 
   [[nodiscard]] Size                  size() const noexcept { return _size; }
@@ -117,17 +94,17 @@ public:
 
   [[nodiscard]] iterator begin() noexcept
   {
-    return reinterpret_cast<T*>(_array);
+    return reinterpret_cast<T*>(&_data);
   }
 
   [[nodiscard]] const_iterator begin() const noexcept
   {
-    return reinterpret_cast<const T*>(_array);
+    return reinterpret_cast<const T*>(&_data);
   }
 
   [[nodiscard]] const_iterator cbegin() const noexcept
   {
-    return reinterpret_cast<const T*>(_array);
+    return reinterpret_cast<const T*>(&_data);
   }
 
   [[nodiscard]] iterator       end() noexcept { return begin() + _size; }
@@ -135,14 +112,27 @@ public:
   [[nodiscard]] const_iterator cend() const noexcept { return begin() + _size; }
 
 private:
-  using Element = typename std::aligned_storage_t<sizeof(T), alignof(T)>;
+  [[nodiscard]] StaticVectorView<T, Size, max_size> impl() noexcept
+  {
+    return StaticVectorView<T, Size, max_size>{_size, begin()};
+  }
 
-  Size    _size{};
-  Element _array[max_size]{}; // NOLINT(*-c-arrays)
+  [[nodiscard]] ConstStaticVectorView<T, Size, max_size> impl() const noexcept
+  {
+    return ConstStaticVectorView<T, Size, max_size>{_size, begin()};
+  }
+
+  Size _size{};
+
+  struct alignas(T) Data {
+    std::array<std::byte, max_size * sizeof(T)> bytes;
+  };
+
+  Data _data{};
 };
 
 template<class T, class Size, Size max_size>
-[[nodiscard]] bool
+[[nodiscard]] inline bool
 operator<(const spaix::StaticVector<T, Size, max_size>& lhs,
           const spaix::StaticVector<T, Size, max_size>& rhs) noexcept
 {

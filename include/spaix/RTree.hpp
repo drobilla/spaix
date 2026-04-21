@@ -20,6 +20,9 @@
 
 namespace spaix {
 
+template<class T, class Size, Size max_size>
+class StaticVectorView;
+
 /**
    An R-tree which spatially indexes points or rectangles.
 
@@ -199,9 +202,9 @@ private:
 
   /// Split `nodes` plus `node` in two and return the resulting sides
   template<class Entry, ChildCount fanout>
-  DirNodePair split(StaticVector<Entry, ChildCount, fanout>& nodes,
-                    Entry                                    entry,
-                    NodeType                                 type) noexcept;
+  DirNodePair split(StaticVectorView<Entry, ChildCount, fanout> nodes,
+                    Entry                                       entry,
+                    NodeType                                    type) noexcept;
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm

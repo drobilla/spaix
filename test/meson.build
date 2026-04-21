@@ -46,17 +46,9 @@ elif cpp.get_id() == 'gcc'
   endif
 
 elif cpp.get_id() == 'msvc'
-  cpp_suppressions += [
-    '/experimental:external',
-    '/external:W0',
-    '/external:anglebrackets',
-  ]
-
   if warning_level == 'everything'
-    cpp_suppressions = [
+    cpp_suppressions += [
       '/wd4514',  # unreferenced inline function has been removed
-      '/wd4582',  # constructor is not explicitly called
-      '/wd4583',  # destructor is not explicitly called
       '/wd4623',  # default constructor implicitly deleted
       '/wd4625',  # copy constructor implicitly deleted
       '/wd4626',  # copy assignment operator implicitly deleted
@@ -68,6 +60,12 @@ elif cpp.get_id() == 'msvc'
       '/wd5027',  # move assignment operator implicitly deleted
       '/wd5045',  # will insert Spectre mitigation for memory load
       '/wd5219',  # implicit conversion to float
+    ]
+  endif
+
+  if warning_level in ['everything', '3']
+    cpp_suppressions += [
+      '/wd4324',  # structure was padded due to alignment specifier
     ]
   endif
 endif
