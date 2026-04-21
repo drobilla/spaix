@@ -58,6 +58,7 @@ headers = files(
   'include/spaix/homox/Point.hpp',
   'include/spaix/homox/Rect.hpp',
   'include/spaix/search/Everything.hpp',
+  'include/spaix/search/Exactly.hpp',
   'include/spaix/search/Touching.hpp',
   'include/spaix/search/Within.hpp',
   'include/spaix/types.hpp',

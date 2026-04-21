@@ -35,6 +35,7 @@
 #include <spaix/homox/Point.hpp>             // IWYU pragma: keep
 #include <spaix/homox/Rect.hpp>              // IWYU pragma: keep
 #include <spaix/search/Everything.hpp>       // IWYU pragma: keep
+#include <spaix/search/Exactly.hpp>          // IWYU pragma: keep
 #include <spaix/search/Touching.hpp>         // IWYU pragma: keep
 #include <spaix/search/Within.hpp>           // IWYU pragma: keep
 #include <spaix/types.hpp>                   // IWYU pragma: keep

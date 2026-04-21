@@ -5,6 +5,7 @@
 #define SPAIX_QUERIES_HPP
 
 #include <spaix/search/Everything.hpp>
+#include <spaix/search/Exactly.hpp>
 #include <spaix/search/Touching.hpp>
 #include <spaix/search/Within.hpp>
 
@@ -17,6 +18,12 @@ struct Queries {
   static constexpr search::Everything everything()
   {
     return search::Everything{};
+  }
+
+  template<class K>
+  static constexpr search::Exactly<Comparisons, K> exactly(const K& k)
+  {
+    return search::Exactly<Comparisons, K>{k};
   }
 
   template<class K>

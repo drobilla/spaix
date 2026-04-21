@@ -101,7 +101,14 @@ make_tree(std::mt19937& rng, const unsigned span)
 
   for (unsigned y = 0; y <= span; ++y) {
     for (unsigned x = 0; x <= span; ++x) {
-      tree.insert(make_key<Key>(x_values[x], y_values[y]), (y * span) + x);
+      const auto key = make_key<Key>(x_values[x], y_values[y]);
+
+      tree.insert(key, (y * span) + x);
+
+      const auto matches = tree.query(Queries::exactly(key));
+      CHECK(!matches.empty());
+      CHECK(std::distance(matches.begin(), matches.end()) == 1U);
+      CHECK(matches.begin()->first == key);
     }
   }
 
