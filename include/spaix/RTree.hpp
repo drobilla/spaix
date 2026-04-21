@@ -54,6 +54,8 @@ public:
   using ChildCount = typename DirNode::ChildCount;
   using ChildIndex = typename DirNode::ChildCount;
 
+  using DatEntry = typename DirNode::DatEntry;
+
   /// Return the maximum height of a tree
   static constexpr unsigned max_height() noexcept { return Conf::max_height; }
 
@@ -113,8 +115,11 @@ public:
   /// Insert a new item with the given `key` and `data`
   void insert(const Key& key, const Data& data);
 
+  /// Reinsert an existing item under a new `key`
+  void relocate(data_iterator& i, const Key& key);
+
   /// Erase the given item
-  void erase(data_iterator& i);
+  DatEntry erase(data_iterator& i);
 
   /**
      Return a range over all items covered by the given search.
@@ -190,7 +195,6 @@ public:
   [[nodiscard]] data_iterator end() noexcept { return {}; }
 
 private:
-  using DatEntry    = typename DirNode::DatEntry;
   using DirEntry    = typename DirNode::DirEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 

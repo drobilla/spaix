@@ -38,6 +38,56 @@ RTree<B, K, D, C>::insert(const Key& key, const Data& data)
 }
 
 template<class B, class K, class D, class C>
+void
+RTree<B, K, D, C>::relocate(data_iterator& i, const Key& key)
+{
+  assert(!i.empty());
+
+  if (i.parent() == _root.node.get()) {
+    // Base case: element is a child of the root
+    i->first  = key;
+    _root.key = ideal_key(*_root.node);
+  } else {
+    const auto dat_parent = i.parent();
+    const auto dat_index  = i.index();
+    auto&      dat_entry  = dat_parent->dat_children()[dat_index];
+
+    i.step_up();
+    auto* e = &i.parent()->dir_children()[i.index()];
+    if (Ops::unify(e->key, key) == e->key) {
+      // Fast path: new key is within existing directory's bounds
+      detail::entry_key(dat_entry) = key;
+
+      // Shrink directory keys upwards as necessary
+      auto new_key    = ideal_key(*e->node);
+      bool condensing = (new_key != e->key);
+      for (; !i.empty() && condensing; i.step_up()) {
+        e          = &i.parent()->dir_children()[i.index()];
+        new_key    = ideal_key(*e->node);
+        condensing = (new_key != e->key);
+        if (condensing) {
+          e->key = new_key;
+        }
+      }
+
+      if (condensing) {
+        assert(i.empty() || i.parent() == _root.node.get());
+        _root.key = ideal_key(*_root.node);
+      }
+
+    } else {
+      // Slow path: erase and reinsert normally
+      i.step_down(dat_parent, dat_index); // Restore iterator
+
+      auto entry               = erase(i);
+      detail::entry_key(entry) = key;
+      insert_entry(_height - 1U, std::move(entry));
+      ++_size;
+    }
+  }
+}
+
+template<class B, class K, class D, class C>
 template<class Entry>
 void
 RTree<B, K, D, C>::insert_entry(const unsigned depth, Entry entry) noexcept
@@ -59,15 +109,18 @@ RTree<B, K, D, C>::insert_entry(const unsigned depth, Entry entry) noexcept
 }
 
 template<class B, class K, class D, class C>
-void
-RTree<B, K, D, C>::erase(data_iterator& i)
+auto
+RTree<B, K, D, C>::erase(data_iterator& i) -> DatEntry
 {
+  assert(!i.empty());
+
   // Drop leaf entry
+  auto entry = std::move(i.parent()->dat_children()[i.index()]);
   i.parent()->dat_children().pop_at(i.index());
   i.step_up();
   if (--_size == 0U) {
     clear();
-    return;
+    return entry;
   }
 
   // Condense tree by re-inserting any under-full directory nodes
@@ -75,6 +128,8 @@ RTree<B, K, D, C>::erase(data_iterator& i)
 
   assert(!(_root.node->child_type() == NodeType::directory &&
            _root.node->num_children() == 1));
+
+  return entry;
 }
 
 template<class B, class K, class D, class C>

@@ -30,6 +30,7 @@
 #include <random>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -103,9 +104,10 @@ make_tree(std::mt19937& rng, const unsigned span)
 
   for (unsigned y = 0; y <= span; ++y) {
     for (unsigned x = 0; x <= span; ++x) {
-      const auto key = make_key<Key>(x_values[x], y_values[y]);
+      const auto key   = make_key<Key>(x_values[x], y_values[y]);
+      const auto value = (y_values[y] * span) + x_values[x];
 
-      tree.insert(key, (y * span) + x);
+      tree.insert(key, value);
 
       const auto matches = tree.query(Queries::exactly(key));
       CHECK(!matches.empty());
@@ -259,6 +261,20 @@ test_queries(const Tree&    tree,
 
   std::uniform_int_distribution<unsigned> dist{0, span - 1U};
 
+  auto random_rect = [&rng, &dist]() {
+    const auto x0     = dist(rng);
+    const auto x1     = dist(rng);
+    const auto y0     = dist(rng);
+    const auto y1     = dist(rng);
+    const auto x_low  = std::min(x0, x1);
+    const auto x_high = std::max(x0, x1) + 1U;
+    const auto y_low  = std::min(y0, y1);
+    const auto y_high = std::max(y0, y1) + 1U;
+
+    return std::make_pair(std::make_pair(x_low, x_high),
+                          std::make_pair(y_low, y_high));
+  };
+
   // Test a query that is in the tree bounds, but has no matches
   {
     const auto mid = static_cast<float>(span) / 2.0f;
@@ -278,14 +294,11 @@ test_queries(const Tree&    tree,
 
   // Test random queries
   for (auto i = 0U; i < n_queries; ++i) {
-    const auto x0     = dist(rng);
-    const auto x1     = dist(rng);
-    const auto y0     = dist(rng);
-    const auto y1     = dist(rng);
-    const auto x_low  = std::min(x0, x1);
-    const auto x_high = std::max(x0, x1) + 1U;
-    const auto y_low  = std::min(y0, y1);
-    const auto y_high = std::max(y0, y1) + 1U;
+    const auto x_y_range = random_rect();
+    const auto x_low     = x_y_range.first.first;
+    const auto x_high    = x_y_range.first.second;
+    const auto y_low     = x_y_range.second.first;
+    const auto y_high    = x_y_range.second.second;
 
     const auto x_span = x_high - x_low;
     const auto y_span = y_high - y_low;
@@ -331,7 +344,8 @@ test_tree(const unsigned span, const unsigned n_queries)
   const auto start_time = static_cast<unsigned>(time(nullptr));
   const auto seed       = std::random_device{}() ^ start_time;
 
-  std::mt19937 rng{seed};
+  std::mt19937                            rng{seed};
+  std::uniform_int_distribution<unsigned> dist{0, span - 1U};
 
   auto tree = make_tree<Tree>(rng, span);
 
@@ -361,7 +375,7 @@ test_tree(const unsigned span, const unsigned n_queries)
 
   test_queries(tree, rng, span, n_queries);
 
-  // Remove all elements
+  // Relocate and remove all elements
   {
     std::vector<unsigned> y_values(span + 1);
     std::vector<unsigned> x_values(span + 1);
@@ -371,18 +385,36 @@ test_tree(const unsigned span, const unsigned n_queries)
 
     for (unsigned y = 0; y <= span; ++y) {
       for (unsigned x = 0; x <= span; ++x) {
-        const auto key = make_key<Key>(x_values[x], y_values[y]);
+        const auto key   = make_key<Key>(x_values[x], y_values[y]);
+        const auto value = (y_values[y] * span) + x_values[x];
 
+        const auto size_before = tree.size();
+
+        // Check that the item exists at the expected key
         auto matches = tree.query(Queries::exactly(key));
         CHECK(!matches.empty());
         CHECK(std::distance(matches.begin(), matches.end()) == 1U);
         CHECK(matches.begin()->first == key);
+        CHECK(matches.begin()->second == value);
 
-        const auto size_before = tree.size();
-        tree.erase(matches.begin());
-        const auto size_after = tree.size();
+        // Move the item to a new location
+        const auto new_key = make_key<Key>(dist(rng), dist(rng));
+        tree.relocate(matches.begin(), new_key);
+        CHECK(tree.size() == size_before);
 
-        CHECK(size_after == size_before - 1U);
+        // Check that the item exists at the new key
+        auto new_matches = tree.query(Queries::exactly(new_key));
+        CHECK(!new_matches.empty());
+        // CHECK(std::distance(new_matches.begin(), new_matches.end()) == 1U);
+        CHECK(new_matches.begin()->first == new_key);
+        while (new_matches.begin()->second != value && !new_matches.empty()) {
+          ++new_matches.begin();
+        }
+        CHECK(new_matches.begin()->second == value);
+
+        // Erase the item and check the tree size
+        tree.erase(new_matches.begin());
+        CHECK(tree.size() == size_before - 1U);
       }
     }
   }
