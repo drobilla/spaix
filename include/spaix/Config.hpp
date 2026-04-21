@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <ratio>
+#include <type_traits>
 
 namespace spaix {
 
@@ -34,8 +35,8 @@ static constexpr auto default_max_tree_height = 12U;
    @tparam data_placement Where data in the tree is stored.
    @tparam max_tree_height The maximum height of the tree.
 */
-template<ChildCount    max_dir_fanout,
-         ChildCount    max_dat_fanout,
+template<unsigned      max_dir_fanout,
+         unsigned      max_dat_fanout,
          DataPlacement data_placement,
          unsigned      max_tree_height = default_max_tree_height>
 struct StaticStructure {
@@ -43,6 +44,9 @@ struct StaticStructure {
   static constexpr auto dir_fanout = max_dir_fanout;
   static constexpr auto dat_fanout = max_dat_fanout;
   static constexpr auto max_height = max_tree_height;
+  static constexpr auto max_fanout = std::max(dir_fanout, dat_fanout);
+
+  using ChildCount = std::conditional_t<(max_fanout < 255U), uint8_t, uint16_t>;
 };
 
 /**

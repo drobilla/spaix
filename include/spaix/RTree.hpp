@@ -11,7 +11,6 @@
 #include <spaix/detail/DirectoryNode.hpp>
 #include <spaix/detail/power.hpp>
 #include <spaix/search/Everything.hpp>
-#include <spaix/types.hpp>
 
 #include <array>
 #include <cstddef>
@@ -22,6 +21,8 @@ namespace spaix {
 
 template<class T, class Size, Size max_size>
 class StaticVectorView;
+
+enum class NodeType : unsigned char;
 
 /**
    An R-tree which spatially indexes points or rectangles.
@@ -48,6 +49,9 @@ public:
   using DatNode = DataNode<Key, Data>; ///< Leaf node
   using DirNode =
     detail::DirectoryNode<Box, DatNode, Structure>; ///< Internal node
+
+  using ChildCount = typename DirNode::ChildCount;
+  using ChildIndex = typename DirNode::ChildCount;
 
   /// Return the maximum height of a tree
   static constexpr unsigned max_height() noexcept { return Conf::max_height; }
@@ -193,16 +197,16 @@ private:
                          const Visitor&   visitor) const noexcept;
 
   /// Create a new parent seeded with a child
-  template<class Entry, ChildCount count>
-  static DirEntry new_parent(StaticVector<Entry, ChildCount, count>& deposit,
-                             ChildIndex                              index,
+  template<class Entry, class Count, Count count>
+  static DirEntry new_parent(StaticVector<Entry, Count, count>& deposit,
+                             ChildIndex                         index,
                              NodeType child_type) noexcept;
 
   /// Split `nodes` plus `node` in two and return the resulting sides
-  template<class Entry, ChildCount fanout>
-  DirNodePair split(StaticVectorView<Entry, ChildCount, fanout> nodes,
-                    Entry                                       entry,
-                    NodeType                                    type) noexcept;
+  template<class Entry, class Count, Count fanout>
+  DirNodePair split(StaticVectorView<Entry, Count, fanout> nodes,
+                    Entry                                  entry,
+                    NodeType                               type) noexcept;
 
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm

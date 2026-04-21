@@ -5,14 +5,13 @@
 #define SPAIX_DETAIL_DISTRIBUTE_HPP
 
 #include <spaix/detail/entry.hpp>
-#include <spaix/types.hpp>
 
 #include <utility>
 
 namespace spaix::detail {
 
 template<class DirEntry, class DirKey, class Entry>
-inline ChildCount
+inline auto
 distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
 {
   parent.key = new_parent_key;
@@ -23,7 +22,7 @@ template<class Ops, class DirEntry, class Deposit>
 inline void
 distribute_remaining(DirEntry& parent, Deposit deposit)
 {
-  for (ChildIndex i = 0; i < deposit.size(); ++i) {
+  for (auto i = typename Deposit::size_type{}; i < deposit.size(); ++i) {
     auto& entry = deposit[i];
     Ops::expand(parent.key, entry_key(entry));
     parent.node->append_child(std::move(entry));

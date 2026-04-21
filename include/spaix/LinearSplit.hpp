@@ -33,16 +33,19 @@ public:
 
   /// Return the indices of the children that should be used for split seeds
   template<class DirKey, class Entries>
-  SplitSeeds<Volume> pick_seeds(const Entries& deposit) noexcept
+  SplitSeeds<typename Entries::size_type, Volume> pick_seeds(
+    const Entries& deposit) noexcept
   {
     using std::max;
     using std::min;
 
+    using ChildIndex = typename Entries::size_type;
+
     using Scalar =
       decltype(Ops::template lower<0>(detail::entry_key(deposit[0])));
 
-    std::array<ExtremeIndices, n_dimensions> indices{};
-    const detail::Index<0U, n_dimensions>    dim_begin{};
+    std::array<ExtremeIndices<ChildIndex>, n_dimensions> indices{};
+    const detail::Index<0U, n_dimensions>                dim_begin{};
 
     for (ChildIndex i = 1; i < deposit.size(); ++i) {
       update_indices(deposit, i, indices, dim_begin);
@@ -66,11 +69,12 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirNode>
-  void distribute_children(SplitSeeds<Volume>& seeds,
-                           Deposit&&           deposit,
-                           DirNode&            lhs,
-                           DirNode&            rhs,
-                           const ChildCount    max_fanout) noexcept
+  void distribute_children(
+    SplitSeeds<typename Deposit::size_type, Volume>& seeds,
+    Deposit&&                                        deposit,
+    DirNode&                                         lhs,
+    DirNode&                                         rhs,
+    const unsigned                                   max_fanout) noexcept
   {
     using detail::distribute_child;
 
@@ -114,12 +118,19 @@ public:
   }
 
 private:
+  template<class ChildIndex>
   struct ExtremeIndices {
     ChildIndex min_min = 1;
     ChildIndex max_min = 1;
     ChildIndex min_max = 0;
     ChildIndex max_max = 0;
   };
+
+  template<class Entries>
+  using IndexFor = typename Entries::size_type;
+
+  template<class Entries>
+  using ExtremeIndicesFor = ExtremeIndices<IndexFor<Entries>>;
 
   template<class T>
   struct MaxSeparation {
@@ -129,16 +140,17 @@ private:
 
   template<class Entries, size_t n_dims>
   static void update_indices(const Entries&,
-                             const ChildIndex,
-                             std::array<ExtremeIndices, n_dims>&,
+                             const IndexFor<Entries>,
+                             std::array<ExtremeIndicesFor<Entries>, n_dims>&,
                              detail::EndIndex<n_dims>) noexcept
   {}
 
   template<class Entries, size_t dim, size_t n_dims>
-  static void update_indices(const Entries&                      deposit,
-                             const ChildIndex                    child_index,
-                             std::array<ExtremeIndices, n_dims>& indices,
-                             detail::Index<dim, n_dims>          index) noexcept
+  static void update_indices(
+    const Entries&                                  deposit,
+    const IndexFor<Entries>                         child_index,
+    std::array<ExtremeIndicesFor<Entries>, n_dims>& indices,
+    detail::Index<dim, n_dims>                      index) noexcept
   {
     const auto& child     = deposit[child_index];
     const auto& child_key = detail::entry_key(child);
@@ -172,18 +184,19 @@ private:
   }
 
   template<class Entries, class T, size_t n_dims>
-  static void update_max_separation(const Entries&,
-                                    const std::array<ExtremeIndices, n_dims>&,
-                                    MaxSeparation<T>&,
-                                    detail::EndIndex<n_dims>) noexcept
+  static void update_max_separation(
+    const Entries&,
+    const std::array<ExtremeIndicesFor<Entries>, n_dims>&,
+    MaxSeparation<T>&,
+    detail::EndIndex<n_dims>) noexcept
   {}
 
   template<class Entries, class T, size_t dim, size_t n_dims>
   static void update_max_separation(
-    const Entries&                            deposit,
-    const std::array<ExtremeIndices, n_dims>& indices,
-    MaxSeparation<T>&                         max_separation,
-    detail::Index<dim, n_dims>                index) noexcept
+    const Entries&                                        deposit,
+    const std::array<ExtremeIndicesFor<Entries>, n_dims>& indices,
+    MaxSeparation<T>&                                     max_separation,
+    detail::Index<dim, n_dims>                            index) noexcept
   {
     const auto& min_min = detail::entry_key(deposit[indices[dim].min_min]);
     const auto& max_min = detail::entry_key(deposit[indices[dim].max_min]);

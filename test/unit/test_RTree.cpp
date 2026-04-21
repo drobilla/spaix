@@ -34,8 +34,7 @@
 
 namespace {
 
-using ChildCount = spaix::ChildCount;
-using NodeType   = spaix::NodeType;
+using NodeType = spaix::NodeType;
 
 using Scalar      = float;
 using Rect        = spaix::heterox::Rect<float, float>;
@@ -155,7 +154,7 @@ test_visit(const Tree& tree)
 
   // Check that visitation can be stopped at directories
   tree.visit(
-    [&](const NodePath& path, const DirKey&, NodeType, ChildCount) {
+    [&](const NodePath& path, const DirKey&, auto, auto) {
       CHECK(path.size() <= 2);
       top_paths.emplace_back(path);
       return path.size() < 2 ? spaix::VisitStatus::proceed
@@ -173,7 +172,7 @@ test_visit(const Tree& tree)
   size_t n_dirs   = 0;
   size_t n_leaves = 0;
   tree.visit(
-    [&](const NodePath&, const DirKey&, NodeType, ChildCount) {
+    [&](const NodePath&, const DirKey&, auto, auto) {
       ++n_dirs;
       return spaix::VisitStatus::proceed;
     },
@@ -190,9 +189,10 @@ template<class Tree>
 void
 test_structure(const Tree& tree)
 {
-  using DirKey   = typename Tree::Box;
-  using Key      = typename Tree::Key;
-  using NodePath = typename Tree::NodePath;
+  using DirKey     = typename Tree::Box;
+  using Key        = typename Tree::Key;
+  using NodePath   = typename Tree::NodePath;
+  using ChildCount = typename Tree::ChildCount;
 
   std::map<NodePath, DirKey> dir_keys;
   std::set<NodePath>         dat_paths;

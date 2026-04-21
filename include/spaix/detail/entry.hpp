@@ -5,7 +5,6 @@
 #define SPAIX_DETAIL_ENTRY_HPP
 
 #include <spaix/DataNode.hpp>
-#include <spaix/types.hpp>
 
 #include <memory>
 
@@ -99,17 +98,10 @@ entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 }
 
 template<class Key, class Node>
-ChildCount
+auto
 entry_num_children(const NodePointerEntry<Key, Node>& entry) noexcept
 {
   return entry.node->num_children();
-}
-
-template<class Key, class Data>
-ChildCount
-entry_num_children(const DataNode<Key, Data>&) noexcept
-{
-  return 0U;
 }
 
 } // namespace spaix::detail

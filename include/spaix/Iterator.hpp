@@ -25,8 +25,9 @@ template<class Predicate, class DirNode, class DatNode, unsigned max_height>
 class Iterator : public DataIterator<DirNode, DatNode, max_height>
 {
 public:
-  using Base     = DataIterator<DirNode, DatNode, max_height>;
-  using DirEntry = typename DirNode::DirEntry;
+  using Base       = DataIterator<DirNode, DatNode, max_height>;
+  using DirEntry   = typename DirNode::DirEntry;
+  using ChildIndex = typename Base::ChildIndex;
 
   using iterator_category = std::forward_iterator_tag;
   using difference_type   = intptr_t;

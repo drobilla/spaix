@@ -42,7 +42,10 @@ elif cpp.get_id() == 'gcc'
   endif
 
   if host_machine.system() == 'windows'
-    cpp_suppressions += ['-Wno-useless-cast']
+    cpp_suppressions += [
+      '-Wno-strict-overflow',
+      '-Wno-useless-cast',
+    ]
   endif
 
 elif cpp.get_id() == 'msvc'

@@ -4,8 +4,6 @@
 #ifndef SPAIX_ENTRYITERATOR_HPP
 #define SPAIX_ENTRYITERATOR_HPP
 
-#include <spaix/types.hpp>
-
 #include <array>
 #include <cassert>
 
@@ -30,6 +28,8 @@ template<class DirNode, unsigned max_height>
 class EntryIterator
 {
 public:
+  using ChildIndex = typename DirNode::ChildIndex;
+
   EntryIterator() noexcept = default;
   ~EntryIterator()         = default;
 

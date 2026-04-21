@@ -1,14 +1,12 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_SPLITSEEDS_HPP
 #define SPAIX_SPLITSEEDS_HPP
 
-#include <spaix/types.hpp>
-
 namespace spaix {
 
-template<typename Volume>
+template<class ChildIndex, class Volume>
 struct SplitSeeds {
   ChildIndex lhs_index;
   ChildIndex rhs_index;

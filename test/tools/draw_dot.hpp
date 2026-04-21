@@ -19,24 +19,25 @@ to_string(const NodePath& path)
 {
   std::string s{"n"};
   for (auto i = path.begin(); i != path.end(); ++i) {
-    s += ((i == path.begin()) ? "" : "_") + std::to_string(*i);
+    s += ((i == path.begin()) ? "" : "_") +
+         std::to_string(static_cast<size_t>(*i));
   }
 
   return s;
 }
 
-template<class DirKey, class NodePath>
+template<class DirKey, class NodePath, class ChildCount>
 static inline void
-draw_dir_dot(std::ostream&   os,
-             const DirKey&   key,
-             const NodePath& path,
-             const size_t    n_children)
+draw_dir_dot(std::ostream&    os,
+             const DirKey&    key,
+             const NodePath&  path,
+             const ChildCount n_children)
 {
   const auto id = to_string(path);
   os << "  " << id << "[label=\"" << key << "\"];\n";
 
   auto child_path{path};
-  for (ChildCount i = 0; i < n_children; ++i) {
+  for (typename NodePath::value_type i = 0U; i < n_children; ++i) {
     child_path.emplace_back(i);
     os << "  " << id << " -- " << to_string(child_path) << ";\n";
     child_path.pop_back();
@@ -59,10 +60,11 @@ template<class Tree>
 void
 draw_dot(std::ostream& os, const Tree& tree, const size_t max_depth = 0U)
 {
-  using Key      = typename Tree::Key;
-  using Data     = typename Tree::Data;
-  using DirKey   = typename Tree::Box;
-  using NodePath = typename Tree::NodePath;
+  using Key        = typename Tree::Key;
+  using Data       = typename Tree::Data;
+  using DirKey     = typename Tree::Box;
+  using NodePath   = typename Tree::NodePath;
+  using ChildCount = typename Tree::DirNode::ChildCount;
 
   using spaix::VisitStatus;
 

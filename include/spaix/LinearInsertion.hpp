@@ -4,8 +4,6 @@
 #ifndef SPAIX_LINEARINSERTION_HPP
 #define SPAIX_LINEARINSERTION_HPP
 
-#include <spaix/types.hpp>
-
 #include <limits>
 #include <tuple>
 #include <utility>
@@ -26,9 +24,11 @@ public:
 
   /// Choose the best child node to insert/expand by `key`
   template<class Children, class Key>
-  std::pair<ChildIndex, Box> choose(const Children& children,
-                                    const Key&      key) noexcept
+  std::pair<typename Children::size_type, Box> choose(const Children& children,
+                                                      const Key& key) noexcept
   {
+    using ChildIndex = typename Children::size_type;
+
     using Count  = decltype(entry_num_children(children[0]));
     using Volume = decltype(Ops::volume(std::declval<Key>()));
     using Cost   = std::tuple<Volume, Volume, Count>;

@@ -6,9 +6,6 @@
 
 namespace spaix {
 
-using ChildIndex = unsigned;
-using ChildCount = unsigned;
-
 enum class NodeType : unsigned char {
   directory, ///< Internal directory node
   data,      ///< Leaf data node

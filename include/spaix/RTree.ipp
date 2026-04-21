@@ -166,10 +166,10 @@ RTree<B, K, D, C>::visit_matches_rec(const DirNode&   node,
 
 /// Create a new parent seeded with a child
 template<class B, class K, class D, class C>
-template<class Entry, ChildCount count>
+template<class Entry, class Count, Count count>
 auto
-RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
-                              ChildIndex                              index,
+RTree<B, K, D, C>::new_parent(StaticVector<Entry, Count, count>& deposit,
+                              ChildIndex                         index,
                               NodeType child_type) noexcept -> DirEntry
 {
   auto* const iter{deposit.begin() + index};
@@ -184,17 +184,17 @@ RTree<B, K, D, C>::new_parent(StaticVector<Entry, ChildCount, count>& deposit,
 
 /// Split `nodes` plus `node` in two and return the resulting sides
 template<class B, class K, class D, class C>
-template<class Entry, ChildCount fanout>
+template<class Entry, class Count, Count fanout>
 auto
-RTree<B, K, D, C>::split(StaticVectorView<Entry, ChildCount, fanout> nodes,
-                         Entry                                       entry,
+RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> nodes,
+                         Entry                                  entry,
                          const NodeType type) noexcept -> DirNodePair
 {
   constexpr auto max_fanout =
     fanout - (fanout * Conf::MinFill::num / Conf::MinFill::den);
 
   // Make an array of all nodes to deposit
-  StaticVector<Entry, ChildCount, fanout + 1> deposit;
+  StaticVector<Entry, ChildCount, static_cast<ChildCount>(fanout + 1U)> deposit;
   std::for_each(nodes.begin(), nodes.end(), [&deposit](auto& node) {
     deposit.emplace_back(std::move(node));
   });
@@ -227,6 +227,8 @@ template<typename Children, typename NodePath, typename ChildFunc>
 VisitStatus
 visit_children(const Children& children, NodePath& path, ChildFunc child_func)
 {
+  using ChildIndex = typename Children::size_type;
+
   VisitStatus status = VisitStatus::proceed;
 
   for (ChildIndex i = 0U; i < children.size() && status == VisitStatus::proceed;

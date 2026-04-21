@@ -30,10 +30,12 @@ public:
   using Volume = typename Ops::Volume;
 
   /// Return the indices of the children that should be used for split seeds
-  template<class DirKey, class Entry, ChildCount count>
-  SplitSeeds<Volume> pick_seeds(
+  template<class DirKey, class Entry, class ChildCount, ChildCount count>
+  SplitSeeds<ChildCount, Volume> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit) noexcept
   {
+    using ChildIndex = ChildCount;
+
     assert(deposit.size() > 1U);
     assert(deposit.size() == deposit.capacity());
 
@@ -42,10 +44,10 @@ public:
       volumes[i] = Ops::volume(detail::entry_key(deposit[i]));
     }
 
-    Volume             max_waste{std::numeric_limits<Volume>::lowest()};
-    SplitSeeds<Volume> seeds{};
+    Volume max_waste{std::numeric_limits<Volume>::lowest()};
+    SplitSeeds<ChildCount, Volume> seeds{};
     for (ChildIndex i = 0; i < deposit.size() - 1; ++i) {
-      for (ChildIndex j = i + 1; j < deposit.size(); ++j) {
+      for (auto j = static_cast<ChildIndex>(i + 1); j < deposit.size(); ++j) {
         const auto& k = detail::entry_key(deposit[i]);
         const auto& l = detail::entry_key(deposit[j]);
 
@@ -70,15 +72,15 @@ public:
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
-  template<class Deposit, class DirEntry>
-  void distribute_children(SplitSeeds<Volume>& seeds,
-                           Deposit&&           deposit,
-                           DirEntry&           lhs,
-                           DirEntry&           rhs,
-                           const ChildCount    max_fanout) noexcept
+  template<class Deposit, class DirEntry, class ChildCount>
+  void distribute_children(SplitSeeds<ChildCount, Volume>& seeds,
+                           Deposit&&                       deposit,
+                           DirEntry&                       lhs,
+                           DirEntry&                       rhs,
+                           const unsigned                  max_fanout) noexcept
   {
-    const ChildIndex n_entries = deposit.size();
-    for (ChildIndex i = 0; i < n_entries; ++i) {
+    const auto n_entries = deposit.size();
+    for (auto i = 0U; i < n_entries; ++i) {
       const auto  best   = pick_next(seeds, deposit, lhs, rhs);
       auto* const iter   = deposit.begin() + best.child_index;
       auto&       parent = best.side == Side::left ? lhs : rhs;
@@ -106,7 +108,7 @@ public:
 
 private:
   /// Assignment of a child to a parent during a split
-  template<class DirKey>
+  template<class ChildIndex, class DirKey>
   struct ChildAssignment {
     ChildIndex child_index;
     DirKey     new_parent_key;
@@ -116,15 +118,16 @@ private:
 
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
-  ChildAssignment<typename DirEntry::Key> pick_next(
-    const SplitSeeds<Volume>& seeds,
-    const Deposit&            deposit,
-    const DirEntry&           lhs,
-    const DirEntry&           rhs) noexcept
+  ChildAssignment<typename Deposit::size_type, typename DirEntry::Key>
+  pick_next(const SplitSeeds<typename Deposit::size_type, Volume>& seeds,
+            const Deposit&                                         deposit,
+            const DirEntry&                                        lhs,
+            const DirEntry&                                        rhs) noexcept
   {
+    using ChildIndex = typename Deposit::size_type;
     using DirNode    = typename DirEntry::Node;
     using DirKey     = typename DirNode::DirKey;
-    using Result     = ChildAssignment<DirKey>;
+    using Result     = ChildAssignment<ChildIndex, DirKey>;
     using Preference = Volume;
 
     Preference best_preference{0};

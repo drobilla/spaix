@@ -25,6 +25,9 @@ public:
   static constexpr auto dir_fanout = Structure::dir_fanout;
   static constexpr auto dat_fanout = Structure::dat_fanout;
 
+  using ChildCount = typename Structure::ChildCount;
+  using ChildIndex = ChildCount;
+
   using Key    = typename DatNode::first_type;
   using Data   = typename DatNode::second_type;
   using DirKey = Box;

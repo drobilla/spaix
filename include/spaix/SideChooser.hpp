@@ -8,10 +8,10 @@
 
 namespace spaix {
 
-template<typename Volume>
+template<class ChildIndex, class Volume>
 struct SplitSeeds;
 
-template<class DirKey, class ChildKey, class Ops>
+template<class DirKey, class ChildKey, class ChildCount, class Ops>
 class SideChooser
 {
 public:
@@ -94,14 +94,18 @@ private:
   unsigned   _tie_phase{};
 };
 
-template<class Ops, class Volume, class DirKey, class ChildKey>
-SideChooser<DirKey, ChildKey, Ops>
-make_side_chooser(const SplitSeeds<Volume>& seeds,
-                  const DirKey&             lhs_key,
-                  const ChildCount          lhs_n_children,
-                  const DirKey&             rhs_key,
-                  const ChildCount          rhs_n_children,
-                  const ChildKey&           child_key) noexcept
+template<class Ops,
+         class Volume,
+         class ChildCount,
+         class DirKey,
+         class ChildKey>
+SideChooser<DirKey, ChildKey, ChildCount, Ops>
+make_side_chooser(const SplitSeeds<ChildCount, Volume>& seeds,
+                  const DirKey&                         lhs_key,
+                  const ChildCount                      lhs_n_children,
+                  const DirKey&                         rhs_key,
+                  const ChildCount                      rhs_n_children,
+                  const ChildKey&                       child_key) noexcept
 {
   return {lhs_key,
           seeds.lhs_volume,

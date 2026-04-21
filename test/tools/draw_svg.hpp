@@ -41,7 +41,7 @@ color(const NodePath& path, const double alpha)
 
   std::array<uint32_t, 3U> components{};
   unsigned                 c = 0U;
-  for (const ChildIndex index : path) {
+  for (const auto index : path) {
     components[c] += ((static_cast<uint32_t>(index) * u8max) / (fanout - 1U));
     c = (c + 1) % 3;
   }
@@ -163,7 +163,7 @@ draw_svg(std::ostream&  os,
 
   tree.visit(
     [&os, bounds, scale, max_depth](
-      const NodePath& path, const DirKey& key, NodeType, ChildCount) {
+      const NodePath& path, const DirKey& key, auto, auto) {
       svg::draw_dir<Ops>(os, key, path, bounds, scale);
       return (!max_depth || path.size() <= max_depth) ? VisitStatus::proceed
                                                       : VisitStatus::finish;
