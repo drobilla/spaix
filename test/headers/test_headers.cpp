@@ -5,6 +5,7 @@
 #include <spaix/DataIterator.hpp>            // IWYU pragma: keep
 #include <spaix/DataNode.hpp>                // IWYU pragma: keep
 #include <spaix/DataPlacement.hpp>           // IWYU pragma: keep
+#include <spaix/EntryIterator.hpp>           // IWYU pragma: keep
 #include <spaix/Iterator.hpp>                // IWYU pragma: keep
 #include <spaix/LinearInsertion.hpp>         // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>             // IWYU pragma: keep

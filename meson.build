@@ -28,6 +28,7 @@ headers = files(
   'include/spaix/DataIterator.hpp',
   'include/spaix/DataNode.hpp',
   'include/spaix/DataPlacement.hpp',
+  'include/spaix/EntryIterator.hpp',
   'include/spaix/Iterator.hpp',
   'include/spaix/LinearInsertion.hpp',
   'include/spaix/LinearSplit.hpp',

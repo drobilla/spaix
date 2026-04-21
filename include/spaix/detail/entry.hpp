@@ -36,6 +36,20 @@ entry_key(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 }
 
 template<class Key, class Data>
+auto&
+entry_key(DataNode<Key, Data>& entry) noexcept
+{
+  return entry.first;
+}
+
+template<class Key, class Data>
+auto&
+entry_key(std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
+{
+  return entry->first;
+}
+
+template<class Key, class Data>
 const auto&
 entry_data(const DataNode<Key, Data>& entry) noexcept
 {
@@ -71,7 +85,14 @@ entry_ptr(const DataNode<Key, Data>& entry) noexcept
 }
 
 template<class Key, class Data>
-const auto*
+auto*
+entry_ptr(DataNode<Key, Data>& entry) noexcept
+{
+  return &entry;
+}
+
+template<class Key, class Data>
+auto*
 entry_ptr(const std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return entry.get();
