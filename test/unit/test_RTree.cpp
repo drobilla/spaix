@@ -89,6 +89,7 @@ make_tree(std::mt19937& rng, const unsigned span)
   Tree tree;
 
   test_empty_tree(tree, span);
+  CHECK(tree.query(Queries::everything()).empty());
 
   std::vector<unsigned> y_values(span + 1);
   std::vector<unsigned> x_values(span + 1);
@@ -248,41 +249,14 @@ test_clear(const unsigned span)
 
 template<class Tree>
 void
-test_tree(const unsigned span, const unsigned n_queries)
+test_queries(const Tree&    tree,
+             std::mt19937&  rng,
+             const unsigned span,
+             const unsigned n_queries)
 {
   using Key = typename Tree::Key;
 
-  const auto start_time = static_cast<unsigned>(time(nullptr));
-  const auto seed       = std::random_device{}() ^ start_time;
-
-  std::mt19937                            rng{seed};
   std::uniform_int_distribution<unsigned> dist{0, span - 1U};
-
-  auto tree = make_tree<Tree>(rng, span);
-
-  test_visit(tree);
-  test_structure(tree);
-
-  CHECK(tree.begin() == tree.begin());
-  CHECK(tree.end() == tree.end());
-  CHECK(tree.begin() != tree.end());
-  CHECK(tree.end() != tree.begin());
-  CHECK(tree.cbegin() == tree.cbegin());
-  CHECK(tree.cend() == tree.cend());
-  CHECK(tree.cbegin() != tree.cend());
-  CHECK(tree.cend() != tree.cbegin());
-  CHECK(std::next(tree.cbegin()) != tree.cbegin());
-
-  STATIC_CHECK(tree.max_height() > 1U);
-  STATIC_CHECK(tree.max_size() > 1U);
-  STATIC_CHECK(tree.max_size() > tree.max_height());
-
-  size_t n_nodes = 0;
-  for (const auto& node : tree) {
-    (void)node;
-    ++n_nodes;
-  }
-  CHECK(n_nodes == tree.size());
 
   // Test a query that is in the tree bounds, but has no matches
   {
@@ -345,6 +319,44 @@ test_tree(const unsigned span, const unsigned n_queries)
     }
     CHECK((count == expected_count));
   }
+}
+
+template<class Tree>
+void
+test_tree(const unsigned span, const unsigned n_queries)
+{
+  const auto start_time = static_cast<unsigned>(time(nullptr));
+  const auto seed       = std::random_device{}() ^ start_time;
+
+  std::mt19937 rng{seed};
+
+  auto tree = make_tree<Tree>(rng, span);
+
+  test_visit(tree);
+  test_structure(tree);
+
+  CHECK(tree.begin() == tree.begin());
+  CHECK(tree.end() == tree.end());
+  CHECK(tree.begin() != tree.end());
+  CHECK(tree.end() != tree.begin());
+  CHECK(tree.cbegin() == tree.cbegin());
+  CHECK(tree.cend() == tree.cend());
+  CHECK(tree.cbegin() != tree.cend());
+  CHECK(tree.cend() != tree.cbegin());
+  CHECK(std::next(tree.cbegin()) != tree.cbegin());
+
+  STATIC_CHECK(tree.max_height() > 1U);
+  STATIC_CHECK(tree.max_size() > 1U);
+  STATIC_CHECK(tree.max_size() > tree.max_height());
+
+  size_t n_nodes = 0;
+  for (const auto& node : tree) {
+    (void)node;
+    ++n_nodes;
+  }
+  CHECK(n_nodes == tree.size());
+
+  test_queries(tree, rng, span, n_queries);
 
   tree.clear();
   test_empty_tree(tree, span);
