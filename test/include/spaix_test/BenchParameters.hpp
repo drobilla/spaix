@@ -1,4 +1,4 @@
-// Copyright 2013-2022 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef SPAIX_TEST_BENCHPARAMETERS_HPP
@@ -19,7 +19,7 @@ struct BenchParameters {
     , n_steps{std::stoul(args.at("steps"))}
     , span{std::stof(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
-    , page_size{std::stoul(args.at("page-size"))}
+    , fanout{static_cast<uint32_t>(std::stoul(args.at("fanout")))}
   {}
 
   size_t   n_elements;
@@ -27,7 +27,7 @@ struct BenchParameters {
   size_t   n_steps;
   float    span;
   uint32_t seed;
-  size_t   page_size;
+  uint32_t fanout;
 };
 
 } // namespace spaix::test

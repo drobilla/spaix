@@ -23,6 +23,7 @@
 #include <spaix/detail/attributes.hpp>       // IWYU pragma: keep
 #include <spaix/detail/distribute.hpp>       // IWYU pragma: keep
 #include <spaix/detail/entry.hpp>            // IWYU pragma: keep
+#include <spaix/detail/power.hpp>            // IWYU pragma: keep
 #include <spaix/heterox/Comparisons.hpp>     // IWYU pragma: keep
 #include <spaix/heterox/Operations.hpp>      // IWYU pragma: keep
 #include <spaix/heterox/Point.hpp>           // IWYU pragma: keep
@@ -35,7 +36,6 @@
 #include <spaix/search/Everything.hpp>       // IWYU pragma: keep
 #include <spaix/search/Touching.hpp>         // IWYU pragma: keep
 #include <spaix/search/Within.hpp>           // IWYU pragma: keep
-#include <spaix/sizes.hpp>                   // IWYU pragma: keep
 #include <spaix/types.hpp>                   // IWYU pragma: keep
 
 #ifdef __GNUC__

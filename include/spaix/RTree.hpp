@@ -9,8 +9,8 @@
 #include <spaix/StaticVector.hpp>
 #include <spaix/TreeRange.hpp>
 #include <spaix/detail/DirectoryNode.hpp>
+#include <spaix/detail/power.hpp>
 #include <spaix/search/Everything.hpp>
-#include <spaix/sizes.hpp>
 #include <spaix/types.hpp>
 
 #include <array>
@@ -47,17 +47,16 @@ public:
     detail::DirectoryNode<Box, DatNode, Structure>; ///< Internal node
 
   /// Return the maximum height of a tree
-  static constexpr unsigned max_height() noexcept
-  {
-    return max_tree_height<DirNode, DatNode, Conf::placement>(
-      Conf::min_dir_fanout);
-  }
+  static constexpr unsigned max_height() noexcept { return Conf::max_height; }
 
   /// Return an upper bound on the maximum number of elements in a tree
   static constexpr size_t max_size() noexcept
   {
+    static_assert(Conf::max_height);
+    static_assert(Conf::dat_fanout);
+    static_assert(Conf::dir_fanout);
     return Conf::dat_fanout *
-           power(Conf::dir_fanout, static_cast<size_t>(max_height()) - 1U);
+           detail::power<size_t>(Conf::dir_fanout, Conf::max_height);
   }
 
   /// An iterator over a search area
@@ -79,7 +78,7 @@ public:
   using node_type   = DatNode;
 
   // RTree-specific types
-  using NodePath     = StaticVector<ChildIndex, ChildCount, max_height()>;
+  using NodePath     = StaticVector<ChildIndex, ChildCount, max_height() + 1U>;
   using end_iterator = typename iterator::Base;
 
   /// Construct an RTree with a default-constructed insertion and split
@@ -176,9 +175,6 @@ public:
 private:
   using DirEntry    = typename DirNode::DirEntry;
   using DirNodePair = std::array<DirEntry, 2>;
-
-  static_assert(sizeof(DirNode) <= Structure::max_dir_node_size);
-  static_assert(sizeof(DirNode) >= Structure::min_dir_node_size);
 
   template<class Children>
   static Box parent_key(const Children& children) noexcept;

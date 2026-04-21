@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 """Benchmark R-tree variants."""
@@ -328,11 +328,11 @@ def main(argv):
         "--no-plot", action="store_true", help="do not plot benchmarks"
     )
     parser.add_argument(
-        "--page-size",
+        "--fanout",
         type=int,
-        default=512,
-        metavar="BYTES",
-        help="page size for directory nodes",
+        default=8,
+        metavar="COUNT",
+        help="fanout for directory nodes",
     )
     parser.add_argument(
         "--inline", action="store_true", help="inline data nodes in parents"
@@ -367,8 +367,8 @@ def main(argv):
         args.program = args.program[1:]  # Remove default
 
     bench_opts = [
-        "--page-size",
-        str(args.page_size),
+        "--fanout",
+        str(args.fanout),
         "--placement",
         "inline" if args.inline else "separate",
         "--queries",

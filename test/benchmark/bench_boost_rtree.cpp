@@ -1,12 +1,10 @@
-// Copyright 2013-2024 David Robillard <d@drobilla.net>
+// Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <spaix_test/BenchParameters.hpp>
 #include <spaix_test/Distribution.hpp>
 #include <spaix_test/options.hpp>
 #include <spaix_test/write_row.hpp>
-
-#include <spaix/types.hpp>
 
 #ifdef __clang__
 _Pragma("clang diagnostic push")
@@ -71,8 +69,6 @@ using Box   = bg::model::box<Point>;
 
 template<class T>
 using Distribution = spaix::test::Distribution<T>;
-
-constexpr unsigned min_fill_divisor = 3;
 
 struct QueryMetrics {
   Distribution<double> iter_times;
@@ -199,7 +195,7 @@ run(const Parameters& params)
 
       spaix::test::write_row(os,
                              total_times.n(),
-                             params.page_size,
+                             0U,
                              t.parameters().max_elements,
                              Seconds(total_elapsed).count(),
                              row_count / Seconds(row_elapsed).count(),
@@ -225,27 +221,17 @@ run(const Parameters& params)
   return 0;
 }
 
-template<size_t page_size>
+template<unsigned fanout>
 int
 run(const Parameters& params, const Args& args)
 {
-  static constexpr auto overhead =
-    sizeof(spaix::NodeType) + sizeof(spaix::ChildCount);
-
-  static constexpr auto entry_space    = page_size - overhead;
-  static constexpr auto dir_entry_size = sizeof(Box) + sizeof(void*);
-  static constexpr auto dir_fanout     = entry_space / dir_entry_size;
-
-  constexpr auto max_fill = dir_fanout;
-  constexpr auto min_fill = std::max(size_t{1}, max_fill / min_fill_divisor);
-
   const auto split = args.at("split");
   if (split == "linear") {
-    return run<bgi::linear<max_fill, min_fill>>(params);
+    return run<bgi::linear<fanout>>(params);
   }
 
   if (split == "quadratic") {
-    return run<bgi::quadratic<max_fill, min_fill>>(params);
+    return run<bgi::quadratic<fanout>>(params);
   }
 
   throw std::runtime_error("Unknown algorithm '" + split + "'");
@@ -254,23 +240,23 @@ run(const Parameters& params, const Args& args)
 int
 run(const Parameters& params, const Args& args)
 {
-  switch (params.page_size) {
-  case 256:
-    return run<256>(params, args);
-  case 512:
-    return run<512>(params, args);
-  case 1024:
-    return run<1024>(params, args);
-  case 2048:
-    return run<2048>(params, args);
-  case 4096:
-    return run<4096>(params, args);
-  case 8192:
-    return run<8192>(params, args);
+  switch (params.fanout) {
+  case 4:
+    return run<4>(params, args);
+  case 8:
+    return run<8>(params, args);
+  case 12:
+    return run<12>(params, args);
+  case 16:
+    return run<16>(params, args);
+  case 20:
+    return run<20>(params, args);
+  case 24:
+    return run<24>(params, args);
   }
 
-  throw std::runtime_error("Invalid page size '" +
-                           std::to_string(params.page_size) + "'");
+  throw std::runtime_error("Invalid fanout '" + std::to_string(params.fanout) +
+                           "'");
 }
 
 } // namespace
@@ -279,8 +265,8 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
+    {"fanout", {"Fanout for directory nodes", "COUNT", "8"}},
     {"insert", {"Insert (linear, quadratic)", "ALGORITHM", "linear"}},
-    {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
     {"placement", {"Data placement (ignored)", "PLACEMENT", "inline"}},
     {"queries", {"Number of queries per step", "COUNT", "100"}},
     {"seed", {"Random number generator seed", "SEED", "5489"}},

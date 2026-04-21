@@ -200,8 +200,8 @@ run(const Parameters& params, std::ostream& os)
 
       spaix::test::write_row(os,
                              total_times.n(),
-                             params.page_size,
-                             Tree::Conf::dir_fanout,
+                             sizeof(typename Tree::DirNode),
+                             params.fanout,
                              Seconds(total_elapsed).count(),
                              row_count / Seconds(row_elapsed).count(),
                              times.mean(),
@@ -230,15 +230,14 @@ run(const Parameters& params, std::ostream& os)
 template<class Insertion,
          class Split,
          spaix::DataPlacement placement,
-         size_t               page_size>
+         unsigned             fanout>
 int
 run(const Parameters& params)
 {
-  using Conf = spaix::Config<
-    spaix::PageStructure<Rect2, Rect2, Data, page_size, placement>,
-    Split,
-    Insertion,
-    MinFillRatio>;
+  using Conf = spaix::Config<spaix::StaticStructure<fanout, fanout, placement>,
+                             Split,
+                             Insertion,
+                             MinFillRatio>;
 
   return run<spaix::RTree<Rect2, Rect2, Data, Conf>>(params, std::cout);
 }
@@ -247,23 +246,23 @@ template<class Insertion, class Split, spaix::DataPlacement placement>
 int
 run(const Parameters& params)
 {
-  switch (params.page_size) {
-  case 256:
-    return run<Insertion, Split, placement, 256>(params);
-  case 512:
-    return run<Insertion, Split, placement, 512>(params);
-  case 1024:
-    return run<Insertion, Split, placement, 1024>(params);
-  case 2048:
-    return run<Insertion, Split, placement, 2048>(params);
-  case 4096:
-    return run<Insertion, Split, placement, 4096>(params);
-  case 8192:
-    return run<Insertion, Split, placement, 8192>(params);
+  switch (params.fanout) {
+  case 4:
+    return run<Insertion, Split, placement, 4>(params);
+  case 8:
+    return run<Insertion, Split, placement, 8>(params);
+  case 12:
+    return run<Insertion, Split, placement, 12>(params);
+  case 16:
+    return run<Insertion, Split, placement, 16>(params);
+  case 20:
+    return run<Insertion, Split, placement, 20>(params);
+  case 24:
+    return run<Insertion, Split, placement, 24>(params);
   }
 
-  throw std::runtime_error("Invalid page size '" +
-                           std::to_string(params.page_size) + "'");
+  throw std::runtime_error("Invalid fanout '" + std::to_string(params.fanout) +
+                           "'");
 }
 
 template<class Insertion, class Split>
@@ -315,8 +314,8 @@ int
 main(int argc, char** argv)
 {
   const spaix::test::Options opts{
+    {"fanout", {"Fanout for directory nodes", "COUNT", "8"}},
     {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
-    {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
     {"placement",
      {"Data placement (inline or separate)", "PLACEMENT", "inline"}},
     {"queries", {"Number of queries per step", "COUNT", "100"}},

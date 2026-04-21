@@ -50,7 +50,7 @@ Benchmarking
 The included benchmarking script can be used to benchmark the various
 algorithms and parameters, for example:
 
-    scripts/benchmark.py --page-size 512 --size 1000000 --queries 1000
+    scripts/benchmark.py --fanout 16 --size 1000000 --queries 1000
 
 This will produce an HTML page which contains several plots for various
 operations.  See the help output for details.

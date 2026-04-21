@@ -228,6 +228,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
   const Rect everything{
     0.0f, static_cast<float>(span), 0.0f, static_cast<float>(span)};
 
+  CHECK(!(everything == Rect{}));
   CHECK(tree.empty());
   CHECK(tree.begin() == tree.end());
   CHECK(tree.query(Queries::Contained{everything}).empty());
@@ -360,11 +361,11 @@ test_tree(const unsigned span, const unsigned n_queries)
   test_empty_tree(tree, span);
 }
 
-template<class Key, spaix::DataPlacement placement, size_t page_size>
+template<class Key, spaix::DataPlacement placement, unsigned fanout>
 void
-test_page_size(const unsigned span, const unsigned n_queries)
+test_fanout(const unsigned span, const unsigned n_queries)
 {
-  using Structure = spaix::PageStructure<Rect, Key, Data, page_size, placement>;
+  using Structure = spaix::StaticStructure<fanout, fanout, placement>;
 
   // Test a small tree where the root has leaf children
   test_tree<spaix::RTree<Rect,
@@ -396,9 +397,9 @@ template<class Key, spaix::DataPlacement placement>
 void
 test_placement(const unsigned span, const unsigned n_queries)
 {
-  test_page_size<Key, placement, 256>(span, n_queries);
-  test_page_size<Key, placement, 512>(span, n_queries);
-  test_page_size<Key, placement, 4096>(span, n_queries);
+  test_fanout<Key, placement, 4>(span, n_queries);
+  test_fanout<Key, placement, 16>(span, n_queries);
+  test_fanout<Key, placement, 32>(span, n_queries);
 }
 
 template<class Key>

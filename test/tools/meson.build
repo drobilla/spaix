@@ -19,11 +19,12 @@ test(
   suite: 'draw',
 )
 
-test('page_256', draw_tree, args: ['--page-size', '256'], suite: 'draw')
-test('page_512', draw_tree, args: ['--page-size', '512'], suite: 'draw')
-test('page_1024', draw_tree, args: ['--page-size', '1024'], suite: 'draw')
-test('page_2048', draw_tree, args: ['--page-size', '2048'], suite: 'draw')
-test('page_4096', draw_tree, args: ['--page-size', '4096'], suite: 'draw')
+test('fanout_4', draw_tree, args: ['--fanout', '4'], suite: 'draw')
+test('fanout_8', draw_tree, args: ['--fanout', '8'], suite: 'draw')
+test('fanout_12', draw_tree, args: ['--fanout', '12'], suite: 'draw')
+test('fanout_16', draw_tree, args: ['--fanout', '16'], suite: 'draw')
+test('fanout_20', draw_tree, args: ['--fanout', '20'], suite: 'draw')
+test('fanout_24', draw_tree, args: ['--fanout', '24'], suite: 'draw')
 
 test(
   'bad_insert',
@@ -40,16 +41,16 @@ test(
   suite: 'draw',
 )
 test(
-  'bad_small_page',
+  'bad_low_fanout',
   draw_tree,
-  args: ['--page-size', '128'],
+  args: ['--fanout', '3'],
   should_fail: true,
   suite: 'draw',
 )
 test(
-  'bad_large_page',
+  'bad_high_fanout',
   draw_tree,
-  args: ['--page-size', '8192'],
+  args: ['--fanout', '25'],
   should_fail: true,
   suite: 'draw',
 )

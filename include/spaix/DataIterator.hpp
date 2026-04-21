@@ -95,7 +95,7 @@ private:
     return _stack.back();
   }
 
-  StaticVector<Frame, unsigned, max_height> _stack;
+  StaticVector<Frame, unsigned, max_height + 1U> _stack;
 };
 
 } // namespace spaix

@@ -36,14 +36,14 @@ using Ops    = spaix::homox::Operations<Scalar, 2U>;
 struct Parameters {
   explicit Parameters(const spaix::test::Arguments& args)
     : n_elements{std::stoul(args.at("size"))}
-    , page_size{std::stoul(args.at("page-size"))}
+    , fanout{static_cast<uint32_t>(std::stoul(args.at("fanout")))}
     , scale{std::stod(args.at("scale"))}
     , span{std::stod(args.at("span"))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
   {}
 
   size_t   n_elements;
-  size_t   page_size;
+  unsigned fanout;
   double   scale;
   Scalar   span;
   uint32_t seed;
@@ -76,15 +76,12 @@ run(const Parameters& params)
   return 0;
 }
 
-template<class Insertion, class Split, size_t page_size>
+template<class Insertion, class Split, unsigned fanout>
 int
 run(const Parameters& params)
 {
-  using Structure = spaix::PageStructure<Rect2,
-                                         Point2,
-                                         Scalar,
-                                         page_size,
-                                         spaix::DataPlacement::separate>;
+  using Structure =
+    spaix::StaticStructure<fanout, fanout, spaix::DataPlacement::separate>;
 
   using Config = spaix::Config<Structure, Split, Insertion>;
 
@@ -95,21 +92,23 @@ template<class Insertion, class Split>
 int
 run(const Parameters& params)
 {
-  switch (params.page_size) {
-  case 256:
-    return run<Insertion, Split, 256>(params);
-  case 512:
-    return run<Insertion, Split, 512>(params);
-  case 1024:
-    return run<Insertion, Split, 1024>(params);
-  case 2048:
-    return run<Insertion, Split, 2048>(params);
-  case 4096:
-    return run<Insertion, Split, 4096>(params);
+  switch (params.fanout) {
+  case 4:
+    return run<Insertion, Split, 4>(params);
+  case 8:
+    return run<Insertion, Split, 8>(params);
+  case 12:
+    return run<Insertion, Split, 12>(params);
+  case 16:
+    return run<Insertion, Split, 16>(params);
+  case 20:
+    return run<Insertion, Split, 20>(params);
+  case 24:
+    return run<Insertion, Split, 24>(params);
   }
 
-  throw std::runtime_error("Invalid page size '" +
-                           std::to_string(params.page_size) + "'");
+  throw std::runtime_error("Invalid fanout '" + std::to_string(params.fanout) +
+                           "'");
 }
 
 template<class Insertion>
@@ -146,7 +145,7 @@ main(int argc, char** argv)
 {
   const spaix::test::Options opts{
     {"insert", {"Insert (linear)", "ALGORITHM", "linear"}},
-    {"page-size", {"Page size for directory nodes", "BYTES", "512"}},
+    {"fanout", {"Fanout for directory nodes", "COUNT", "8"}},
     {"scale", {"Scale factor for SVG output", "NUMBER", "1.0"}},
     {"seed", {"Random number generator seed", "SEED", "5489"}},
     {"size", {"Number of elements", "ELEMENTS", "1024"}},

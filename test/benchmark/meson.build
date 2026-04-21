@@ -47,37 +47,37 @@ test(
 test(
   'bench',
   bench_exe,
-  args: ['--size', '16', '--page-size', '256'],
+  args: ['--size', '16', '--fanout', '4'],
   suite: 'benchmark',
 )
 test(
   'bench',
   bench_exe,
-  args: ['--size', '16', '--page-size', '512'],
+  args: ['--size', '16', '--fanout', '8'],
   suite: 'benchmark',
 )
 test(
   'bench',
   bench_exe,
-  args: ['--size', '16', '--page-size', '1024'],
+  args: ['--size', '16', '--fanout', '12'],
   suite: 'benchmark',
 )
 test(
   'bench',
   bench_exe,
-  args: ['--size', '16', '--page-size', '2048'],
+  args: ['--size', '16', '--fanout', '16'],
   suite: 'benchmark',
 )
 test(
   'bench',
   bench_exe,
-  args: ['--size', '16', '--page-size', '4096'],
+  args: ['--size', '16', '--fanout', '20'],
   suite: 'benchmark',
 )
 test(
   'bench',
   bench_exe,
-  args: ['--size', '16', '--page-size', '8192'],
+  args: ['--size', '16', '--fanout', '24'],
   suite: 'benchmark',
 )
 
@@ -112,14 +112,14 @@ test(
 test(
   'bench',
   bench_exe,
-  args: ['--page-size', '128'],
+  args: ['--fanout', '3'],
   should_fail: true,
   suite: 'benchmark',
 )
 test(
   'bench',
   bench_exe,
-  args: ['--page-size', '16384'],
+  args: ['--fanout', '25'],
   should_fail: true,
   suite: 'benchmark',
 )

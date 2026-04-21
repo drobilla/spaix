@@ -46,6 +46,7 @@ headers = files(
   'include/spaix/detail/attributes.hpp',
   'include/spaix/detail/distribute.hpp',
   'include/spaix/detail/entry.hpp',
+  'include/spaix/detail/power.hpp',
   'include/spaix/heterox/Comparisons.hpp',
   'include/spaix/heterox/Operations.hpp',
   'include/spaix/heterox/Point.hpp',
@@ -58,7 +59,6 @@ headers = files(
   'include/spaix/search/Everything.hpp',
   'include/spaix/search/Touching.hpp',
   'include/spaix/search/Within.hpp',
-  'include/spaix/sizes.hpp',
   'include/spaix/types.hpp',
 )
 
