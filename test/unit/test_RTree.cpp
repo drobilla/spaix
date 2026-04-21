@@ -72,6 +72,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
 
   CHECK(tree.empty());
   CHECK(!tree.size());
+  CHECK(!tree.height());
   CHECK(tree.begin() == tree.end());
   CHECK(tree.query(Queries::everything()).empty());
   CHECK(tree.bounds() == typename Tree::Box{});

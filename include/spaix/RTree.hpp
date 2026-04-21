@@ -137,12 +137,16 @@ public:
   /// Remove all items from the tree
   void clear() noexcept
   {
-    _root = {Box{}, nullptr};
-    _size = 0;
+    _root   = {Box{}, nullptr};
+    _height = 0U;
+    _size   = 0U;
   }
 
   /// Return the number of items in the tree
   [[nodiscard]] size_t size() const noexcept { return _size; }
+
+  /// Return the current height of the tree
+  [[nodiscard]] unsigned height() const noexcept { return _height; }
 
   /// Return true iff there are no items in the tree
   [[nodiscard]] bool empty() const noexcept { return !_root.node; }
@@ -178,6 +182,7 @@ public:
   [[nodiscard]] data_iterator end() noexcept { return {}; }
 
 private:
+  using DatEntry    = typename DirNode::DatEntry;
   using DirEntry    = typename DirNode::DirEntry;
   using DirNodePair = std::array<DirEntry, 2>;
 
@@ -186,10 +191,14 @@ private:
 
   static Box ideal_key(const DirNode& node) noexcept;
 
-  DirNodePair insert_rec(DirEntry&   parent_entry,
-                         const Box&  new_parent_key,
-                         const Key&  key,
-                         const Data& data) noexcept;
+  template<class Entry>
+  void insert_entry(unsigned depth, Entry entry) noexcept;
+
+  template<class Entry>
+  DirNodePair insert_rec(unsigned   depth,
+                         DirEntry&  parent_entry,
+                         const Box& new_parent_key,
+                         Entry      element) noexcept;
 
   template<class Predicate, class Visitor>
   void visit_matches_rec(const DirNode&   node,
@@ -202,7 +211,10 @@ private:
                              ChildIndex                         index,
                              NodeType child_type) noexcept;
 
-  /// Split `nodes` plus `node` in two and return the resulting sides
+  DirNodePair split_node(DirNode& node, DirEntry entry) noexcept;
+  DirNodePair split_node(DirNode& node, DatEntry entry) noexcept;
+
+  /// Split `nodes` plus `entry` in two and return the resulting sides
   template<class Entry, class Count, Count fanout>
   DirNodePair split(StaticVectorView<Entry, Count, fanout> nodes,
                     Entry                                  entry,
@@ -211,6 +223,7 @@ private:
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm
   size_t    _size{};               ///< Number of elements
+  unsigned  _height{};             ///< Height of tree
   DirEntry  _root{Box{}, nullptr}; ///< Key and pointer to root node
 };
 

@@ -86,6 +86,11 @@ public:
 
   [[nodiscard]] ChildIndex num_children() const { return _size; }
 
+  [[nodiscard]] ChildCount fanout() const
+  {
+    return (_child_type == NodeType::directory) ? dir_fanout : dat_fanout;
+  }
+
   [[nodiscard]] NodeType child_type() const { return _child_type; }
 
   [[nodiscard]] ConstDirChildrenView dir_children() const
