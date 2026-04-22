@@ -36,16 +36,16 @@ using Ops    = spaix::homox::Operations<Scalar, 2U>;
 struct Parameters {
   explicit Parameters(const spaix::test::Arguments& args)
     : n_elements{std::stoul(args.at("size"))}
-    , fanout{static_cast<uint32_t>(std::stoul(args.at("fanout")))}
     , scale{std::stod(args.at("scale"))}
     , span{std::stod(args.at("span"))}
+    , fanout{static_cast<uint32_t>(std::stoul(args.at("fanout")))}
     , seed{static_cast<uint32_t>(std::stoul(args.at("seed")))}
   {}
 
   size_t   n_elements;
-  unsigned fanout;
   double   scale;
   Scalar   span;
+  unsigned fanout;
   uint32_t seed;
 };
 

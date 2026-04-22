@@ -243,9 +243,9 @@ private:
     unsigned                                skip,
     StaticVectorView<Entry, Fanout, fanout> nodes) noexcept;
 
+  size_t    _size{};               ///< Number of elements
   Insertion _insertion{};          ///< Insertion algorithm
   Split     _split{};              ///< Split algorithm
-  size_t    _size{};               ///< Number of elements
   unsigned  _height{};             ///< Height of tree
   DirEntry  _root{Box{}, nullptr}; ///< Key and pointer to root node
 };
