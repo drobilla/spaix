@@ -108,13 +108,6 @@ ranges(const Point<Ts...>& point) noexcept
   return detail::point_ranges_rec(point, detail::ibegin<Ts...>());
 }
 
-template<size_t dim, class... Ts>
-constexpr detail::Nth<dim, Ts...>
-span(const Point<Ts...>&) noexcept
-{
-  return {};
-}
-
 namespace detail {
 
 template<class... Ts, size_t n_dims>

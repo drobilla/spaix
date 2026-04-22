@@ -127,15 +127,6 @@ ranges(const Rect<Ts...>& rect) noexcept
   return rect.tuple();
 }
 
-template<size_t dim, class... Ts>
-constexpr detail::DifferenceOf<detail::Nth<dim, Ts...>, detail::Nth<dim, Ts...>>
-span(const Rect<Ts...>& rect) noexcept
-{
-  const auto& dim_range = get<dim>(rect);
-
-  return dim_range.upper - dim_range.lower;
-}
-
 namespace detail {
 
 template<class... Ts, size_t n_dims>

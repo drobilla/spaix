@@ -16,14 +16,6 @@ namespace spaix::heterox::detail {
 template<size_t n, typename... Ts>
 using Nth = typename std::tuple_element_t<n, std::tuple<Ts...>>;
 
-template<class Tuple>
-struct CommonElementType {};
-
-template<class... Ts>
-struct CommonElementType<std::tuple<Ts...>> {
-  using type = std::common_type_t<Ts...>;
-};
-
 template<size_t i, size_t n>
 struct InclusiveIndex {
   constexpr InclusiveIndex<i + 1, n> operator++() const { return {}; }
@@ -46,29 +38,8 @@ ibegin_inclusive() noexcept
   return {};
 }
 
-template<class... Ts, size_t last>
-constexpr auto
-tuple_product(const std::tuple<Ts...>& tuple,
-              InclusiveIndex<last, last>) noexcept
-{
-  return std::get<last>(tuple);
-}
-
-template<class... Ts, size_t i, size_t last>
-constexpr auto
-tuple_product(const std::tuple<Ts...>& tuple,
-              InclusiveIndex<i, last>  index) noexcept
-{
-  return std::get<i>(tuple) * tuple_product(tuple, ++index);
-}
-
 template<class... Ts>
-using ProductOf =
-  decltype(tuple_product<Ts...>(std::declval<std::tuple<Ts...>>(),
-                                ibegin_inclusive<Ts...>()));
-
-template<class L, class R>
-using DifferenceOf = decltype(std::declval<L>() - std::declval<R>());
+using ProductOf = decltype((std::declval<Ts>() * ...));
 
 } // namespace spaix::heterox::detail
 

@@ -104,14 +104,6 @@ range(const Rect<T, D>& rect)
   return rect.array()[dim];
 }
 
-template<size_t dim, class T, size_t D>
-constexpr T
-span(const Rect<T, D>& rect)
-{
-  const auto& range = get<dim>(rect);
-  return (range.second < range.first) ? 0 : range.second - range.first;
-}
-
 template<class T, size_t D>
 inline std::ostream&
 operator<<(std::ostream& os, const Rect<T, D>& rect)

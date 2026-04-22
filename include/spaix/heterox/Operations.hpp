@@ -25,7 +25,10 @@ template<class... Ts, size_t last_dim>
 constexpr auto
 volume_rec(const Rect<Ts...>& rect, detail::LastIndex<last_dim>) noexcept
 {
-  return span<last_dim>(rect);
+  const auto r = range<last_dim>(rect);
+
+  return (r.lower < r.upper) ? (r.upper - r.lower)
+                             : decltype(r.upper - r.lower){};
 }
 
 template<class... Ts, size_t dim, size_t last_dim>
@@ -35,12 +38,8 @@ volume_rec(const Rect<Ts...>&                    rect,
 {
   const auto r = range<dim>(rect);
 
-  if (r.lower < r.upper) {
-    return (r.upper - r.lower) * volume_rec(rect, ++index);
-  }
-
-  return detail::DifferenceOf<detail::Nth<dim + 1U, Ts...>,
-                              detail::Nth<dim + 1U, Ts...>>{};
+  return (r.lower < r.upper) ? ((r.upper - r.lower) * volume_rec(rect, ++index))
+                             : decltype(r.upper - r.lower){};
 }
 
 template<class Lhs, class Rhs, size_t n_dims>
