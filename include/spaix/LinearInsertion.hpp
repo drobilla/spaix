@@ -24,7 +24,7 @@ public:
 
   /// Choose the best child node to insert/expand by `key`
   template<class Children, class Key>
-  std::pair<typename Children::size_type, Box> choose(const Children& children,
+  std::pair<Box, typename Children::size_type> choose(const Children& children,
                                                       const Key& key) noexcept
   {
     using ChildIndex = typename Children::size_type;
@@ -54,7 +54,7 @@ public:
       }
     }
 
-    return {best_index, best_key};
+    return {best_key, best_index};
   }
 };
 

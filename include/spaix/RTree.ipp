@@ -225,7 +225,7 @@ RTree<B, K, D, C>::insert_rec(const unsigned depth,
   if (depth) {
     // Recursing downwards
     auto children = parent.dir_children();
-    const auto [index, expanded] =
+    const auto [expanded, index] =
       _insertion.choose(children, detail::entry_key(element));
 
     auto sides =
