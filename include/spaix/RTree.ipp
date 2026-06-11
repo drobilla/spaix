@@ -193,6 +193,29 @@ RTree<B, K, D, C>::ideal_key(const DirNode& node) noexcept -> Box
 template<class B, class K, class D, class C>
 template<class Entry>
 auto
+RTree<B, K, D, C>::insert_leaf(DirEntry&  parent_entry,
+                               const Box& new_parent_key,
+                               Entry      entry) noexcept -> DirNodePair
+{
+  auto& parent = *parent_entry.node;
+
+  if (parent.num_children() < Conf::fanout(parent.child_type())) {
+    // Simple insert
+    parent.append_child(std::move(entry));
+    parent_entry.key = new_parent_key;
+    assert(parent_entry.key == ideal_key(parent));
+
+  } else {
+    // Split insert
+    return split_node(parent, std::move(entry));
+  }
+
+  return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
+}
+
+template<class B, class K, class D, class C>
+template<class Entry>
+auto
 RTree<B, K, D, C>::insert_rec(const unsigned depth,
                               DirEntry&      parent_entry,
                               const Box&     new_parent_key,
@@ -221,15 +244,8 @@ RTree<B, K, D, C>::insert_rec(const unsigned depth,
       assert(parent_entry.key == ideal_key(parent));
     }
 
-  } else if (parent.num_children() < Conf::fanout(parent.child_type())) {
-    // Simple insert
-    parent.append_child(std::move(element));
-    parent_entry.key = new_parent_key;
-    assert(parent_entry.key == ideal_key(parent));
-
   } else {
-    // Split insert
-    return split_node(parent, std::move(element));
+    return insert_leaf(parent_entry, new_parent_key, std::move(element));
   }
 
   return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};

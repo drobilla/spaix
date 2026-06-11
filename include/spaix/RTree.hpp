@@ -209,6 +209,11 @@ private:
   void insert_entry(unsigned depth, Entry entry) noexcept;
 
   template<class Entry>
+  [[nodiscard]] DirNodePair insert_leaf(DirEntry&  parent_entry,
+                                        const Box& new_parent_key,
+                                        Entry      entry) noexcept;
+
+  template<class Entry>
   [[nodiscard]] DirNodePair insert_rec(unsigned   depth,
                                        DirEntry&  parent_entry,
                                        const Box& new_parent_key,
