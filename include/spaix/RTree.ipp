@@ -195,7 +195,7 @@ template<class Entry>
 auto
 RTree<B, K, D, C>::insert_leaf(DirEntry&  parent_entry,
                                const Box& new_parent_key,
-                               Entry      entry) noexcept -> DirNodePair
+                               Entry      entry) noexcept -> DirEntryPair
 {
   auto& parent = *parent_entry.node;
 
@@ -219,7 +219,7 @@ auto
 RTree<B, K, D, C>::insert_rec(const unsigned depth,
                               DirEntry&      parent_entry,
                               const Box&     new_parent_key,
-                              Entry          element) noexcept -> DirNodePair
+                              Entry          element) noexcept -> DirEntryPair
 {
   auto& parent = *parent_entry.node;
   if (depth) {
@@ -352,7 +352,7 @@ RTree<B, K, D, C>::new_parent(StaticVector<Entry, Count, count>& deposit,
 template<class B, class K, class D, class C>
 auto
 RTree<B, K, D, C>::split_node(DirNode& node, DirEntry entry) noexcept
-  -> DirNodePair
+  -> DirEntryPair
 {
   return split(node.dir_children(), std::move(entry), NodeType::directory);
 }
@@ -360,39 +360,39 @@ RTree<B, K, D, C>::split_node(DirNode& node, DirEntry entry) noexcept
 template<class B, class K, class D, class C>
 auto
 RTree<B, K, D, C>::split_node(DirNode& node, DatEntry entry) noexcept
-  -> DirNodePair
+  -> DirEntryPair
 {
   return split(node.dat_children(), std::move(entry), NodeType::data);
 }
 
-/// Split `nodes` plus `node` in two and return the resulting sides
+/// Split `entries` plus `entry` in two and return the resulting sides
 template<class B, class K, class D, class C>
 template<class Entry, class Count, Count fanout>
 auto
-RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> nodes,
+RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> entries,
                          Entry                                  entry,
-                         const NodeType type) noexcept -> DirNodePair
+                         const NodeType type) noexcept -> DirEntryPair
 {
   constexpr auto max_fanout =
     fanout - (fanout * Conf::MinFill::num / Conf::MinFill::den);
 
-  // Make an array of all nodes to deposit
+  // Make an array of all entries to deposit
   StaticVector<Entry, ChildCount, static_cast<ChildCount>(fanout + 1U)> deposit;
-  std::for_each(nodes.begin(), nodes.end(), [&deposit](auto& node) {
-    deposit.emplace_back(std::move(node));
+  std::for_each(entries.begin(), entries.end(), [&deposit](auto& e) {
+    deposit.emplace_back(std::move(e));
   });
   deposit.emplace_back(std::move(entry));
 
-  // Pick two nodes to seed the left and right groups
+  // Pick two entries to seed the left and right groups
   auto seeds = _split.template pick_seeds<B>(deposit);
   assert(seeds.lhs_index < seeds.rhs_index);
 
-  // Create left/right parent nodes with right/left seeds
+  // Create left/right parent entries with right/left seeds
   // The largest index is popped first to avoid invalidating the other
-  DirNodePair sides{new_parent(deposit, seeds.rhs_index, type),
-                    new_parent(deposit, seeds.lhs_index, type)};
+  DirEntryPair sides{new_parent(deposit, seeds.rhs_index, type),
+                     new_parent(deposit, seeds.lhs_index, type)};
 
-  // Distribute remaining nodes between seeds
+  // Distribute remaining entries between seeds
   _split.distribute_children(
     seeds, std::move(deposit), sides[0], sides[1], max_fanout);
 
@@ -409,10 +409,10 @@ template<class Entry, class Fanout, Fanout fanout>
 void
 RTree<B, K, D, C>::reinsert_children(
   const unsigned                          skip,
-  StaticVectorView<Entry, Fanout, fanout> nodes) noexcept
+  StaticVectorView<Entry, Fanout, fanout> entries) noexcept
 {
-  for (Fanout i = 0U; i < nodes.size(); ++i) {
-    Entry& e = nodes[i];
+  for (Fanout i = 0U; i < entries.size(); ++i) {
+    Entry& e = entries[i];
     assert(_height >= 1U + skip);
     insert_entry(_height - 1U - skip, std::move(e));
   }

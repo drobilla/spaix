@@ -68,12 +68,12 @@ public:
   }
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
-  template<class Deposit, class DirNode>
+  template<class Deposit, class Entry>
   void distribute_children(
     SplitSeeds<typename Deposit::size_type, Volume>& seeds,
     Deposit&&                                        deposit,
-    DirNode&                                         lhs,
-    DirNode&                                         rhs,
+    Entry&                                           lhs,
+    Entry&                                           rhs,
     const unsigned                                   max_fanout) noexcept
   {
     using detail::distribute_child;

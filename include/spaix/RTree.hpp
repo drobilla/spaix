@@ -195,8 +195,8 @@ public:
   [[nodiscard]] data_iterator end() noexcept { return {}; }
 
 private:
-  using DirEntry    = typename DirNode::DirEntry;
-  using DirNodePair = std::array<DirEntry, 2>;
+  using DirEntry     = typename DirNode::DirEntry;
+  using DirEntryPair = std::array<DirEntry, 2>;
 
   using entry_iterator = EntryIterator<DirNode, max_height()>;
 
@@ -209,15 +209,15 @@ private:
   void insert_entry(unsigned depth, Entry entry) noexcept;
 
   template<class Entry>
-  [[nodiscard]] DirNodePair insert_leaf(DirEntry&  parent_entry,
-                                        const Box& new_parent_key,
-                                        Entry      entry) noexcept;
+  [[nodiscard]] DirEntryPair insert_leaf(DirEntry&  parent_entry,
+                                         const Box& new_parent_key,
+                                         Entry      entry) noexcept;
 
   template<class Entry>
-  [[nodiscard]] DirNodePair insert_rec(unsigned   depth,
-                                       DirEntry&  parent_entry,
-                                       const Box& new_parent_key,
-                                       Entry      element) noexcept;
+  [[nodiscard]] DirEntryPair insert_rec(unsigned   depth,
+                                        DirEntry&  parent_entry,
+                                        const Box& new_parent_key,
+                                        Entry      element) noexcept;
 
   void condense_tree(entry_iterator& i) noexcept;
 
@@ -233,20 +233,21 @@ private:
     ChildIndex                         index,
     NodeType                           child_type) noexcept;
 
-  [[nodiscard]] DirNodePair split_node(DirNode& node, DirEntry entry) noexcept;
-  [[nodiscard]] DirNodePair split_node(DirNode& node, DatEntry entry) noexcept;
+  [[nodiscard]] DirEntryPair split_node(DirNode& node, DirEntry entry) noexcept;
+  [[nodiscard]] DirEntryPair split_node(DirNode& node, DatEntry entry) noexcept;
 
-  /// Split `nodes` plus `entry` in two and return the resulting sides
+  /// Split `entries` plus `entry` in two and return the resulting sides
   template<class Entry, class Count, Count fanout>
-  [[nodiscard]] DirNodePair split(StaticVectorView<Entry, Count, fanout> nodes,
-                                  Entry                                  entry,
-                                  NodeType type) noexcept;
+  [[nodiscard]] DirEntryPair split(
+    StaticVectorView<Entry, Count, fanout> entries,
+    Entry                                  entry,
+    NodeType                               type) noexcept;
 
   /// Reinsert children from an old directory node
   template<class Entry, class Fanout, Fanout fanout>
   void reinsert_children(
     unsigned                                skip,
-    StaticVectorView<Entry, Fanout, fanout> nodes) noexcept;
+    StaticVectorView<Entry, Fanout, fanout> entries) noexcept;
 
   size_t    _size{};               ///< Number of elements
   Insertion _insertion{};          ///< Insertion algorithm
