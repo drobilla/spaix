@@ -57,6 +57,24 @@ public:
     return _parents[_size - 1];
   }
 
+  [[nodiscard]] DirNode* parent_at(unsigned index) const noexcept
+  {
+    assert(index < _size);
+    return _parents[index];
+  }
+
+  [[nodiscard]] ChildIndex index_at(unsigned index) const noexcept
+  {
+    assert(index < _size);
+    return _indexes[index];
+  }
+
+  [[nodiscard]] typename DirNode::DirEntry& at(unsigned index) noexcept
+  {
+    assert(index < _size);
+    return _parents[index]->dir_children()[_indexes[index]];
+  }
+
   [[nodiscard]] ChildIndex index() const noexcept
   {
     assert(_size);
@@ -86,6 +104,25 @@ public:
   }
 
   void clear() noexcept { _size = 0; }
+
+  void set_frame(const unsigned   frame_index,
+                 DirNode* const   node,
+                 const ChildIndex child_index) noexcept
+  {
+    _parents[frame_index] = node;
+    _indexes[frame_index] = child_index;
+  }
+
+  void push_front(DirNode* const node, const ChildIndex index) noexcept
+  {
+    std::copy_backward(
+      _parents.begin(), _parents.begin() + _size, _parents.begin() + _size + 1);
+    std::copy_backward(
+      _indexes.begin(), _indexes.begin() + _size, _indexes.begin() + _size + 1);
+    _parents[0] = node;
+    _indexes[0] = index;
+    ++_size;
+  }
 
 private:
   static constexpr auto max_size = max_height + 1U;

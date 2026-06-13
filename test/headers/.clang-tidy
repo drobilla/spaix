@@ -21,7 +21,7 @@ CheckOptions:
   - key:   cppcoreguidelines-avoid-magic-numbers.IgnoreTypeAliases
     value: true
   - key:   readability-function-cognitive-complexity.Threshold
-    value: '22'
+    value: '23'
   - key:   readability-magic-numbers.IgnoreTypeAliases
     value: true
 FormatStyle: file

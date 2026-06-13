@@ -107,7 +107,9 @@ make_tree(std::mt19937& rng, const unsigned span)
       const auto key   = make_key<Key>(x_values[x], y_values[y]);
       const auto value = (y_values[y] * span) + x_values[x];
 
-      tree.insert(key, value);
+      const auto i = tree.insert(key, value);
+      CHECK(i->first == key);
+      CHECK(i->second == value);
 
       const auto matches = tree.query(Queries::exactly(key));
       CHECK(!matches.empty());

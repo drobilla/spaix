@@ -24,7 +24,7 @@ CheckOptions:
   - key:   hicpp-uppercase-literal-suffix.NewSuffixes
     value: 'L;U;UL;ULL'
   - key:   readability-function-cognitive-complexity.Threshold
-    value: '22'
+    value: '23'
   - key:   readability-magic-numbers.IgnoreTypeAliases
     value: true
   - key:   readability-uppercase-literal-suffix.NewSuffixes

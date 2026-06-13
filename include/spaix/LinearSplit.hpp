@@ -5,7 +5,9 @@
 #define SPAIX_LINEARSPLIT_HPP
 
 #include <spaix/SideChooser.hpp>
+#include <spaix/SplitParts.hpp>
 #include <spaix/SplitSeeds.hpp>
+#include <spaix/detail/EntryTracker.hpp>
 #include <spaix/detail/Index.hpp>
 #include <spaix/detail/distribute.hpp>
 #include <spaix/detail/entry.hpp>
@@ -72,17 +74,25 @@ public:
   void distribute_children(
     SplitSeeds<typename Deposit::size_type, Volume>& seeds,
     Deposit&&                                        deposit,
-    Entry&                                           lhs,
-    Entry&                                           rhs,
+    const typename Deposit::size_type                track_index,
+    SplitParts<Entry, typename Deposit::size_type>&  parts,
     const unsigned                                   max_fanout) noexcept
   {
+    using ChildIndex = typename Deposit::size_type;
+
     using detail::distribute_child;
+
+    Entry& lhs = parts.sides[0];
+    Entry& rhs = parts.sides[1];
+
+    detail::EntryTracker<Entry, ChildIndex> tracker{parts, false};
 
     // Scan the deposit entries once, sending each left or right immediately
     const size_t n_entries = deposit.size();
     for (size_t i = 0; i < n_entries; ++i) {
       auto child = std::move(deposit.back());
       deposit.pop_back();
+      const auto child_index = deposit.size();
 
       const auto& key     = detail::entry_key(child);
       const auto  n_left  = detail::entry_num_children(lhs);
@@ -93,25 +103,30 @@ public:
 
       const Side side    = chooser.choose_side();
       const auto outcome = chooser.outcome(side);
+      if (child_index == track_index) {
+        tracker.track(side,
+                      (side == Side::left) ? lhs.node->num_children()
+                                           : rhs.node->num_children());
+      }
 
-      // Distribute the child to the chosen side and update its volume
-      if (side == Side::left) {
-        const auto n = distribute_child(lhs, outcome.key, std::move(child));
-        if (n == max_fanout) {
-          detail::distribute_remaining<Ops>(rhs,
-                                            std::forward<Deposit>(deposit));
-          return;
+      // Distribute the child to the chosen side and finish if it's now full
+      auto&      parent = (side == Side::left) ? lhs : rhs;
+      auto&      other  = (side == Side::left) ? rhs : lhs;
+      const auto n = distribute_child(parent, outcome.key, std::move(child));
+      if (n == max_fanout) {
+        const auto new_index = detail::distribute_remaining<Ops>(
+          other, std::forward<Deposit>(deposit), track_index);
+        if (track_index < child_index) {
+          tracker.track((side == Side::left) ? Side::right : Side::left,
+                        new_index);
         }
+        return;
+      }
 
+      // Update seed volumes before continuing
+      if (side == Side::left) {
         seeds.lhs_volume = outcome.volume;
       } else {
-        const auto n = distribute_child(rhs, outcome.key, std::move(child));
-        if (n == max_fanout) {
-          detail::distribute_remaining<Ops>(lhs,
-                                            std::forward<Deposit>(deposit));
-          return;
-        }
-
         seeds.rhs_volume = outcome.volume;
       }
     }

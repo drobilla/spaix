@@ -25,16 +25,17 @@ RTree<B, K, D, C>::RTree(Insertion insertion, Split split) noexcept
 {}
 
 template<class B, class K, class D, class C>
-void
-RTree<B, K, D, C>::insert(const Key& key, const Data& data)
+auto
+RTree<B, K, D, C>::insert(const Key& key, const Data& data) -> data_iterator
 {
   if (empty()) {
     _root = {B{key}, std::make_unique<DirNode>(NodeType::data)};
     ++_height;
   }
 
-  insert_entry(_height - 1U, DirNode::make_dat_entry(key, data));
+  auto i = insert_entry(_height - 1U, DirNode::make_dat_entry(key, data));
   ++_size;
+  return i;
 }
 
 template<class B, class K, class D, class C>
@@ -89,23 +90,80 @@ RTree<B, K, D, C>::relocate(data_iterator& i, const Key& key)
 
 template<class B, class K, class D, class C>
 template<class Entry>
-void
+auto
 RTree<B, K, D, C>::insert_entry(const unsigned depth, Entry entry) noexcept
+  -> data_iterator
 {
-  const auto root_key = Ops::unify(_root.key, detail::entry_key(entry));
-  auto       sides    = insert_rec(depth, _root, root_key, std::move(entry));
+  constexpr auto did_split = [](const auto& parts) {
+    return !!parts.sides[0].node;
+  };
 
-  if (sides[0].node) {
-    const auto new_root_key = Ops::unify(sides[0].key, sides[1].key);
-    auto       root_node    = std::make_unique<DirNode>(NodeType::directory);
+  data_iterator iter;
+  const auto    entry_key = detail::entry_key(entry);
 
-    root_node->append_child(std::move(sides[0]));
-    root_node->append_child(std::move(sides[1]));
+  // Walk down, choosing directories
+  std::array<std::pair<Box, ChildIndex>, max_height()> choices;
+  DirNode* down_parent = _root.node.get();
+  for (unsigned d = 0U; d < depth; ++d) {
+    auto children = down_parent->dir_children();
 
-    assert(new_root_key == ideal_key(*root_node));
-    _root = {new_root_key, std::move(root_node)};
-    ++_height;
+    choices[d] = _insertion.choose(children, entry_key);
+    iter.step_down(down_parent, choices[d].second);
+    down_parent = children[choices[d].second].node.get();
   }
+
+  // Insert element into leaf
+  DirNode* const leaf  = iter.empty() ? _root.node.get() : down_parent;
+  auto           parts = insert_leaf(*leaf, std::move(entry));
+  if (did_split(parts)) {
+    iter.step_down((parts.tracked_side == Side::left)
+                     ? parts.sides[0].node.get()
+                     : parts.sides[1].node.get(),
+                   parts.tracked_index);
+  } else {
+    iter.step_down(leaf, parts.tracked_index);
+  }
+
+  // Walk up, handling split children as necessary
+  unsigned d = depth;
+  for (; d && did_split(parts); --d) {
+    auto& parent                   = *iter.parent_at(d - 1);
+    auto  children                 = parent.dir_children();
+    children[iter.index_at(d - 1)] = std::move(parts.sides[0]);
+    if (children.size() == Conf::dir_fanout) { // Parent full, continue split
+      parts = split_node(parent, std::move(parts.sides[1]));
+      if (did_split(parts)) {
+        iter.set_frame(d - 1,
+                       (parts.tracked_side == Side::left)
+                         ? parts.sides[0].node.get()
+                         : parts.sides[1].node.get(),
+                       parts.tracked_index);
+      }
+    } else { // Append split RHS
+      parent.append_child(std::move(parts.sides[1]));
+      parts.sides = {};
+    }
+  }
+
+  // Enlarge keys as necessary the rest of the way up
+  for (; d; --d) {
+    iter.parent_at(d - 1)->dir_children()[iter.index_at(d - 1)].key =
+      choices[d - 1].first;
+  }
+
+  if (did_split(parts)) { // Root split
+    auto root_node = std::make_unique<DirNode>(NodeType::directory);
+    root_node->append_child(std::move(parts.sides[0]));
+    root_node->append_child(std::move(parts.sides[1]));
+    _root = {Ops::unify(parts.sides[0].key, parts.sides[1].key),
+             std::move(root_node)};
+    iter.push_front(_root.node.get(), parts.tracked_side == Side::left ? 0 : 1);
+    ++_height;
+  } else {
+    _root.key = Ops::unify(_root.key, entry_key);
+  }
+
+  return iter;
 }
 
 template<class B, class K, class D, class C>
@@ -193,62 +251,19 @@ RTree<B, K, D, C>::ideal_key(const DirNode& node) noexcept -> Box
 template<class B, class K, class D, class C>
 template<class Entry>
 auto
-RTree<B, K, D, C>::insert_leaf(DirEntry&  parent_entry,
-                               const Box& new_parent_key,
-                               Entry      entry) noexcept -> DirEntryPair
+RTree<B, K, D, C>::insert_leaf(DirNode& parent, Entry entry) noexcept
+  -> SplitParts<DirEntry, ChildIndex>
 {
-  auto& parent = *parent_entry.node;
-
-  if (parent.num_children() < Conf::fanout(parent.child_type())) {
-    // Simple insert
-    parent.append_child(std::move(entry));
-    parent_entry.key = new_parent_key;
-    assert(parent_entry.key == ideal_key(parent));
-
-  } else {
+  if (parent.num_children() >= Conf::fanout(parent.child_type())) {
     // Split insert
     return split_node(parent, std::move(entry));
   }
 
-  return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
-}
-
-template<class B, class K, class D, class C>
-template<class Entry>
-auto
-RTree<B, K, D, C>::insert_rec(const unsigned depth,
-                              DirEntry&      parent_entry,
-                              const Box&     new_parent_key,
-                              Entry          element) noexcept -> DirEntryPair
-{
-  auto& parent = *parent_entry.node;
-  if (depth) {
-    // Recursing downwards
-    auto children = parent.dir_children();
-    const auto [expanded, index] =
-      _insertion.choose(children, detail::entry_key(element));
-
-    auto sides =
-      insert_rec(depth - 1U, children[index], expanded, std::move(element));
-    if (sides[0].node) { // Child was split, replace it
-      children[index] = std::move(sides[0]);
-      if (children.size() == Conf::dir_fanout) {
-        return split(
-          std::move(children), std::move(sides[1]), parent.child_type());
-      }
-
-      parent.append_child(std::move(sides[1]));
-      parent_entry.key = parent_key(children);
-    } else {
-      parent_entry.key = new_parent_key;
-      assert(parent_entry.key == ideal_key(parent));
-    }
-
-  } else {
-    return insert_leaf(parent_entry, new_parent_key, std::move(element));
-  }
-
-  return {DirEntry{Box{}, nullptr}, DirEntry{Box{}, nullptr}};
+  // Simple insert
+  SplitParts<DirEntry, ChildIndex> parts{};
+  parts.tracked_index = parent.num_children();
+  parent.append_child(std::move(entry));
+  return parts;
 }
 
 template<class B, class K, class D, class C>
@@ -352,7 +367,7 @@ RTree<B, K, D, C>::new_parent(StaticVector<Entry, Count, count>& deposit,
 template<class B, class K, class D, class C>
 auto
 RTree<B, K, D, C>::split_node(DirNode& node, DirEntry entry) noexcept
-  -> DirEntryPair
+  -> SplitParts<DirEntry, ChildIndex>
 {
   return split(node.dir_children(), std::move(entry), NodeType::directory);
 }
@@ -360,7 +375,7 @@ RTree<B, K, D, C>::split_node(DirNode& node, DirEntry entry) noexcept
 template<class B, class K, class D, class C>
 auto
 RTree<B, K, D, C>::split_node(DirNode& node, DatEntry entry) noexcept
-  -> DirEntryPair
+  -> SplitParts<DirEntry, ChildIndex>
 {
   return split(node.dat_children(), std::move(entry), NodeType::data);
 }
@@ -371,17 +386,18 @@ template<class Entry, class Count, Count fanout>
 auto
 RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> entries,
                          Entry                                  entry,
-                         const NodeType type) noexcept -> DirEntryPair
+                         const NodeType                         type) noexcept
+  -> SplitParts<DirEntry, ChildIndex>
 {
   constexpr auto max_fanout =
     fanout - (fanout * Conf::MinFill::num / Conf::MinFill::den);
 
-  // Make an array of all entries to deposit
+  // Make an array of all nodes to deposit
   StaticVector<Entry, ChildCount, static_cast<ChildCount>(fanout + 1U)> deposit;
-  std::for_each(entries.begin(), entries.end(), [&deposit](auto& e) {
-    deposit.emplace_back(std::move(e));
-  });
   deposit.emplace_back(std::move(entry));
+  std::for_each(entries.begin(), entries.end(), [&deposit](auto& node) {
+    deposit.emplace_back(std::move(node));
+  });
 
   // Pick two entries to seed the left and right groups
   auto seeds = _split.template pick_seeds<B>(deposit);
@@ -389,19 +405,26 @@ RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> entries,
 
   // Create left/right parent entries with right/left seeds
   // The largest index is popped first to avoid invalidating the other
-  DirEntryPair sides{new_parent(deposit, seeds.rhs_index, type),
-                     new_parent(deposit, seeds.lhs_index, type)};
+  SplitParts<DirEntry, ChildIndex> parts{
+    {new_parent(deposit, seeds.rhs_index, type),
+     new_parent(deposit, seeds.lhs_index, type)},
+    ChildIndex{},
+    Side::right};
+
+  const auto track_index =
+    (seeds.lhs_index > 0U) ? ChildCount{} : deposit.size();
 
   // Distribute remaining entries between seeds
   _split.distribute_children(
-    seeds, std::move(deposit), sides[0], sides[1], max_fanout);
+    seeds, std::move(deposit), track_index, parts, max_fanout);
 
-  assert(sides[0].node->num_children() + sides[1].node->num_children() ==
+  assert(parts.sides[0].node->num_children() +
+           parts.sides[1].node->num_children() ==
          fanout + 1);
-  assert(sides[0].key == ideal_key(*sides[0].node));
-  assert(sides[1].key == ideal_key(*sides[1].node));
+  assert(parts.sides[0].key == ideal_key(*parts.sides[0].node));
+  assert(parts.sides[1].key == ideal_key(*parts.sides[1].node));
 
-  return sides;
+  return parts;
 }
 
 template<class B, class K, class D, class C>

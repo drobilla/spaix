@@ -7,6 +7,7 @@
 #include <spaix/DataNode.hpp>
 #include <spaix/EntryIterator.hpp>
 #include <spaix/Iterator.hpp>
+#include <spaix/SplitParts.hpp>
 #include <spaix/StaticVector.hpp>
 #include <spaix/TreeRange.hpp>
 #include <spaix/detail/DirectoryNode.hpp>
@@ -113,7 +114,7 @@ public:
   RTree& operator=(RTree&&) noexcept = default;
 
   /// Insert a new item with the given `key` and `data`
-  void insert(const Key& key, const Data& data);
+  data_iterator insert(const Key& key, const Data& data);
 
   /// Reinsert an existing item under a new `key`
   void relocate(data_iterator& i, const Key& key);
@@ -195,8 +196,7 @@ public:
   [[nodiscard]] data_iterator end() noexcept { return {}; }
 
 private:
-  using DirEntry     = typename DirNode::DirEntry;
-  using DirEntryPair = std::array<DirEntry, 2>;
+  using DirEntry = typename DirNode::DirEntry;
 
   using entry_iterator = EntryIterator<DirNode, max_height()>;
 
@@ -206,18 +206,12 @@ private:
   static Box ideal_key(const DirNode& node) noexcept;
 
   template<class Entry>
-  void insert_entry(unsigned depth, Entry entry) noexcept;
+  data_iterator insert_entry(unsigned depth, Entry entry) noexcept;
 
   template<class Entry>
-  [[nodiscard]] DirEntryPair insert_leaf(DirEntry&  parent_entry,
-                                         const Box& new_parent_key,
-                                         Entry      entry) noexcept;
-
-  template<class Entry>
-  [[nodiscard]] DirEntryPair insert_rec(unsigned   depth,
-                                        DirEntry&  parent_entry,
-                                        const Box& new_parent_key,
-                                        Entry      element) noexcept;
+  [[nodiscard]] SplitParts<DirEntry, ChildIndex> insert_leaf(
+    DirNode& parent,
+    Entry    entry) noexcept;
 
   void condense_tree(entry_iterator& i) noexcept;
 
@@ -233,12 +227,17 @@ private:
     ChildIndex                         index,
     NodeType                           child_type) noexcept;
 
-  [[nodiscard]] DirEntryPair split_node(DirNode& node, DirEntry entry) noexcept;
-  [[nodiscard]] DirEntryPair split_node(DirNode& node, DatEntry entry) noexcept;
+  [[nodiscard]] SplitParts<DirEntry, ChildIndex> split_node(
+    DirNode& node,
+    DirEntry entry) noexcept;
+
+  [[nodiscard]] SplitParts<DirEntry, ChildIndex> split_node(
+    DirNode& node,
+    DatEntry entry) noexcept;
 
   /// Split `entries` plus `entry` in two and return the resulting sides
   template<class Entry, class Count, Count fanout>
-  [[nodiscard]] DirEntryPair split(
+  [[nodiscard]] SplitParts<DirEntry, ChildIndex> split(
     StaticVectorView<Entry, Count, fanout> entries,
     Entry                                  entry,
     NodeType                               type) noexcept;

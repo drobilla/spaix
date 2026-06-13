@@ -7,6 +7,7 @@
 #include <spaix/SideChooser.hpp>
 #include <spaix/SplitSeeds.hpp>
 #include <spaix/StaticVector.hpp>
+#include <spaix/detail/EntryTracker.hpp>
 #include <spaix/detail/distribute.hpp>
 #include <spaix/detail/entry.hpp>
 #include <spaix/types.hpp>
@@ -73,17 +74,27 @@ public:
 
   /// Distribute nodes in `deposit` between parents `lhs` and `rhs`
   template<class Deposit, class DirEntry, class ChildCount>
-  void distribute_children(SplitSeeds<ChildCount, Volume>& seeds,
-                           Deposit&&                       deposit,
-                           DirEntry&                       lhs,
-                           DirEntry&                       rhs,
-                           const unsigned                  max_fanout) noexcept
+  void distribute_children(
+    SplitSeeds<ChildCount, Volume>&                    seeds,
+    Deposit&&                                          deposit,
+    typename Deposit::size_type                        track_index,
+    SplitParts<DirEntry, typename Deposit::size_type>& parts,
+    const unsigned                                     max_fanout) noexcept
   {
+    DirEntry& lhs = parts.sides[0];
+    DirEntry& rhs = parts.sides[1];
+
+    detail::EntryTracker<DirEntry, ChildCount> tracker{
+      parts, track_index >= deposit.size()};
+
     const auto n_entries = deposit.size();
     for (auto i = 0U; i < n_entries; ++i) {
       const auto  best   = pick_next(seeds, deposit, lhs, rhs);
       auto* const iter   = deposit.begin() + best.child_index;
       auto&       parent = best.side == Side::left ? lhs : rhs;
+      if (best.child_index == track_index) {
+        tracker.track(best.side, parent.node->num_children());
+      }
 
       assert(best.child_index < deposit.size());
 
@@ -91,10 +102,17 @@ public:
         detail::distribute_child(parent, best.new_parent_key, std::move(*iter));
 
       deposit.pop_at(best.child_index);
+      if (track_index == deposit.size()) {
+        track_index = best.child_index;
+      }
 
       if (n_children == max_fanout) {
-        detail::distribute_remaining<Ops>(best.side == Side::left ? rhs : lhs,
-                                          std::forward<Deposit>(deposit));
+        const auto new_index =
+          detail::distribute_remaining<Ops>(best.side == Side::left ? rhs : lhs,
+                                            std::forward<Deposit>(deposit),
+                                            track_index);
+        tracker.track((best.side == Side::left) ? Side::right : Side::left,
+                      new_index);
         return;
       }
 
