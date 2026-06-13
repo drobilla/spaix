@@ -1,4 +1,4 @@
-# Copyright 2020-2025 David Robillard <d@drobilla.net>
+# Copyright 2020-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR GPL-3.0-only
 
 Checks: >
@@ -6,5 +6,7 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-macro-usage,
   -misc-no-recursion,
-  -readability-function-cognitive-complexity,
+CheckOptions:
+  - key:   readability-function-cognitive-complexity.Threshold
+    value: '46'
 InheritParentConfig: true
