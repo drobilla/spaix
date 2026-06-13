@@ -45,7 +45,7 @@ public:
   using ConstDatChildrenView =
     ConstStaticVectorView<const DatEntry, ChildCount, dat_fanout>;
 
-  explicit DirectoryNode(const NodeType t)
+  explicit DirectoryNode(const NodeType t) noexcept
     : _child_type{t}
   {}
 
@@ -69,14 +69,14 @@ public:
     return DatEntryType<DatNode, placement>::make(key, data);
   }
 
-  ChildCount append_child(DatEntry child)
+  ChildCount append_child(DatEntry child) noexcept
   {
     assert(_child_type == NodeType::data);
     dat_children().emplace_back(std::move(child));
     return _size;
   }
 
-  ChildCount append_child(DirEntry entry)
+  ChildCount append_child(DirEntry entry) noexcept
   {
     assert(_child_type == NodeType::directory);
     assert(entry.node);
@@ -84,34 +84,34 @@ public:
     return _size;
   }
 
-  [[nodiscard]] ChildIndex num_children() const { return _size; }
+  [[nodiscard]] ChildIndex num_children() const noexcept { return _size; }
 
-  [[nodiscard]] ChildCount fanout() const
+  [[nodiscard]] ChildCount fanout() const noexcept
   {
     return (_child_type == NodeType::directory) ? dir_fanout : dat_fanout;
   }
 
-  [[nodiscard]] NodeType child_type() const { return _child_type; }
+  [[nodiscard]] NodeType child_type() const noexcept { return _child_type; }
 
-  [[nodiscard]] ConstDirChildrenView dir_children() const
+  [[nodiscard]] ConstDirChildrenView dir_children() const noexcept
   {
     assert(_child_type == NodeType::directory);
     return {_size, reinterpret_cast<const DirEntry*>(&_children)};
   }
 
-  [[nodiscard]] ConstDatChildrenView dat_children() const
+  [[nodiscard]] ConstDatChildrenView dat_children() const noexcept
   {
     assert(_child_type == NodeType::data);
     return {_size, reinterpret_cast<const DatEntry*>(&_children)};
   }
 
-  [[nodiscard]] DirChildrenView dir_children()
+  [[nodiscard]] DirChildrenView dir_children() noexcept
   {
     assert(_child_type == NodeType::directory);
     return {_size, reinterpret_cast<DirEntry*>(&_children)};
   }
 
-  [[nodiscard]] DatChildrenView dat_children()
+  [[nodiscard]] DatChildrenView dat_children() noexcept
   {
     assert(_child_type == NodeType::data);
     return {_size, reinterpret_cast<DatEntry*>(&_children)};
