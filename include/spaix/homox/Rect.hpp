@@ -10,7 +10,6 @@
 #include <array>
 #include <cstddef>
 #include <iosfwd>
-#include <iostream>
 #include <limits>
 #include <utility>
 
@@ -104,9 +103,9 @@ range(const Rect<T, D>& rect)
   return rect.array()[dim];
 }
 
-template<class T, size_t D>
-inline std::ostream&
-operator<<(std::ostream& os, const Rect<T, D>& rect)
+template<class CharT, class Traits, class T, size_t D>
+inline std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const Rect<T, D>& rect)
 {
   os << '[';
   for (size_t i = 0; i < D; ++i) {

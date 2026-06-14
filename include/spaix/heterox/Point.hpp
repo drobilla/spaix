@@ -10,7 +10,6 @@
 
 #include <cstddef>
 #include <iosfwd>
-#include <ostream>
 #include <tuple>
 #include <utility>
 
@@ -110,16 +109,16 @@ ranges(const Point<Ts...>& point) noexcept
 
 namespace detail {
 
-template<class... Ts, size_t n_dims>
+template<class CharT, class Traits, class... Ts, size_t n_dims>
 void
-print_rec(std::ostream&,
+print_rec(std::basic_ostream<CharT, Traits>&,
           const Point<Ts...>&,
           ::spaix::detail::EndIndex<n_dims>) noexcept
 {}
 
-template<class... Ts, size_t dim, size_t n_dims>
+template<class CharT, class Traits, class... Ts, size_t dim, size_t n_dims>
 void
-print_rec(std::ostream&                       os,
+print_rec(std::basic_ostream<CharT, Traits>&  os,
           const Point<Ts...>&                 point,
           ::spaix::detail::Index<dim, n_dims> index)
 {
@@ -129,9 +128,9 @@ print_rec(std::ostream&                       os,
 
 } // namespace detail
 
-template<class... Ts>
-inline std::ostream&
-operator<<(std::ostream& os, const Point<Ts...>& point)
+template<class CharT, class Traits, class... Ts>
+inline std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const Point<Ts...>& point)
 {
   os << '[';
   detail::print_rec(os, point, point.ibegin());

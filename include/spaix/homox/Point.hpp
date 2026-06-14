@@ -6,7 +6,7 @@
 
 #include <array>
 #include <cstddef>
-#include <iostream>
+#include <iosfwd>
 #include <utility>
 
 namespace spaix::homox {
@@ -61,9 +61,9 @@ get(const Point<T, D>& point)
   return point[dim];
 }
 
-template<class T, size_t D>
+template<class CharT, class Traits, class T, size_t D>
 inline std::ostream&
-operator<<(std::ostream& os, const Point<T, D>& point)
+operator<<(std::basic_ostream<CharT, Traits>& os, const Point<T, D>& point)
 {
   os << '[';
   for (size_t i = 0; i < D; ++i) {
