@@ -6,7 +6,7 @@
 
 #include <spaix/detail/Index.hpp>
 #include <spaix/heterox/Point.hpp>
-#include <spaix/heterox/detail/meta.hpp>
+#include <spaix/heterox/detail.hpp>
 #include <spaix/types.hpp>
 
 #include <cstddef>

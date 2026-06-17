@@ -29,7 +29,7 @@
 #include <spaix/heterox/Operations.hpp>      // IWYU pragma: keep
 #include <spaix/heterox/Point.hpp>           // IWYU pragma: keep
 #include <spaix/heterox/Rect.hpp>            // IWYU pragma: keep
-#include <spaix/heterox/detail/meta.hpp>     // IWYU pragma: keep
+#include <spaix/heterox/detail.hpp>          // IWYU pragma: keep
 #include <spaix/homox/Comparisons.hpp>       // IWYU pragma: keep
 #include <spaix/homox/Operations.hpp>        // IWYU pragma: keep
 #include <spaix/homox/Point.hpp>             // IWYU pragma: keep

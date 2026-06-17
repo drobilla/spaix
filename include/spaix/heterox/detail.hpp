@@ -1,8 +1,8 @@
 // Copyright 2013-2026 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef SPAIX_HETEROX_DETAIL_META_HPP
-#define SPAIX_HETEROX_DETAIL_META_HPP
+#ifndef SPAIX_HETEROX_DETAIL_HPP
+#define SPAIX_HETEROX_DETAIL_HPP
 
 #include <cstddef>
 #include <tuple>
@@ -43,4 +43,4 @@ using ProductOf = decltype((std::declval<Ts>() * ...));
 
 } // namespace spaix::heterox::detail
 
-#endif // SPAIX_HETEROX_DETAIL_META_HPP
+#endif // SPAIX_HETEROX_DETAIL_HPP

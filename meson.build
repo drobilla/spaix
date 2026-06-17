@@ -23,46 +23,60 @@ pkg = import('pkgconfig')
 # Library #
 ###########
 
-headers = files(
-  'include/spaix/Config.hpp',
-  'include/spaix/DataIterator.hpp',
-  'include/spaix/DataNode.hpp',
-  'include/spaix/DataPlacement.hpp',
-  'include/spaix/EntryIterator.hpp',
-  'include/spaix/Iterator.hpp',
-  'include/spaix/LinearInsertion.hpp',
-  'include/spaix/LinearSplit.hpp',
-  'include/spaix/QuadraticSplit.hpp',
-  'include/spaix/Queries.hpp',
-  'include/spaix/RTree.hpp',
-  'include/spaix/RTree.ipp',
-  'include/spaix/SideChooser.hpp',
-  'include/spaix/SplitSeeds.hpp',
-  'include/spaix/StaticVector.hpp',
-  'include/spaix/TreeRange.hpp',
-  'include/spaix/detail/DatEntryType.hpp',
-  'include/spaix/detail/DirectoryNode.hpp',
-  'include/spaix/detail/Index.hpp',
-  'include/spaix/detail/NodePointerEntry.hpp',
-  'include/spaix/detail/attributes.hpp',
-  'include/spaix/detail/distribute.hpp',
-  'include/spaix/detail/entry.hpp',
-  'include/spaix/detail/power.hpp',
-  'include/spaix/heterox/Comparisons.hpp',
-  'include/spaix/heterox/Operations.hpp',
-  'include/spaix/heterox/Point.hpp',
-  'include/spaix/heterox/Rect.hpp',
-  'include/spaix/heterox/detail/meta.hpp',
-  'include/spaix/homox/Comparisons.hpp',
-  'include/spaix/homox/Operations.hpp',
-  'include/spaix/homox/Point.hpp',
-  'include/spaix/homox/Rect.hpp',
-  'include/spaix/search/Everything.hpp',
-  'include/spaix/search/Exactly.hpp',
-  'include/spaix/search/Touching.hpp',
-  'include/spaix/search/Within.hpp',
-  'include/spaix/types.hpp',
-)
+headers = {
+  '': files(
+    'include/spaix/Config.hpp',
+    'include/spaix/ConstStaticVectorView.hpp',
+    'include/spaix/DataIterator.hpp',
+    'include/spaix/DataNode.hpp',
+    'include/spaix/DataPlacement.hpp',
+    'include/spaix/EntryIterator.hpp',
+    'include/spaix/Iterator.hpp',
+    'include/spaix/LinearInsertion.hpp',
+    'include/spaix/LinearSplit.hpp',
+    'include/spaix/QuadraticSplit.hpp',
+    'include/spaix/Queries.hpp',
+    'include/spaix/RTree.hpp',
+    'include/spaix/RTree.ipp',
+    'include/spaix/SideChooser.hpp',
+    'include/spaix/SplitParts.hpp',
+    'include/spaix/SplitSeeds.hpp',
+    'include/spaix/StaticVector.hpp',
+    'include/spaix/StaticVectorView.hpp',
+    'include/spaix/TreeRange.hpp',
+    'include/spaix/types.hpp',
+  ),
+  'detail': files(
+    'include/spaix/detail/DatEntryType.hpp',
+    'include/spaix/detail/DirectoryNode.hpp',
+    'include/spaix/detail/EntryTracker.hpp',
+    'include/spaix/detail/Index.hpp',
+    'include/spaix/detail/NodePointerEntry.hpp',
+    'include/spaix/detail/attributes.hpp',
+    'include/spaix/detail/distribute.hpp',
+    'include/spaix/detail/entry.hpp',
+    'include/spaix/detail/power.hpp',
+  ),
+  'heterox': files(
+    'include/spaix/heterox/Comparisons.hpp',
+    'include/spaix/heterox/Operations.hpp',
+    'include/spaix/heterox/Point.hpp',
+    'include/spaix/heterox/Rect.hpp',
+    'include/spaix/heterox/detail.hpp',
+  ),
+  'homox': files(
+    'include/spaix/homox/Comparisons.hpp',
+    'include/spaix/homox/Operations.hpp',
+    'include/spaix/homox/Point.hpp',
+    'include/spaix/homox/Rect.hpp',
+  ),
+  'search': files(
+    'include/spaix/search/Everything.hpp',
+    'include/spaix/search/Exactly.hpp',
+    'include/spaix/search/Touching.hpp',
+    'include/spaix/search/Within.hpp',
+  ),
+}
 
 # Declare dependency for internal meson dependants
 spaix_dep = declare_dependency(
@@ -83,7 +97,12 @@ if not get_option('install').disabled()
   )
 
   # Install headers to a versioned include directory
-  install_headers(headers, subdir: versioned_name + '/spaix')
+  foreach subdir, subdir_headers : headers
+    install_headers(
+      subdir_headers,
+      subdir: versioned_name / 'spaix' / subdir,
+    )
+  endforeach
 endif
 
 #########

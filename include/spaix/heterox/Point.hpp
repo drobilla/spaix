@@ -5,7 +5,7 @@
 #define SPAIX_HETEROX_POINT_HPP
 
 #include <spaix/detail/Index.hpp>
-#include <spaix/heterox/detail/meta.hpp>
+#include <spaix/heterox/detail.hpp>
 #include <spaix/types.hpp>
 
 #include <cstddef>
