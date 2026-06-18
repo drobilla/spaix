@@ -58,7 +58,7 @@ color(const NodePath& path, const double alpha)
   return {buf.data()};
 }
 
-template<class Ops, size_t axis, class Key, class DirKey>
+template<typename Ops, size_t axis, class Key, class DirKey>
 inline double
 coord(const Key& key, const DirKey& bounds, const double scale)
 {
@@ -68,7 +68,7 @@ coord(const Key& key, const DirKey& bounds, const double scale)
     pad);
 }
 
-template<class Ops, size_t axis, class Key>
+template<typename Ops, size_t axis, class Key>
 inline double
 span(const Key& key)
 {
@@ -82,7 +82,7 @@ write_attr(std::ostream& os, const std::string& key, const T& value)
   os << " " << key << "=\"" << value << "\"";
 }
 
-template<class Ops, class DirKey, class NodePath>
+template<typename Ops, class DirKey, class NodePath>
 inline void
 draw_dir(std::ostream&   os,
          const DirKey&   key,
@@ -106,7 +106,7 @@ draw_dir(std::ostream&   os,
   os << "/>\n";
 }
 
-template<class Ops, class T, size_t D, class NodePath>
+template<typename Ops, class T, size_t D, class NodePath>
 inline void
 draw_dat(std::ostream&     os,
          const Rect<T, D>& key,
@@ -117,7 +117,7 @@ draw_dat(std::ostream&     os,
   draw_dir(os, key, path, bounds, scale);
 }
 
-template<class Ops, class T, size_t D, class NodePath>
+template<typename Ops, class T, size_t D, class NodePath>
 inline void
 draw_dat(std::ostream&      os,
          const Point<T, D>& key,

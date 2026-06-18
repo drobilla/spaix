@@ -18,7 +18,7 @@ distribute_child(DirEntry& parent, const DirKey& new_parent_key, Entry&& child)
   return parent.node->append_child(std::forward<Entry>(child));
 }
 
-template<class Ops, class DirEntry, class Deposit>
+template<typename Ops, class DirEntry, class Deposit>
 inline typename Deposit::size_type
 distribute_remaining(DirEntry&                         parent,
                      Deposit                           deposit,

@@ -11,7 +11,7 @@ namespace spaix {
 template<class ChildIndex, class Volume>
 struct SplitSeeds;
 
-template<class Ops, class ChildKey, class ChildCount>
+template<typename Ops, class ChildKey, class ChildCount>
 class SideChooser
 {
   using Box    = typename Ops::Box;
@@ -95,7 +95,11 @@ private:
   unsigned   _tie_phase{};
 };
 
-template<class Ops, class Volume, class ChildCount, class Box, class ChildKey>
+template<typename Ops,
+         class Volume,
+         class ChildCount,
+         class Box,
+         class ChildKey>
 SideChooser<Ops, ChildKey, ChildCount>
 make_side_chooser(const SplitSeeds<ChildCount, Volume>& seeds,
                   const Box&                            lhs_key,
