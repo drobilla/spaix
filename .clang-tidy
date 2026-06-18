@@ -15,9 +15,11 @@ Checks: >
   -llvmlibc-*,
   -misc-include-cleaner,
   -misc-no-recursion,
+  -modernize-use-designated-initializers,
   -modernize-use-trailing-return-type,
   -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,
+  -readability-redundant-typename,
 CheckOptions:
   - key:   cppcoreguidelines-avoid-magic-numbers.IgnoreTypeAliases
     value: true

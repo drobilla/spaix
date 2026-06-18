@@ -15,5 +15,7 @@ Checks: >
   -google-runtime-float,
   -llvm-prefer-static-over-anonymous-namespace,
   -misc-non-private-member-variables-in-classes,
+  -modernize-use-starts-ends-with,
+  -readability-container-contains,
   -readability-implicit-bool-conversion,
 InheritParentConfig: true
