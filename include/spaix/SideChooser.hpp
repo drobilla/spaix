@@ -11,21 +11,22 @@ namespace spaix {
 template<class ChildIndex, class Volume>
 struct SplitSeeds;
 
-template<class DirKey, class ChildKey, class ChildCount, class Ops>
+template<class Ops, class ChildKey, class ChildCount>
 class SideChooser
 {
-public:
+  using Box    = typename Ops::Box;
   using Volume = typename Ops::Volume;
 
+public:
   struct Outcome {
     Volume volume;
-    DirKey key;
+    Box    key;
   };
 
-  SideChooser(const DirKey&    lhs_key,
+  SideChooser(const Box&       lhs_key,
               const Volume     lhs_volume,
               const ChildCount lhs_n_children,
-              const DirKey&    rhs_key,
+              const Box&       rhs_key,
               const Volume     rhs_volume,
               const ChildCount rhs_n_children,
               const ChildKey&  child_key) noexcept
@@ -82,8 +83,8 @@ private:
                                              : Side::right;
   }
 
-  DirKey     _l_key;
-  DirKey     _r_key;
+  Box        _l_key;
+  Box        _r_key;
   ChildKey   _child_key;
   ChildCount _l_n_children;
   ChildCount _r_n_children;
@@ -94,16 +95,12 @@ private:
   unsigned   _tie_phase{};
 };
 
-template<class Ops,
-         class Volume,
-         class ChildCount,
-         class DirKey,
-         class ChildKey>
-SideChooser<DirKey, ChildKey, ChildCount, Ops>
+template<class Ops, class Volume, class ChildCount, class Box, class ChildKey>
+SideChooser<Ops, ChildKey, ChildCount>
 make_side_chooser(const SplitSeeds<ChildCount, Volume>& seeds,
-                  const DirKey&                         lhs_key,
+                  const Box&                            lhs_key,
                   const ChildCount                      lhs_n_children,
-                  const DirKey&                         rhs_key,
+                  const Box&                            rhs_key,
                   const ChildCount                      rhs_n_children,
                   const ChildKey&                       child_key) noexcept
 {

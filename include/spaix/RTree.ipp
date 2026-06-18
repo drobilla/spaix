@@ -400,7 +400,7 @@ RTree<B, K, D, C>::split(StaticVectorView<Entry, Count, fanout> entries,
   });
 
   // Pick two entries to seed the left and right groups
-  auto seeds = _split.template pick_seeds<B>(deposit);
+  auto seeds = _split.pick_seeds(deposit);
   assert(seeds.lhs_index < seeds.rhs_index);
 
   // Create left/right parent entries with right/left seeds

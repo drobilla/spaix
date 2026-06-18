@@ -34,7 +34,7 @@ public:
   using Volume = typename Ops::Volume;
 
   /// Return the indices of the children that should be used for split seeds
-  template<class DirKey, class Entries>
+  template<class Entries>
   SplitSeeds<typename Entries::size_type, Volume> pick_seeds(
     const Entries& deposit) noexcept
   {

@@ -27,11 +27,12 @@ namespace spaix {
 template<typename Ops>
 class QuadraticSplit
 {
-public:
+  using Box    = typename Ops::Box;
   using Volume = typename Ops::Volume;
 
+public:
   /// Return the indices of the children that should be used for split seeds
-  template<class DirKey, class Entry, class ChildCount, ChildCount count>
+  template<class Entry, class ChildCount, ChildCount count>
   SplitSeeds<ChildCount, Volume> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit) noexcept
   {
@@ -52,7 +53,7 @@ public:
         const auto& k = detail::entry_key(deposit[i]);
         const auto& l = detail::entry_key(deposit[j]);
 
-        const auto both  = Ops::unify(DirKey{k}, l);
+        const auto both  = Ops::unify(Box{k}, l);
         const auto waste = Ops::volume(both) - volumes[i] - volumes[j];
 
         if (waste >= max_waste) {
@@ -126,30 +127,28 @@ public:
 
 private:
   /// Assignment of a child to a parent during a split
-  template<class ChildIndex, class DirKey>
+  template<class ChildIndex>
   struct ChildAssignment {
     ChildIndex child_index;
-    DirKey     new_parent_key;
+    Box        new_parent_key;
     Volume     new_parent_volume;
     Side       side;
   };
 
   /// Choose the next child to distribute during a split
   template<class Deposit, class DirEntry>
-  ChildAssignment<typename Deposit::size_type, typename DirEntry::Key>
-  pick_next(const SplitSeeds<typename Deposit::size_type, Volume>& seeds,
-            const Deposit&                                         deposit,
-            const DirEntry&                                        lhs,
-            const DirEntry&                                        rhs) noexcept
+  ChildAssignment<typename Deposit::size_type> pick_next(
+    const SplitSeeds<typename Deposit::size_type, Volume>& seeds,
+    const Deposit&                                         deposit,
+    const DirEntry&                                        lhs,
+    const DirEntry&                                        rhs) noexcept
   {
     using ChildIndex = typename Deposit::size_type;
-    using DirNode    = typename DirEntry::Node;
-    using DirKey     = typename DirNode::DirKey;
-    using Result     = ChildAssignment<ChildIndex, DirKey>;
+    using Result     = ChildAssignment<ChildIndex>;
     using Preference = Volume;
 
     Preference best_preference{0};
-    Result     best{deposit.size(), DirKey{}, Volume{}, Side::left};
+    Result     best{deposit.size(), Box{}, Volume{}, Side::left};
 
     for (ChildIndex i = 0; i < deposit.size(); ++i) {
       auto chooser = make_side_chooser<Ops>(seeds,
