@@ -1,6 +1,5 @@
-spaix (0.0.1) unstable; urgency=medium
+spaix (0.0.2) unstable; urgency=medium
 
   * Initial release
 
- -- David Robillard <d@drobilla.net>  Fri, 17 Apr 2026 02:32:41 +0000
-
+ -- David Robillard <d@drobilla.net>  Thu, 18 Jun 2026 00:57:12 +0000
