@@ -6,6 +6,7 @@
 #include <spaix/LinearInsertion.hpp> // IWYU pragma: keep
 #include <spaix/LinearSplit.hpp>     // IWYU pragma: keep
 #include <spaix/QuadraticSplit.hpp>  // IWYU pragma: keep
+#include <spaix/Queries.hpp>
 #include <spaix/RTree.hpp>
 
 #include <glm/ext/vector_float2.hpp>
@@ -101,8 +102,11 @@ private:
   glm::vec4 _vec;
 };
 
-struct Queries {
-  static constexpr bool contains(const Rect& parent, const Point& child)
+struct Comparisons {
+  using Box = Rect;
+
+  [[nodiscard]] static constexpr bool contains(const Rect&  parent,
+                                               const Point& child)
   {
     return (child.x() >= parent.left() && child.x() <= parent.right()) &&
            (child.y() >= parent.top() && child.y() <= parent.bottom());
@@ -121,27 +125,9 @@ struct Queries {
     return rhs.left() <= lhs.right() && lhs.left() <= rhs.right() &&
            rhs.top() <= lhs.bottom() && lhs.top() <= rhs.bottom();
   }
-
-  struct Contained {
-    explicit Contained(Rect key)
-      : _query_key{key}
-    {}
-
-    [[nodiscard]] constexpr bool directory(const Rect& k) const
-    {
-      return intersects(_query_key, k);
-    }
-
-    template<class DatKey>
-    [[nodiscard]] constexpr bool leaf(const DatKey& k) const
-    {
-      return contains(_query_key, k);
-    }
-
-  private:
-    Rect _query_key;
-  };
 };
+
+using Queries = spaix::Queries<Comparisons>;
 
 struct Ops {
   using Scalar = float;
@@ -231,7 +217,7 @@ test_empty_tree(const Tree& tree, const unsigned span)
   CHECK(!(everything == Rect{}));
   CHECK(tree.empty());
   CHECK(tree.begin() == tree.end());
-  CHECK(tree.query(Queries::Contained{everything}).empty());
+  CHECK(tree.query(Queries::everything()).empty());
 }
 
 template<class Tree>
@@ -312,7 +298,7 @@ test_tree(const unsigned span, const unsigned n_queries)
   const auto mid = static_cast<float>(span) / 2.0f;
   const auto no_matches_query =
     Rect{mid + 0.1f, mid + 0.1f, mid + 0.9f, mid + 0.9f};
-  for (const auto& node : tree.query(Queries::Contained{no_matches_query})) {
+  for (const auto& node : tree.query(Queries::within(no_matches_query))) {
     ++count;
     (void)node;
   }
@@ -339,19 +325,19 @@ test_tree(const unsigned span, const unsigned n_queries)
     const auto expected_count = num_items_in_area<Key>(x_span, y_span);
 
     const auto verify = [&](const auto& node) {
-      CHECK((Queries::contains(query, node.first)));
-      CHECK((Queries::contains(tree.bounds(), node.first)));
+      CHECK((Comparisons::contains(query, node.first)));
+      CHECK((Comparisons::contains(tree.bounds(), node.first)));
       ++count;
     };
 
     // Visitor query
     count = 0;
-    tree.visit_matches(Queries::Contained{query}, verify);
+    tree.visit_matches(Queries::within(query), verify);
     CHECK((count == expected_count));
 
     // Incremental query
     count = 0;
-    for (const auto& node : tree.query(Queries::Contained{query})) {
+    for (const auto& node : tree.query(Queries::within(query))) {
       verify(node);
     }
     CHECK((count == expected_count));
