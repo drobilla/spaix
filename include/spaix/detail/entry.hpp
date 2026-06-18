@@ -7,6 +7,7 @@
 #include <spaix/DataNode.hpp>
 
 #include <memory>
+#include <type_traits>
 
 namespace spaix::detail {
 
@@ -47,6 +48,10 @@ entry_key(std::unique_ptr<DataNode<Key, Data>>& entry) noexcept
 {
   return entry->first;
 }
+
+template<class Entry>
+using EntryKey =
+  std::remove_reference_t<decltype(detail::entry_key(std::declval<Entry>()))>;
 
 template<class Key, class Data>
 const auto&

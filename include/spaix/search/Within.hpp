@@ -7,9 +7,14 @@
 #include <type_traits>
 #include <utility>
 
+#include <spaix/concepts.hpp>
+
 namespace spaix::search {
 
-template<typename Comparisons, typename QueryKey>
+template<typename Comps, typename QueryKey>
+#if SPAIX_USE_CONCEPTS
+  requires ChecksIntersects<Comps, QueryKey> && ChecksContains<Comps, QueryKey>
+#endif
 class Within
 {
 public:
@@ -20,13 +25,13 @@ public:
   template<class DirKey>
   [[nodiscard]] constexpr bool directory(const DirKey& k) const noexcept
   {
-    return Comparisons::intersects(_query_key, k);
+    return Comps::intersects(_query_key, k);
   }
 
   template<class DatKey>
   [[nodiscard]] constexpr bool leaf(const DatKey& k) const noexcept
   {
-    return Comparisons::contains(_query_key, k);
+    return Comps::contains(_query_key, k);
   }
 
 private:

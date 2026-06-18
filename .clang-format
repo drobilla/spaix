@@ -7,6 +7,7 @@ AlignConsecutiveDeclarations: true
 AlignEscapedNewlines: Left
 AttributeMacros:
   - SPAIX_ALWAYS_INLINE
+  - SPAIX_REQUIRES
 BasedOnStyle: Mozilla
 BraceWrapping:
   AfterNamespace: false

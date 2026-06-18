@@ -7,9 +7,14 @@
 #include <type_traits>
 #include <utility>
 
+#include <spaix/concepts.hpp>
+
 namespace spaix::search {
 
-template<typename Comparisons, typename QueryKey>
+template<typename Comps, typename QueryKey>
+#if SPAIX_USE_CONCEPTS
+  requires ChecksIntersects<Comps, QueryKey>
+#endif
 class Exactly
 {
 public:
@@ -20,7 +25,7 @@ public:
   template<class DirKey>
   [[nodiscard]] constexpr bool directory(const DirKey& k) const noexcept
   {
-    return Comparisons::intersects(k, _query_key);
+    return Comps::intersects(k, _query_key);
   }
 
   template<class DatKey>

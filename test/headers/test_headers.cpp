@@ -17,6 +17,7 @@
 #include <spaix/SplitSeeds.hpp>              // IWYU pragma: keep
 #include <spaix/StaticVector.hpp>            // IWYU pragma: keep
 #include <spaix/TreeRange.hpp>               // IWYU pragma: keep
+#include <spaix/concepts.hpp>                // IWYU pragma: keep
 #include <spaix/detail/DatEntryType.hpp>     // IWYU pragma: keep
 #include <spaix/detail/DirectoryNode.hpp>    // IWYU pragma: keep
 #include <spaix/detail/Index.hpp>            // IWYU pragma: keep

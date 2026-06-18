@@ -4,6 +4,7 @@
 #ifndef SPAIX_SIDECHOOSER_HPP
 #define SPAIX_SIDECHOOSER_HPP
 
+#include <spaix/concepts.hpp>
 #include <spaix/types.hpp>
 
 namespace spaix {
@@ -12,6 +13,9 @@ template<class ChildIndex, class Volume>
 struct SplitSeeds;
 
 template<typename Ops, class ChildKey, class ChildCount>
+#if SPAIX_USE_CONCEPTS
+  requires MeasuresVolume<Ops> && Unifies<Ops, ChildKey>
+#endif
 class SideChooser
 {
   using Box    = typename Ops::Box;

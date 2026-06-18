@@ -7,6 +7,7 @@
 #include <spaix/SideChooser.hpp>
 #include <spaix/SplitParts.hpp>
 #include <spaix/SplitSeeds.hpp>
+#include <spaix/concepts.hpp>
 #include <spaix/detail/EntryTracker.hpp>
 #include <spaix/detail/Index.hpp>
 #include <spaix/detail/distribute.hpp>
@@ -28,6 +29,9 @@ namespace spaix {
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
 template<typename Ops, size_t n_dimensions>
+#if SPAIX_USE_CONCEPTS
+  requires MeasuresVolume<Ops>
+#endif
 class LinearSplit
 {
 public:
@@ -37,6 +41,9 @@ public:
   template<class Entries>
   SplitSeeds<typename Entries::size_type, Volume> pick_seeds(
     const Entries& deposit) noexcept
+#if SPAIX_USE_CONCEPTS
+    requires MeasuresSpan<Ops, detail::EntryKey<typename Entries::value_type>>
+#endif
   {
     using std::max;
     using std::min;

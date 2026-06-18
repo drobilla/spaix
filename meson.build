@@ -44,6 +44,7 @@ headers = {
     'include/spaix/StaticVector.hpp',
     'include/spaix/StaticVectorView.hpp',
     'include/spaix/TreeRange.hpp',
+    'include/spaix/concepts.hpp',
     'include/spaix/types.hpp',
   ),
   'detail': files(

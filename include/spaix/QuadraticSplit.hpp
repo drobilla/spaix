@@ -7,6 +7,7 @@
 #include <spaix/SideChooser.hpp>
 #include <spaix/SplitSeeds.hpp>
 #include <spaix/StaticVector.hpp>
+#include <spaix/concepts.hpp>
 #include <spaix/detail/EntryTracker.hpp>
 #include <spaix/detail/distribute.hpp>
 #include <spaix/detail/entry.hpp>
@@ -25,6 +26,9 @@ namespace spaix {
    From "R-trees: A dynamic index structure for spatial searching", A. Guttman.
 */
 template<typename Ops>
+#if SPAIX_USE_CONCEPTS
+  requires MeasuresVolume<Ops>
+#endif
 class QuadraticSplit
 {
   using Box    = typename Ops::Box;
@@ -35,6 +39,9 @@ public:
   template<class Entry, class ChildCount, ChildCount count>
   SplitSeeds<ChildCount, Volume> pick_seeds(
     const StaticVector<Entry, ChildCount, count>& deposit) noexcept
+#if SPAIX_USE_CONCEPTS
+    requires Unifies<Ops, detail::EntryKey<Entry>>
+#endif
   {
     using ChildIndex = ChildCount;
 
